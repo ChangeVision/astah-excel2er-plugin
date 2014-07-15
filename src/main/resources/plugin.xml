@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension point="com.change_vision.astah.ui.actionSets">
+      <actionSet
+            label="%action_set_label"
+            visible="true"
+            id="com.change_vision.astah.excel2er.actionSet">
+         <menu
+               id="excel2er"
+               label="%menu_group"
+               path="tool/excel2er">
+         </menu>
+         <action
+			   label="%menu_label"
+               icon="icons/sample.gif"
+               class="excel2er.TemplateAction"
+               tooltip="%menu_tooltip"
+               menubarPath="tool/excel2er/"
+               id="excel2er">
+         </action>
+     </actionSet>
+   </extension>
+</plugin>

@@ -26,10 +26,11 @@ public class ParserUtilsTest {
 			ParserUtils.getWorkbook(conf);
 			fail();
 		} catch (ApplicationException e) {
-			assertThat(e.getMessage(),is(Messages.getMessage("error.file_notfound")));
+			assertThat(e.getMessage(),
+					is(Messages.getMessage("error.file_notfound")));
 		}
 	}
-	
+
 	@Test
 	public void should_error_occur_when_invalid_format_file() throws Exception {
 		Configuration conf = new Configuration();
@@ -39,49 +40,57 @@ public class ParserUtilsTest {
 			ParserUtils.getWorkbook(conf);
 			fail();
 		} catch (ApplicationException e) {
-			assertThat(ExceptionUtils.indexOfThrowable(e,POIXMLException.class) > 0,is(true));
+			assertThat(
+					ExceptionUtils.indexOfThrowable(e, POIXMLException.class) > 0,
+					is(true));
 		}
-	}
-	
-	@Test
-	public void should_get_workspace_when_load_xls_excel_file() throws Exception {
-		Configuration conf = new Configuration();
-		conf.setInputFilePath(getWorkspaceFilePath("oldstyle.xls"));
-		
-		Workbook workbook = ParserUtils.getWorkbook(conf);
-		
-		assertThat(workbook.getSheetName(0),is("Domain List"));
 	}
 
 	@Test
-	public void should_get_workspace_when_load_xlsx_excel_file() throws Exception {
+	public void should_get_workspace_when_load_xls_excel_file()
+			throws Exception {
+		Configuration conf = new Configuration();
+		conf.setInputFilePath(getWorkspaceFilePath("oldstyle.xls"));
+
+		Workbook workbook = ParserUtils.getWorkbook(conf);
+
+		assertThat(workbook.getSheetName(0), is("Domain List"));
+	}
+
+	@Test
+	public void should_get_workspace_when_load_xlsx_excel_file()
+			throws Exception {
 		Configuration conf = new Configuration();
 		conf.setInputFilePath(getWorkspaceFilePath("newstyle.xlsx"));
-		
+
 		Workbook workbook = ParserUtils.getWorkbook(conf);
-		
-		assertThat(workbook.getSheetName(0),is("Sheet1"));
+
+		assertThat(workbook.getSheetName(0), is("Sheet1"));
 	}
-	
+
 	@Test
 	public void should_get_value_from_stringtype_cell() throws Exception {
 		Configuration conf = new Configuration();
 		conf.setInputFilePath(getWorkspaceFilePath("cellvalues.xls"));
-		
+
 		Workbook wb = ParserUtils.getWorkbook(conf);
 		Sheet sheet = wb.getSheetAt(0);
-		
-		assertThat(ParserUtils.getCellValue(sheet, 1, "A"),is("abc"));
-		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 2, "1")),is(123.d));
-		assertThat(Boolean.valueOf(ParserUtils.getCellValue(sheet, 3, "1")),is(true));
-		assertThat(ParserUtils.getCellValue(sheet, 4, "A"),is("-"));
-		assertThat(ParserUtils.getCellValue(sheet, 5, "A"),is("✓"));
-		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 6, "A")),is(6.d));
-		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 7, "A")),is(123.d));
-		assertThat(ParserUtils.getCellValue(sheet, 8, "A"),is("日本語"));
+
+		assertThat(ParserUtils.getCellValue(sheet, 1, "A"), is("abc"));
+		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 2, "1")),
+				is(123.d));
+		assertThat(Boolean.valueOf(ParserUtils.getCellValue(sheet, 3, "1")),
+				is(true));
+		assertThat(ParserUtils.getCellValue(sheet, 4, "A"), is("-"));
+		assertThat(ParserUtils.getCellValue(sheet, 5, "A"), is("✓"));
+		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 6, "A")),
+				is(6.d));
+		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 7, "A")),
+				is(123.d));
+		assertThat(ParserUtils.getCellValue(sheet, 8, "A"), is("日本語"));
 	}
-	
-	private String getWorkspaceFilePath(String filename){
+
+	private String getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename).getFile();
 	}
 }

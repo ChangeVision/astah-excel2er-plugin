@@ -5,8 +5,8 @@
 		<bundle.symbolicName>com.change_vision.astah.excel2er</bundle.symbolicName>
 		<bundle.namespace>excel2er</bundle.namespace>
 		<plugin.install>true</plugin.install>
-		<astah.version>6.7</astah.version>
-		<astah.edition>all</astah.edition>
+		<astah.version>6.8</astah.version>
+		<astah.edition>pro</astah.edition>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.change_vision.astah</groupId>
@@ -288,6 +288,22 @@
 			<version>3.10-FINAL</version>
 		</dependency>
 		<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.10-FINAL</version>
@@ -298,6 +314,13 @@
 			<version>${astah.version}</version>
 			<scope>system</scope>
 			<systemPath>${astahPath}/astah-api.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.change_vision.astah</groupId>
+			<artifactId>astah-pro</artifactId>
+			<version>${astah.version}</version>
+			<scope>system</scope>
+			<systemPath>${astahPath}/astah-pro.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>

@@ -1,0 +1,37 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d [%t] %C{0} &lt;%level&gt; - %m%n\tat
+                %c.%M\(%c{0}.java:%L\)%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${user.home}/.astah/${astah.edition}/excel2er.log</File>
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${user.home}/.astah/${astah.edition}/.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>3MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <Pattern>%d [%t] %C &lt;%level&gt; - %m%n</Pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="TRACE">
+        <logger name="com.change_vision" level="${rootLevel:-OFF}">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="FILE" />
+        </logger>
+    </root>
+
+</configuration>

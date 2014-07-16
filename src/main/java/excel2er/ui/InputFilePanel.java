@@ -29,7 +29,8 @@ public class InputFilePanel extends JPanel {
 		setName(NAME);
 		setLayout(new GridBagLayout());
 		setAlignmentX(Component.LEFT_ALIGNMENT);
-		setBorder(BorderFactory.createTitledBorder(Messages.getMessage("explain_input_file")));
+		setBorder(BorderFactory.createTitledBorder(Messages
+				.getMessage("explain_input_file")));
 		createContents();
 		setVisible(true);
 	}
@@ -41,7 +42,7 @@ public class InputFilePanel extends JPanel {
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.insets = new Insets(2, 10, 0, 10);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		add(new Empty(), gbc);
@@ -83,10 +84,12 @@ public class InputFilePanel extends JPanel {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					JFileChooser chooser = new JFileChooser();
-					chooser.setDialogTitle(Messages.getMessage("explain_input_file"));
+					chooser.setDialogTitle(Messages
+							.getMessage("explain_input_file"));
 					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					chooser.setAcceptAllFileFilterUsed(false);
-					chooser.addChoosableFileFilter(new FileNameExtensionFilter("Excel File(xls,xlsx)", "xls", "xlsx"));
+					chooser.addChoosableFileFilter(new FileNameExtensionFilter(
+							"Excel File(xls,xlsx)", "xls", "xlsx"));
 					int option = chooser.showOpenDialog(InputFilePanel.this);
 					if (JFileChooser.APPROVE_OPTION == option) {
 						File file = chooser.getSelectedFile();
@@ -96,7 +99,6 @@ public class InputFilePanel extends JPanel {
 			});
 		}
 	}
-
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("OutputDirectoryPanelTest");
@@ -111,6 +113,5 @@ public class InputFilePanel extends JPanel {
 	public String getInputFilePath() {
 		return inputFileText.getText();
 	}
-
 
 }

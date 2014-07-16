@@ -10,8 +10,9 @@ public class Messages implements IMessageProvider {
 
 	public static final String DEFAULT_BUNDLE = "excel2er.messages";
 
-	private static ResourceBundle INTERNAL_MESSAGES = ResourceBundle.getBundle(DEFAULT_BUNDLE,
-			Locale.getDefault(), Messages.class.getClassLoader());
+	private static ResourceBundle INTERNAL_MESSAGES = ResourceBundle.getBundle(
+			DEFAULT_BUNDLE, Locale.getDefault(),
+			Messages.class.getClassLoader());
 
 	Messages() {
 

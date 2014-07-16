@@ -89,7 +89,7 @@ public class AttributeParserTest {
 	@Test
 	public void should_set_notnull() throws Exception {
 		Configuration conf = createConf("entityListModel.xls", "9", "B");
-		conf.setNotNullCol("16");//P
+		conf.setNotNullCol("16");// P
 		List<Attribute> attrs = parse(conf, "CustomerSheet");
 
 		assertThat(attrs.size(), is(6));
@@ -130,7 +130,7 @@ public class AttributeParserTest {
 		assertThat("Address", attrs.get(4).getLength(), is("200"));
 		assertThat("Telephone", attrs.get(5).getLength(), is("20"));
 	}
-	
+
 	@Test
 	public void should_set_defaultvalue() throws Exception {
 		Configuration conf = createConf("entityListModel.xls", "9", "B");
@@ -138,14 +138,15 @@ public class AttributeParserTest {
 		List<Attribute> attrs = parse(conf, "CustomerSheet");
 
 		assertThat(attrs.size(), is(6));
-		assertThat("CustomerID", attrs.get(0).getDefaultValue(), is(nullValue()));
+		assertThat("CustomerID", attrs.get(0).getDefaultValue(),
+				is(nullValue()));
 		assertThat("Name", attrs.get(1).getDefaultValue(), is("a"));
 		assertThat("Mail", attrs.get(2).getDefaultValue(), is(nullValue()));
 		assertThat("ZipCode", attrs.get(3).getDefaultValue(), is("b"));
 		assertThat("Address", attrs.get(4).getDefaultValue(), is("c"));
 		assertThat("Telephone", attrs.get(5).getDefaultValue(), is("d"));
 	}
-	
+
 	@Test
 	public void should_set_definition() throws Exception {
 		Configuration conf = createConf("entityListModel.xls", "9", "B");
@@ -160,7 +161,7 @@ public class AttributeParserTest {
 		assertThat("Address", attrs.get(4).getDefinition(), is(nullValue()));
 		assertThat("Telephone", attrs.get(5).getDefinition(), is("bbb"));
 	}
-	
+
 	private String getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename).getFile();
 	}

@@ -43,7 +43,7 @@ public class Attribute {
 		this.physicalName = physicalName;
 	}
 
-	public void setPrimaryKey(boolean isPrimaryKey) {		
+	public void setPrimaryKey(boolean isPrimaryKey) {
 		this.isPrimaryKey = isPrimaryKey;
 	}
 

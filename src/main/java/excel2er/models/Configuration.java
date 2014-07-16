@@ -157,31 +157,38 @@ public class Configuration {
 	}
 
 	/**
-	 * validate input value.
-	 * this function check only row item.because reference of column use character or index.
+	 * validate input value. this function check only row item.because reference
+	 * of column use character or index.
+	 * 
 	 * @return errors
 	 */
-	public List<ValidationError> validate(){
+	public List<ValidationError> validate() {
 		List<ValidationError> errors = new ArrayList<ValidationError>();
-		
-		if(!useSheetName && !advanceSetting){
-			throw new IllegalArgumentException("useSheetName or advanceSetting must true");
+
+		if (!useSheetName && !advanceSetting) {
+			throw new IllegalArgumentException(
+					"useSheetName or advanceSetting must true");
 		}
-		
-		//for entity
-		validateDigit(errors,getEntityLogicalRow(),"explain_entity","entity.logicalname.row");
-		validateDigit(errors,getEntityPhysicalRow(),"explain_entity","entity.physicalname.row");
-		
-		//for attribute
-		validateDigit(errors,getStartRow(),"explain_attribute","start_row");
-		
+
+		// for entity
+		validateDigit(errors, getEntityLogicalRow(), "explain_entity",
+				"entity.logicalname.row");
+		validateDigit(errors, getEntityPhysicalRow(), "explain_entity",
+				"entity.physicalname.row");
+
+		// for attribute
+		validateDigit(errors, getStartRow(), "explain_attribute", "start_row");
+
 		return errors;
 	}
-	
-	
-	private void validateDigit(List<ValidationError> errors, String value, String key, String subkey) {
-		if(!StringUtils.isEmpty(value) && !NumberUtils.isDigits(value)){
-			String message =  Messages.getMessage("error.not.digit", Messages.getMessage(key) + " - " + Messages.getMessage(subkey));
+
+	private void validateDigit(List<ValidationError> errors, String value,
+			String key, String subkey) {
+		if (!StringUtils.isEmpty(value) && !NumberUtils.isDigits(value)) {
+			String message = Messages.getMessage(
+					"error.not.digit",
+					Messages.getMessage(key) + " - "
+							+ Messages.getMessage(subkey));
 			errors.add(new ValidationError(message));
 		}
 	}

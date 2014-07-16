@@ -50,21 +50,21 @@ public class ParserUtils {
 	}
 
 	public static String getCellValue(Sheet sheet, int refRow, String refCol) {
-		if(refRow < 0 || refCol == null)
+		if (refRow < 0 || refCol == null)
 			return null;
-		
+
 		Row row = sheet.getRow(refRow - POI_OFFSET_START_INDEX);
-		if(row == null){
+		if (row == null) {
 			return null;
 		}
-		
+
 		Cell cell = null;
 		if (NumberUtils.isDigits(refCol)) {
 			cell = row.getCell(NumberUtils.toInt(refCol)
 					- POI_OFFSET_START_INDEX);
 		} else {
 			CellReference ref = new CellReference(refCol);
-			if(ref != null){
+			if (ref != null) {
 				cell = row.getCell(ref.getCol());
 			}
 		}

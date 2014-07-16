@@ -23,7 +23,7 @@ public class InputFilePanelTest {
 
 	@Before
 	public void setUp() throws Exception {
-		
+
 		JFrame frame = new JFrame();
 		frameFixture = new FrameFixture(frame);
 		InputFilePanel target = new InputFilePanel();
@@ -33,39 +33,48 @@ public class InputFilePanelTest {
 		frameFixture.show();
 		frameFixture.focus();
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
-		if(frameFixture != null)
+		if (frameFixture != null)
 			frameFixture.cleanUp();
 	}
-	
+
 	@Test
-	public void should_text_display_filepath_where_approve_by_filechooser() throws Exception {
+	public void should_text_display_filepath_where_approve_by_filechooser()
+			throws Exception {
 		panelFixture.button(InputFilePanel.ReferenceButton.NAME).click();
 
-		String expectedFilePath = this.getClass().getResource("entityListModel.xls").getFile();
+		String expectedFilePath = this.getClass()
+				.getResource("entityListModel.xls").getFile();
 
 		panelFixture.fileChooser().requireEnabled();
 		panelFixture.fileChooser().selectFile(new File(expectedFilePath));
 		panelFixture.fileChooser().approve();
 
-		assertThat(panelFixture.textBox().text(),is(expectedFilePath));
+		assertThat(panelFixture.textBox().text(), is(expectedFilePath));
 	}
-	
+
 	@Test
 	public void should_accept_only_excelfile() throws Exception {
 		panelFixture.button(InputFilePanel.ReferenceButton.NAME).click();
-		
-		File file = new File(this.getClass().getResource("entityListModel.xls").getFile());
-		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(true));
-		
+
+		File file = new File(this.getClass().getResource("entityListModel.xls")
+				.getFile());
+		assertThat(
+				panelFixture.fileChooser().target.getFileFilter().accept(file),
+				is(true));
+
 		file = new File(this.getClass().getResource("test.xlsx").getFile());
-		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(true));
-		
+		assertThat(
+				panelFixture.fileChooser().target.getFileFilter().accept(file),
+				is(true));
+
 		file = new File(this.getClass().getResource("test.docx").getFile());
-		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(false));
+		assertThat(
+				panelFixture.fileChooser().target.getFileFilter().accept(file),
+				is(false));
 
 	}
-	
+
 }

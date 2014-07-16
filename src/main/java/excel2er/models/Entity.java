@@ -16,7 +16,7 @@ public class Entity {
 	public Entity() {
 		attrs = new ArrayList<Attribute>();
 	}
-	
+
 	public String getEntityLogicalName() {
 		return entityLogicalName;
 	}

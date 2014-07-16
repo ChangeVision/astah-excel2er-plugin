@@ -1,6 +1,5 @@
 package excel2er;
 
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -11,5 +10,5 @@ public class Activator implements BundleActivator {
 
 	public void stop(BundleContext context) {
 	}
-	
+
 }

@@ -19,8 +19,8 @@ public class ApplicationException extends RuntimeException {
 		super(message, cause);
 	}
 
-	public ApplicationException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
+	public ApplicationException(String message, Throwable cause,
+			boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 

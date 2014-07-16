@@ -15,26 +15,29 @@ public class ImportExcelToERModelAction implements IPluginActionDelegate {
 
 	public Object run(IWindow window) throws UnExpectedException {
 		try {
-			
+
 			checkOpenProject();
-			
+
 			JFrame frame = (JFrame) window.getParent();
 			ImportDialog dialog = new ImportDialog(frame);
 			dialog.setVisible(true);
-			
-		} catch(ProjectNotFoundException e){
-			JOptionPane.showMessageDialog(window.getParent(), Messages.getMessage("error.project.not.found"),
-					"Warn", JOptionPane.ERROR_MESSAGE);
+
+		} catch (ProjectNotFoundException e) {
+			JOptionPane.showMessageDialog(window.getParent(),
+					Messages.getMessage("error.project.not.found"), "Warn",
+					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(window.getParent(), "Unexpected error has occurred.",
-					"Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(window.getParent(),
+					"Unexpected error has occurred.", "Alert",
+					JOptionPane.ERROR_MESSAGE);
 			throw new UnExpectedException();
 		}
 		return null;
 	}
 
-	private void checkOpenProject() throws ClassNotFoundException, ProjectNotFoundException {
-		AstahAPI.getAstahAPI().getProjectAccessor().getProject();		
+	private void checkOpenProject() throws ClassNotFoundException,
+			ProjectNotFoundException {
+		AstahAPI.getAstahAPI().getProjectAccessor().getProject();
 	}
 
 }

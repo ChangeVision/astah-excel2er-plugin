@@ -8,9 +8,8 @@ import excel2er.models.Entity;
 
 public class EntityParser {
 
-	public Entity parse(Configuration configuration,
-			Sheet sheet) {
-		
+	public Entity parse(Configuration configuration, Sheet sheet) {
+
 		Entity entity = new Entity();
 		if (configuration.isUseSheetName()) {
 			entity.setEntityLogicalName(sheet.getSheetName());
@@ -25,7 +24,7 @@ public class EntityParser {
 		return entity;
 	}
 
-	private int toInt(String value){
+	private int toInt(String value) {
 		return NumberUtils.toInt(value);
 	}
 }

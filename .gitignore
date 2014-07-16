@@ -6,3 +6,4 @@ failed-gui-tests
 *.bak
 *.lock
 build
+*.~lock

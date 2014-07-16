@@ -16,7 +16,7 @@ import excel2er.Messages;
 import excel2er.models.Configuration;
 import excel2er.services.ImportService;
 
-public class ImportDialog extends JDialog{
+public class ImportDialog extends JDialog {
 
 	private static final long serialVersionUID = 8758963086319476079L;
 	private InputFilePanel inputFilePanel;
@@ -27,23 +27,23 @@ public class ImportDialog extends JDialog{
 	private static int WIDTH = 510;
 	private static int HEIGHT = 140;
 	protected static final int GAP = 1;
-	
+
 	public ImportDialog(JFrame window) {
-		super(window,true);
+		super(window, true);
 		setName(NAME);
 		setTitle(Messages.getMessage("dialog.title"));
 		createContents();
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(window);
 	}
-	
-	
+
 	private void createContents() {
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		getContentPane().setLayout(
+				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		createMainContent();
 
 		createSouthContent();
-        getRootPane().setDefaultButton(generateButton);
+		getRootPane().setDefaultButton(generateButton);
 	}
 
 	private void createMainContent() {
@@ -57,7 +57,7 @@ public class ImportDialog extends JDialog{
 		gbc.gridy = 1;
 		entityPanel = new EntityPanel(this);
 		mainContentPanel.add(entityPanel, gbc);
-		
+
 		gbc.gridy = 2;
 		attributePanel = new ERAttributePanel();
 		mainContentPanel.add(attributePanel, gbc);
@@ -73,7 +73,7 @@ public class ImportDialog extends JDialog{
 		ImportService service = new ImportService();
 		service.execute(this.getConfiguration());
 	}
-	
+
 	private void createSouthContent() {
 		JPanel sourthContentPanel = new JPanel(new GridLayout(1, 2, GAP, GAP));
 		generateButton = new GenerateButton(new ActionListener() {
@@ -111,7 +111,7 @@ public class ImportDialog extends JDialog{
 			addActionListener(listener);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Test");
 		ImportDialog p = new ImportDialog(frame);
@@ -119,11 +119,11 @@ public class ImportDialog extends JDialog{
 		p.setVisible(true);
 	}
 
-	public Configuration getConfiguration(){
+	public Configuration getConfiguration() {
 		checkConfiguration();
-		
+
 		Configuration information = new Configuration();
-		
+
 		information.setInputFilePath(inputFilePanel.getInputFilePath());
 		information.setUseSheetName(entityPanel.isUseSheetName());
 		information.setAdvanceSetting(entityPanel.isAdvanceSetting());
@@ -140,11 +140,11 @@ public class ImportDialog extends JDialog{
 		information.setDataTypeCol(attributePanel.getDataTypeCol());
 		information.setLengthCol(attributePanel.getLengthCol());
 		information.setDefinitionCol(attributePanel.getDefinitionCol());
-		
+
 		return information;
 	}
-	
-	private void checkConfiguration(){
+
+	private void checkConfiguration() {
 		entityPanel.checkInputValue();
 		attributePanel.validate();
 	}

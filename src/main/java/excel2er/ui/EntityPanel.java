@@ -39,20 +39,21 @@ public class EntityPanel extends JPanel {
 		GridBagLayout manager = new GridBagLayout();
 		setLayout(manager);
 		setAlignmentX(Component.LEFT_ALIGNMENT);
-		setBorder(BorderFactory.createTitledBorder(Messages.getMessage("explain_entity")));
+		setBorder(BorderFactory.createTitledBorder(Messages
+				.getMessage("explain_entity")));
 		createContents();
 		createAdvanceTab();
 		setVisible(true);
 	}
 
-	private void createAdvanceTab(){
+	private void createAdvanceTab() {
 		JPanel advance = new JPanel();
 		GridBagLayout manager = new GridBagLayout();
 		advance.setLayout(manager);
-		
+
 		Insets def = new Insets(2, 2, 0, 2);
-		Insets label = new Insets(2,2,0,14);
-		
+		Insets label = new Insets(2, 2, 0, 14);
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
@@ -60,24 +61,28 @@ public class EntityPanel extends JPanel {
 		gbc.insets = label;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = GridBagConstraints.RELATIVE;
-		
+
 		advance.add(new JLabel(Messages.getMessage("entity.logicalname")), gbc);
 		gbc.insets = def;
 		advance.add(new JLabel(Messages.getMessage("row")), gbc);
-		advance.add(logicalrow = new AdvanceElementRowCol(AdvanceElementRowCol.LOGICAL_ROW), gbc);
+		advance.add(logicalrow = new AdvanceElementRowCol(
+				AdvanceElementRowCol.LOGICAL_ROW), gbc);
 		advance.add(new JLabel(Messages.getMessage("col")), gbc);
-		advance.add(logicalcol = new AdvanceElementRowCol(AdvanceElementRowCol.LOGICAL_COL), gbc);
+		advance.add(logicalcol = new AdvanceElementRowCol(
+				AdvanceElementRowCol.LOGICAL_COL), gbc);
 
 		gbc.gridy = 1;
 		advance.add(new JLabel(Messages.getMessage("entity.physicalname")), gbc);
 		advance.add(new JLabel(Messages.getMessage("row")), gbc);
-		advance.add(physicalrow = new AdvanceElementRowCol(AdvanceElementRowCol.PHYSICAL_ROW), gbc);
+		advance.add(physicalrow = new AdvanceElementRowCol(
+				AdvanceElementRowCol.PHYSICAL_ROW), gbc);
 		advance.add(new JLabel(Messages.getMessage("col")), gbc);
-		advance.add(physicalcol = new AdvanceElementRowCol(AdvanceElementRowCol.PHYSICAL_COL), gbc);
+		advance.add(physicalcol = new AdvanceElementRowCol(
+				AdvanceElementRowCol.PHYSICAL_COL), gbc);
 
 		setTarget(advance);
 	}
-	
+
 	private void createContents() {
 		new SelectionArea();
 
@@ -88,7 +93,7 @@ public class EntityPanel extends JPanel {
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.insets = new Insets(2, 10, 0, 10);
-		
+
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -108,21 +113,21 @@ public class EntityPanel extends JPanel {
 		return useSheetNameButton.isSelected();
 	}
 
-	class AdvanceElementRowCol extends JTextField{
-		
+	class AdvanceElementRowCol extends JTextField {
+
 		private static final long serialVersionUID = 1L;
 		static final String PHYSICAL_ROW = "physical_row";
 		static final String PHYSICAL_COL = "physical_col";
 		static final String LOGICAL_ROW = "logical_row";
 		static final String LOGICAL_COL = "logical_col";
-		
-		AdvanceElementRowCol(String name){
+
+		AdvanceElementRowCol(String name) {
 			setName(name);
 			setColumns(2);
 		}
-		
+
 	}
-	
+
 	class SelectionArea extends ButtonGroup {
 
 		private static final long serialVersionUID = -4630277115815049856L;
@@ -194,15 +199,15 @@ public class EntityPanel extends JPanel {
 			dialog.pack();
 		}
 	}
-	
+
 	public Boolean isUseSheetName() {
 		return useSheetNameButton.isSelected();
 	}
-	
+
 	public Boolean isAdvanceSetting() {
 		return advanceSettingButton.isSelected();
 	}
-	
+
 	public String getLogicalRow() {
 		return logicalrow.getText();
 	}
@@ -231,17 +236,19 @@ public class EntityPanel extends JPanel {
 	}
 
 	public void checkInputValue() {
-		isDigit(getLogicalRow(),Messages.getMessage("entity.logicalname") + " " + Messages.getMessage("row"));
-		isDigit(getLogicalCol(),Messages.getMessage("entity.logicalname") + " " + Messages.getMessage("col"));
-		isDigit(getPhysicalRow(),Messages.getMessage("entity.physicalname") + " " + Messages.getMessage("row"));
-		isDigit(getPhysicalRow(),Messages.getMessage("entity.physicalname") + " " + Messages.getMessage("col"));
+		isDigit(getLogicalRow(), Messages.getMessage("entity.logicalname")
+				+ " " + Messages.getMessage("row"));
+		isDigit(getLogicalCol(), Messages.getMessage("entity.logicalname")
+				+ " " + Messages.getMessage("col"));
+		isDigit(getPhysicalRow(), Messages.getMessage("entity.physicalname")
+				+ " " + Messages.getMessage("row"));
+		isDigit(getPhysicalRow(), Messages.getMessage("entity.physicalname")
+				+ " " + Messages.getMessage("col"));
 	}
 
 	private void isDigit(String value, String message) {
-		if(!NumberUtils.isDigits(value))
+		if (!NumberUtils.isDigits(value))
 			throw new NumberFormatException(message);
 	}
-
-
 
 }

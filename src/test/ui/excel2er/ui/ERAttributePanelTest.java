@@ -63,7 +63,7 @@ public class ERAttributePanelTest {
 		
 		assertThat(((ERAttributePanel)panelFixture.target).getLogicalCol(),is("1"));
 		assertThat(((ERAttributePanel)panelFixture.target).getPhysicalCol(),is("2"));
-		assertThat(((ERAttributePanel)panelFixture.target).getPrimaryKey(),is("3"));
+		assertThat(((ERAttributePanel)panelFixture.target).getPrimaryKeyCol(),is("3"));
 		assertThat(((ERAttributePanel)panelFixture.target).getNotNullCol(),is("4"));
 		assertThat(((ERAttributePanel)panelFixture.target).getDefaultValueCol(),is("5"));
 		assertThat(((ERAttributePanel)panelFixture.target).getDataTypeCol(),is("6"));

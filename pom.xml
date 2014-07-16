@@ -283,6 +283,16 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.10-FINAL</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.10-FINAL</version>
+		</dependency>
+		<dependency>
 			<groupId>com.change_vision.astah</groupId>
 			<artifactId>astah-api</artifactId>
 			<version>${astah.version}</version>

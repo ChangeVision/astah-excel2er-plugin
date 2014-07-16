@@ -160,7 +160,7 @@ public class ERAttributePanel extends JPanel {
 	}
 
 
-	public String getPrimaryKey() {
+	public String getPrimaryKeyCol() {
 		return primaryKeyCol.getText();
 	}
 
@@ -188,4 +188,5 @@ public class ERAttributePanel extends JPanel {
 	public String getDefinitionCol() {
 		return definitionCol.getText();
 	}
+
 }

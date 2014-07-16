@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import excel2er.Messages;
 
 public class EntityPanel extends JPanel {
@@ -226,6 +228,18 @@ public class EntityPanel extends JPanel {
 		frame.setSize(800, 600);
 		dialog.pack();
 		dialog.setVisible(true);
+	}
+
+	public void checkInputValue() {
+		isDigit(getLogicalRow(),Messages.getMessage("entity.logicalname") + " " + Messages.getMessage("row"));
+		isDigit(getLogicalCol(),Messages.getMessage("entity.logicalname") + " " + Messages.getMessage("col"));
+		isDigit(getPhysicalRow(),Messages.getMessage("entity.physicalname") + " " + Messages.getMessage("row"));
+		isDigit(getPhysicalRow(),Messages.getMessage("entity.physicalname") + " " + Messages.getMessage("col"));
+	}
+
+	private void isDigit(String value, String message) {
+		if(!NumberUtils.isDigits(value))
+			throw new NumberFormatException(message);
 	}
 
 

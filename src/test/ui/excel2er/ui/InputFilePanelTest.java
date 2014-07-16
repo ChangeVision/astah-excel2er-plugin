@@ -1,7 +1,7 @@
 package excel2er.ui;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
@@ -51,6 +51,21 @@ public class InputFilePanelTest {
 		panelFixture.fileChooser().approve();
 
 		assertThat(panelFixture.textBox().text(),is(expectedFilePath));
+	}
+	
+	@Test
+	public void should_accept_only_excelfile() throws Exception {
+		panelFixture.button(InputFilePanel.ReferenceButton.NAME).click();
+		
+		File file = new File(this.getClass().getResource("entityListModel.xls").getFile());
+		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(true));
+		
+		file = new File(this.getClass().getResource("test.xlsx").getFile());
+		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(true));
+		
+		file = new File(this.getClass().getResource("test.docx").getFile());
+		assertThat(panelFixture.fileChooser().target.getFileFilter().accept(file),is(false));
+
 	}
 	
 }

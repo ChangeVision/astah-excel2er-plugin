@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import excel2er.Messages;
+import excel2er.models.Configuration;
+import excel2er.services.ImportService;
 
 public class ImportDialog extends JDialog{
 
@@ -68,7 +70,8 @@ public class ImportDialog extends JDialog{
 	}
 
 	private void execute() {
-		
+		ImportService service = new ImportService();
+		service.execute(this.getConfiguration());
 	}
 	
 	private void createSouthContent() {
@@ -116,64 +119,33 @@ public class ImportDialog extends JDialog{
 		p.setVisible(true);
 	}
 
-	public String getInputFilePath() {
-		return inputFilePanel.getInputFilePath();
-	}
-
-	public Boolean isUseSheetName() {
-		return entityPanel.isUseSheetName();
-	}
-
-	public Boolean isAdvanceSetting() {
-		return entityPanel.isAdvanceSetting();
-	}
-
-	public String getElementLogicalRow() {
-		return entityPanel.getLogicalRow();
-	}
-
-	public String getElementLogicalCol() {
-		return entityPanel.getLogicalCol();
-	}
-
-	public String getPhysicalRow() {
-		return entityPanel.getPhysicalRow();
-	}
-
-	public String getPhysicalCol() {
-		return entityPanel.getPhysicalCol();
-	}
-
-	public String getAttributeLogicalCol() {
-		return attributePanel.getLogicalCol();
-	}
-
-	public String getAttbitutePhysicalCol() {
-		return attributePanel.getPhysicalCol();
-	}
-
-	public String getPrimaryKey() {
-		return attributePanel.getPrimaryKey();
-	}
-
-	public String getNotNullCol() {
-		return attributePanel.getNotNullCol();
-	}
-
-	public String getDefaultValueCol() {
-		return attributePanel.getDefaultValueCol();
-	}
-
-	public String getDataTypeCol() {
-		return attributePanel.getDataTypeCol();
-	}
-
-	public String getLengthCol() {
-		return attributePanel.getLengthCol();
-	}
-
-	public String getDefinitionCol() {
-		return attributePanel.getDefinitionCol();
+	public Configuration getConfiguration(){
+		checkConfiguration();
+		
+		Configuration information = new Configuration();
+		
+		information.setInputFilePath(inputFilePanel.getInputFilePath());
+		information.setUseSheetName(entityPanel.isUseSheetName());
+		information.setAdvanceSetting(entityPanel.isAdvanceSetting());
+		information.setEntityLogicalRow(entityPanel.getLogicalRow());
+		information.setEntityLogicalCol(entityPanel.getLogicalCol());
+		information.setEntityPhysicalRow(entityPanel.getPhysicalRow());
+		information.setEntityPhysicalCol(entityPanel.getPhysicalCol());
+		information.setStartRow(attributePanel.getStartRow());
+		information.setAttributeLogicalCol(attributePanel.getLogicalCol());
+		information.setAttributePhysicalCol(attributePanel.getPhysicalCol());
+		information.setPrimaryKeyCol(attributePanel.getPrimaryKeyCol());
+		information.setNotNullCol(attributePanel.getNotNullCol());
+		information.setDefaultValueCol(attributePanel.getDefaultValueCol());
+		information.setDataTypeCol(attributePanel.getDataTypeCol());
+		information.setLengthCol(attributePanel.getLengthCol());
+		information.setDefinitionCol(attributePanel.getDefinitionCol());
+		
+		return information;
 	}
 	
+	private void checkConfiguration(){
+		entityPanel.checkInputValue();
+		attributePanel.validate();
+	}
 }

@@ -1,6 +1,8 @@
 package excel2er.services.finder;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
@@ -13,6 +15,9 @@ import excel2er.models.Attribute;
 
 public class DomainFinder {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(DomainFinder.class);
+	
 	public IERDomain find(final Attribute attr) throws ClassNotFoundException,
 			ProjectNotFoundException {
 		ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
@@ -25,18 +30,19 @@ public class DomainFinder {
 						if (target instanceof IERDomain) {
 							IERDomain domain = (IERDomain) target;
 
+							logger.debug("matching " + domain.getName());
 							EqualsBuilder eb = new EqualsBuilder();
-							append(eb, domain.getDatatypeName(),
+							append("getDatatypeName",eb, domain.getDatatypeName(),
 									convertNull(attr.getDataType()));
 							// append(eb,domain.getDefaultValue(),
 							// convertNull(attr.getDefaultValue()));
-							append(eb, domain.getLengthPrecision(),
+							append("getLengthPrecision",eb, domain.getLengthPrecision(),
 									convertNull(attr.getLength()));
-							append(eb, domain.getLogicalName(),
+							append("getLogicalName",eb, domain.getLogicalName(),
 									convertNull(attr.getLogicalName()));
-							append(eb, domain.getPhysicalName(),
+							append("getPhysicalName",eb, domain.getPhysicalName(),
 									convertNull(attr.getPhysicalName()));
-							append(eb, domain.isNotNull(), attr.isNotNull());
+							append("isNotNull",eb, domain.isNotNull(), attr.isNotNull());
 
 							return eb.isEquals();
 
@@ -44,13 +50,15 @@ public class DomainFinder {
 						return false;
 					}
 
-					private void append(EqualsBuilder eb, String one,
+					private void append(String message,EqualsBuilder eb, String one,
 							String other) {
+						logger.debug(message + " match(domain,importmodel) " + one + ":" + other);
 						eb.append(one, other);
 					}
 
-					private void append(EqualsBuilder eb, boolean one,
+					private void append(String message,EqualsBuilder eb, boolean one,
 							boolean other) {
+						logger.debug(message + " match(domain,importmodel) " + one + ":" + other);
 						eb.append(one, other);
 					}
 

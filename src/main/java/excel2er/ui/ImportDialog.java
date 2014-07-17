@@ -1,18 +1,29 @@
 package excel2er.ui;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import excel2er.Messages;
+import excel2er.exceptions.ApplicationException;
+import excel2er.exceptions.ValidationError;
 import excel2er.models.Configuration;
 import excel2er.services.ImportERModelService;
 
@@ -70,8 +81,71 @@ public class ImportDialog extends JDialog {
 	}
 
 	private void execute() {
+		List<ValidationError> errors = validateInput();
+
+		if (errors.size() > 0) {
+			showResultDialog(Status.ERROR, getValidationErrorMessage(errors));
+			return;
+		}
+
 		ImportERModelService service = new ImportERModelService();
-		service.importERModel(this.getConfiguration());
+		try {
+			service.importERModel(getConfiguration());
+
+			showResultDialog(Status.NORMAL, service.getImportLog());
+		} catch (Throwable t) {
+			showResultDialog(Status.ERROR, service.getImportLog());
+			throw new ApplicationException(t);
+		}
+	}
+	
+	private String getValidationErrorMessage(List<ValidationError> errors){
+		StringBuilder sb = new StringBuilder();
+		for(ValidationError error : errors){
+			sb.append(error.getMessage()).append(SystemUtils.LINE_SEPARATOR);
+		}
+		return sb.toString();
+	}
+
+	private void showResultDialog(Status status, String detailMessage) {
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+		String mainMessage = null;
+		if (status.equals(Status.NORMAL)) {
+			mainMessage = Messages.getMessage("result.dialog.normal");
+		} else if (status.equals(Status.ERROR)) {
+			mainMessage = Messages.getMessage("result.dialog.error");
+		}
+
+		final JLabel messageLabel = new JLabel(mainMessage);
+		messageLabel.setAlignmentY(Component.TOP_ALIGNMENT);
+		messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		panel.add(messageLabel);
+
+		if (StringUtils.isNotEmpty(detailMessage)) {
+			final JTextArea detailTextArea = new JTextArea(detailMessage, 5, 10);
+			detailTextArea.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+			detailTextArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+			detailTextArea.setEditable(false);
+			detailTextArea.setLineWrap(true);
+
+			JScrollPane scrollPane = new JScrollPane();
+			scrollPane.setViewportView(detailTextArea);
+
+			panel.add(scrollPane);
+		}
+
+		int messageType = JOptionPane.INFORMATION_MESSAGE;
+		if (status.equals(Status.ERROR)) {
+			messageType = JOptionPane.ERROR_MESSAGE;
+		}
+		JOptionPane.showMessageDialog(this, panel,
+				Messages.getMessage("result.dialog.title"), messageType);
+	}
+
+	private enum Status {
+		NORMAL, ERROR;
 	}
 
 	private void createSouthContent() {
@@ -120,32 +194,29 @@ public class ImportDialog extends JDialog {
 	}
 
 	public Configuration getConfiguration() {
-		checkConfiguration();
+		Configuration configuration = new Configuration();
 
-		Configuration information = new Configuration();
+		configuration.setInputFilePath(inputFilePanel.getInputFilePath());
+		configuration.setUseSheetName(entityPanel.isUseSheetName());
+		configuration.setAdvanceSetting(entityPanel.isAdvanceSetting());
+		configuration.setEntityLogicalRow(entityPanel.getLogicalRow());
+		configuration.setEntityLogicalCol(entityPanel.getLogicalCol());
+		configuration.setEntityPhysicalRow(entityPanel.getPhysicalRow());
+		configuration.setEntityPhysicalCol(entityPanel.getPhysicalCol());
+		configuration.setStartRow(attributePanel.getStartRow());
+		configuration.setAttributeLogicalCol(attributePanel.getLogicalCol());
+		configuration.setAttributePhysicalCol(attributePanel.getPhysicalCol());
+		configuration.setPrimaryKeyCol(attributePanel.getPrimaryKeyCol());
+		configuration.setNotNullCol(attributePanel.getNotNullCol());
+		configuration.setDefaultValueCol(attributePanel.getDefaultValueCol());
+		configuration.setDataTypeCol(attributePanel.getDataTypeCol());
+		configuration.setLengthCol(attributePanel.getLengthCol());
+		configuration.setDefinitionCol(attributePanel.getDefinitionCol());
 
-		information.setInputFilePath(inputFilePanel.getInputFilePath());
-		information.setUseSheetName(entityPanel.isUseSheetName());
-		information.setAdvanceSetting(entityPanel.isAdvanceSetting());
-		information.setEntityLogicalRow(entityPanel.getLogicalRow());
-		information.setEntityLogicalCol(entityPanel.getLogicalCol());
-		information.setEntityPhysicalRow(entityPanel.getPhysicalRow());
-		information.setEntityPhysicalCol(entityPanel.getPhysicalCol());
-		information.setStartRow(attributePanel.getStartRow());
-		information.setAttributeLogicalCol(attributePanel.getLogicalCol());
-		information.setAttributePhysicalCol(attributePanel.getPhysicalCol());
-		information.setPrimaryKeyCol(attributePanel.getPrimaryKeyCol());
-		information.setNotNullCol(attributePanel.getNotNullCol());
-		information.setDefaultValueCol(attributePanel.getDefaultValueCol());
-		information.setDataTypeCol(attributePanel.getDataTypeCol());
-		information.setLengthCol(attributePanel.getLengthCol());
-		information.setDefinitionCol(attributePanel.getDefinitionCol());
-
-		return information;
+		return configuration;
 	}
 
-	private void checkConfiguration() {
-		entityPanel.checkInputValue();
-		attributePanel.validate();
+	List<ValidationError> validateInput() {
+		return getConfiguration().validate();
 	}
 }

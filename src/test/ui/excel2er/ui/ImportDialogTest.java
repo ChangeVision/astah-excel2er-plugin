@@ -115,4 +115,9 @@ public class ImportDialogTest {
 		assertThat(target.getConfiguration().getLengthCol(), is("7"));
 		assertThat(target.getConfiguration().getDefinitionCol(), is("8"));
 	}
+	
+	@Test
+	public void should_validate_necessary_property() throws Exception {
+		target.validateInput();
+	}
 }

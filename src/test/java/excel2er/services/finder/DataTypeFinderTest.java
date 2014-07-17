@@ -28,7 +28,7 @@ public class DataTypeFinderTest {
 	@Test
 	public void not_find_data_type_from_empty_project() throws Exception {
 		AstahModelManager.open(this.getClass()
-				.getResourceAsStream("empty.asta"));
+				.getResource("empty.asta"));
 
 		DataTypeFinder finder = new DataTypeFinder();
 		IERDatatype dataType = finder.find("VARCHAR");
@@ -38,7 +38,7 @@ public class DataTypeFinderTest {
 	@Test
 	public void find_data_type() throws Exception {
 
-		AstahModelManager.open(this.getClass().getResourceAsStream(
+		AstahModelManager.open(this.getClass().getResource(
 				"exist_ermodel.asta"));
 
 		DataTypeFinder finder = new DataTypeFinder();
@@ -52,7 +52,7 @@ public class DataTypeFinderTest {
 	@Test
 	public void find_data_type_ignore_case() throws Exception {
 
-		AstahModelManager.open(this.getClass().getResourceAsStream(
+		AstahModelManager.open(this.getClass().getResource(
 				"exist_ermodel.asta"));
 
 		DataTypeFinder finder = new DataTypeFinder();

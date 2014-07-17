@@ -2,6 +2,8 @@ package excel2er.services;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import com.change_vision.jude.api.inf.model.IERModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
+import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
 import excel2er.models.Attribute;
 import excel2er.models.Configuration;
@@ -29,17 +32,65 @@ public class ImportERModelService {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ImportERModelService.class);
 
+	private StringBuilder importLog;
+	
+	public ImportERModelService() {
+		initImprtLog();
+	}
+	
+	private void initImprtLog() {
+		importLog = new StringBuilder();
+	}
+
 	public void importERModel(Configuration configuration) {
+		
+		initImprtLog();
+		
 		ParseExcelToEntityModelService parseService = new ParseExcelToEntityModelService();
 
 		List<Entity> entities = parseService.parse(configuration);
 
 		for (Entity entity : entities) {
-			createAstahModel(entity);
+			String entityName = entity.getEntityLogicalName();
+			try{
+				createAstahModel(entity);
+			}catch(ApplicationException e){
+				//continue import
+				log_info(Messages.getMessage("log.error.create_entity_end", entityName));
+			}
 		}
 	}
 
+	public String getImportLog(){
+		return importLog.toString();
+	}
+
+	private void log_append(String message) {
+		importLog.append(message).append(SystemUtils.LINE_SEPARATOR);
+	}
+	
+	private void log_info(String message){
+		logger.info(message);
+		log_append(message);
+	}
+
+	private void log_warn(String message) {
+		logger.warn(message);
+		log_append(message);
+	}
+
+	private void log_error(String message) {
+		logger.error(message);
+		log_append(message);
+	}
+	
+	private void log_error(String message,Throwable e) {
+		logger.error(message,e);
+		log_append(message);
+	}
+	
 	IEREntity createAstahModel(Entity entity) {
+		String entityName = entity.getEntityLogicalName();
 		try {
 			ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
 					.getProjectAccessor();
@@ -61,11 +112,10 @@ public class ImportERModelService {
 			}
 
 			IEREntity entityModel = editor.createEREntity(
-					erModel.getSchemata()[0], entity.getEntityLogicalName(),
-					entity.getEntityLogicalName());
+					erModel.getSchemata()[0], entityName,
+					entity.getEntityPhysicalName());
 
-			logger.info(String.format("create entity({0})",
-					entity.getEntityLogicalName()));
+			log_info(Messages.getMessage("log.create_entity", entityName));
 
 			DomainFinder domainFinder = new DomainFinder();
 			DataTypeFinder dataTypeFinder = new DataTypeFinder();
@@ -74,68 +124,111 @@ public class ImportERModelService {
 				IERDomain domain = domainFinder.find(attr);
 				IERAttribute attrModel = null;
 				if (domain != null) {
-					attrModel = createAttributeUsingDomain(editor, entityModel, attr,
-							domain);
+					attrModel = createAttributeUsingDomain(editor, entityModel,
+							attr, domain);
+
+					setEditablePropertyUsingDomain(attr, attrModel);
 				} else {
 					IERDatatype dataType = dataTypeFinder.find(attr
 							.getDataType());
 					if (dataType == null) {
-						logger.warn(
-								String.format("attribute({0}) can't create.because dataType({1}) is missing."),
-								attr.getLogicalName(), attr.getDataType());
+						log_warn(Messages.getMessage(
+								"log.error.create_attribute.missing_datatype",
+								entityName, attr.getLogicalName()));
 						continue;
 					}
-					attrModel = createAttribute(editor, entityModel, attr, dataType);
-					attrModel.setDefaultValue(attr.getDefaultValue());
-					attrModel.setDefinition(attr.getDefinition());
-					attrModel.setLengthPrecision(attr.getLength());
+					attrModel = createAttribute(editor, entityModel, attr,
+							dataType);
+
+					setAdditionalProperty(attr, attrModel);
 				}
 
 			}
-			
+			projectAccessor.getTransactionManager().endTransaction();
+			log_info(Messages.getMessage("log.create_entity_end", entityName));
 			return entityModel;
 		} catch (ClassNotFoundException e) {
+			log_error(Messages.getMessage("log.error.create_entity",
+					entityName, e.getMessage()), e);
+			
 			aboartTransaction();
+			
 			throw new ApplicationException(e);
 		} catch (InvalidEditingException e) {
+			if(StringUtils.equals(e.getKey(),InvalidEditingException.PARAMETER_ERROR_KEY)){
+				log_error(Messages.getMessage("log.error.create_entity.parameter_error",
+						entityName));
+			}else if(StringUtils.equals(e.getKey(),InvalidEditingException.NAME_DOUBLE_ERROR_KEY)){
+				log_error(Messages.getMessage("log.error.create_entity.duplicate_entity",
+						entityName));
+			}else { 
+				log_error(Messages.getMessage("log.error.create_entity.invalideditiongexception",
+						entityName,e.getKey()), e);
+			}
+			
 			aboartTransaction();
+			
 			throw new ApplicationException(e);
 		} catch (ProjectNotFoundException e) {
+			log_error(Messages.getMessage("log.error.create_entity",
+					entityName, e.getMessage()), e);
+			
 			aboartTransaction();
 			throw new ApplicationException(e);
-		} finally {
-			try {
-				ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
-						.getProjectAccessor();
-				projectAccessor.getTransactionManager().endTransaction();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 		}
 	}
 
-	private IERAttribute createAttribute(ERModelEditor editor, IEREntity entityModel,
-			Attribute attr, IERDatatype dataType)
+	private void setEditablePropertyUsingDomain(Attribute attr, IERAttribute attrModel)
 			throws InvalidEditingException {
+		
+		attrModel.setPrimaryKey(attr.isPrimaryKey());
+
+		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
+			attrModel.setDefaultValue(attr.getDefaultValue());
+
+		if (StringUtils.isNotEmpty(attr.getDefinition()))
+			attrModel.setDefinition(attr.getDefinition());
+	}
+
+	private void setAdditionalProperty(Attribute attr, IERAttribute attrModel)
+			throws InvalidEditingException {
+
+		attrModel.setPrimaryKey(attr.isPrimaryKey());
+
+		attrModel.setNotNull(attr.isNotNull());
+
+		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
+			attrModel.setDefaultValue(attr.getDefaultValue());
+
+		if (StringUtils.isNotEmpty(attr.getDefinition()))
+			attrModel.setDefinition(attr.getDefinition());
+
+		if (StringUtils.isNotEmpty(attr.getLength()))
+			attrModel.setLengthPrecision(attr.getLength());
+	}
+
+	private IERAttribute createAttribute(ERModelEditor editor,
+			IEREntity entityModel, Attribute attr, IERDatatype dataType)
+			throws InvalidEditingException {
+		log_info(Messages.getMessage("log.create_attribute",
+				entityModel.getName(), attr.getLogicalName()));
+
 		IERAttribute attrModel = editor.createERAttribute(entityModel,
-				attr.getLogicalName(), attr.getPhysicalName(),
-				dataType);
-		logger.info(String.format("create attribute({0})",
-				attr.getLogicalName()));
+				attr.getLogicalName(), attr.getPhysicalName(), dataType);
+
 		return attrModel;
 	}
 
 	private IERAttribute createAttributeUsingDomain(ERModelEditor editor,
 			IEREntity entityModel, Attribute attr, IERDomain domain)
 			throws InvalidEditingException {
+
+		log_info(Messages.getMessage("log.create_attribute_using_domain",
+				entityModel.getName(), attr.getLogicalName(), domain.getName()));
+
 		IERAttribute attrModel = editor.createERAttribute(entityModel,
-				attr.getLogicalName(), attr.getPhysicalName(),
-				domain);
-		logger.info(String.format(
-				"create attribute({0}) using domain",
-				attr.getLogicalName()));
-		
+				attr.getLogicalName(), attr.getPhysicalName(), domain);
+
 		return attrModel;
 	}
 

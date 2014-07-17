@@ -16,6 +16,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
@@ -25,7 +27,9 @@ public class ParserUtils {
 
 	private static final int POI_OFFSET_START_INDEX = 1;
 	private static FormulaEvaluator formulaEvaluator;
-
+	private static final Logger logger = LoggerFactory
+			.getLogger(ParserUtils.class);
+	
 	public static boolean isEmptyBoth(String one, String other) {
 		return StringUtils.isEmpty(one) && StringUtils.isEmpty(other);
 	}
@@ -50,38 +54,43 @@ public class ParserUtils {
 	}
 
 	public static String getCellValue(Sheet sheet, int refRow, String refCol) {
-		if (refRow < 0 || refCol == null)
-			return null;
-
-		Row row = sheet.getRow(refRow - POI_OFFSET_START_INDEX);
-		if (row == null) {
-			return null;
-		}
-
-		Cell cell = null;
-		if (NumberUtils.isDigits(refCol)) {
-			cell = row.getCell(NumberUtils.toInt(refCol)
-					- POI_OFFSET_START_INDEX);
-		} else {
-			CellReference ref = new CellReference(refCol);
-			if (ref != null) {
-				cell = row.getCell(ref.getCol());
+		try{
+			if (refRow < 0 || refCol == null)
+				return null;
+	
+			Row row = sheet.getRow(refRow - POI_OFFSET_START_INDEX);
+			if (row == null) {
+				return null;
 			}
-		}
-
-		if (cell == null) {
-			return null;
-		}
-
-		try {
-			Object ret = getCellValue(cell);
-			if (ret != null) {
-				return ret.toString();
+	
+			Cell cell = null;
+			if (NumberUtils.isDigits(refCol)) {
+				cell = row.getCell(NumberUtils.toInt(refCol)
+						- POI_OFFSET_START_INDEX);
+			} else {
+				CellReference ref = new CellReference(refCol);
+				if (ref != null) {
+					cell = row.getCell(ref.getCol());
+				}
 			}
-			return null;
-		} catch (Exception e) {
-			// ignore.
-			return null;
+	
+			if (cell == null) {
+				return null;
+			}
+	
+			try {
+				Object ret = getCellValue(cell);
+				if (ret != null) {
+					return ret.toString();
+				}
+				return null;
+			} catch (Exception e) {
+				// ignore.
+				return null;
+			}
+		}catch(Throwable t){
+			logger.error(String.format("error occur when get cell value at sheet(%s) row,cell(%s,%s)",sheet.getSheetName(),refRow,refCol));
+			throw new ApplicationException(t);
 		}
 	}
 

@@ -165,6 +165,11 @@ public class Configuration {
 	public List<ValidationError> validate() {
 		List<ValidationError> errors = new ArrayList<ValidationError>();
 
+		if(StringUtils.isEmpty(getInputFilePath())){
+			errors.add(new ValidationError(Messages.getMessage(
+					"error.inputfile_required")));
+		}
+		
 		if (!useSheetName && !advanceSetting) {
 			throw new IllegalArgumentException(
 					"useSheetName or advanceSetting must true");

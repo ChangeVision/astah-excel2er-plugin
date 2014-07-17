@@ -3,6 +3,9 @@ package excel2er.actions;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.ui.IPluginActionDelegate;
@@ -12,7 +15,9 @@ import excel2er.Messages;
 import excel2er.ui.ImportDialog;
 
 public class ImportExcelToERModelAction implements IPluginActionDelegate {
-
+	private static final Logger logger = LoggerFactory
+			.getLogger(ImportExcelToERModelAction.class);
+	
 	public Object run(IWindow window) throws UnExpectedException {
 		try {
 
@@ -27,6 +32,8 @@ public class ImportExcelToERModelAction implements IPluginActionDelegate {
 					Messages.getMessage("error.project.not.found"), "Warn",
 					JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) {
+			logger.error("Unexpected error has occurred.",e);
+			
 			JOptionPane.showMessageDialog(window.getParent(),
 					"Unexpected error has occurred.", "Alert",
 					JOptionPane.ERROR_MESSAGE);

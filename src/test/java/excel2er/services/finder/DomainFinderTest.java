@@ -17,7 +17,7 @@ public class DomainFinderTest {
 	@Test
 	public void domain_not_found_from_empty_project() throws Exception {
 		AstahModelManager.open(this.getClass()
-				.getResourceAsStream("empty.asta"));
+				.getResource("empty.asta"));
 		DomainFinder finder = new DomainFinder();
 
 		Attribute attr = new Attribute();
@@ -29,7 +29,7 @@ public class DomainFinderTest {
 
 	@Test
 	public void find_domain() throws Exception {
-		AstahModelManager.open(this.getClass().getResourceAsStream(
+		AstahModelManager.open(this.getClass().getResource(
 				"domain.asta"));
 		DomainFinder finder = new DomainFinder();
 
@@ -46,7 +46,7 @@ public class DomainFinderTest {
 
 	@Test
 	public void find_domain_all_condition() throws Exception {
-		AstahModelManager.open(this.getClass().getResourceAsStream(
+		AstahModelManager.open(this.getClass().getResource(
 				"domain.asta"));
 		DomainFinder finder = new DomainFinder();
 

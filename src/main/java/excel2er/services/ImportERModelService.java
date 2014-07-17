@@ -25,11 +25,11 @@ import excel2er.models.Entity;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
 
-public class ImportService {
+public class ImportERModelService {
 	private static final Logger logger = LoggerFactory
-			.getLogger(ImportService.class);
+			.getLogger(ImportERModelService.class);
 
-	public void execute(Configuration configuration) {
+	public void importERModel(Configuration configuration) {
 		ParseExcelToEntityModelService parseService = new ParseExcelToEntityModelService();
 
 		List<Entity> entities = parseService.parse(configuration);
@@ -39,7 +39,7 @@ public class ImportService {
 		}
 	}
 
-	private void createAstahModel(Entity entity) {
+	IEREntity createAstahModel(Entity entity) {
 		try {
 			ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
 					.getProjectAccessor();
@@ -93,8 +93,7 @@ public class ImportService {
 
 			}
 			
-			transactionManager.endTransaction();
-			
+			return entityModel;
 		} catch (ClassNotFoundException e) {
 			aboartTransaction();
 			throw new ApplicationException(e);
@@ -110,7 +109,7 @@ public class ImportService {
 						.getProjectAccessor();
 				projectAccessor.getTransactionManager().endTransaction();
 			} catch (Exception e) {
-				//
+				e.printStackTrace();
 			}
 
 		}

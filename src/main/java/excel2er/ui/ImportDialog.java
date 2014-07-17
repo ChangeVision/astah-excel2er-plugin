@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import excel2er.Messages;
 import excel2er.models.Configuration;
-import excel2er.services.ImportService;
+import excel2er.services.ImportERModelService;
 
 public class ImportDialog extends JDialog {
 
@@ -70,8 +70,8 @@ public class ImportDialog extends JDialog {
 	}
 
 	private void execute() {
-		ImportService service = new ImportService();
-		service.execute(this.getConfiguration());
+		ImportERModelService service = new ImportERModelService();
+		service.importERModel(this.getConfiguration());
 	}
 
 	private void createSouthContent() {

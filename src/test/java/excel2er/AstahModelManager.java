@@ -1,5 +1,6 @@
 package excel2er;
 
+import java.io.File;
 import java.io.InputStream;
 
 import junit.framework.AssertionFailedError;
@@ -17,5 +18,9 @@ public class AstahModelManager {
 
 	public static void close() throws Exception {
 		AstahAPI.getAstahAPI().getProjectAccessor().close();
+	}
+	
+	public static void save(File file) throws Exception {
+		AstahAPI.getAstahAPI().getProjectAccessor().saveAs(file.getPath());
 	}
 }

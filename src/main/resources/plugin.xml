@@ -15,8 +15,8 @@
                icon="icons/sample.gif"
                class="excel2er.actions.ImportExcelToERModelAction"
                tooltip="%menu_tooltip"
-               menubarPath="tool/excel2er/"
-               id="excel2er">
+               menubarPath="tool/er"
+               id="excel2er.actions.ImportExcelToERModelAction">
          </action>
      </actionSet>
    </extension>

@@ -1,4 +1,4 @@
-package excel2er.ui;
+package excel2er.ui.erentity;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,6 +23,10 @@ import com.change_vision.jude.api.inf.model.INamedElement;
 
 import excel2er.AstahModelManager;
 import excel2er.Messages;
+import excel2er.ui.erentity.ERAttributePanel;
+import excel2er.ui.erentity.EntityPanel;
+import excel2er.ui.erentity.ImportDialog;
+import excel2er.ui.erentity.InputFilePanel;
 
 @RunWith(GUITestRunner.class)
 public class AcceptanceTest {
@@ -350,30 +354,6 @@ public class AcceptanceTest {
 		message.append(getMessage("error.required","explain_attribute","item_datatype")).append(SystemUtils.LINE_SEPARATOR);
 		message.append(getMessage("error.required","explain_attribute","start_row"));
 		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT).text(),is(message.toString()));
-	}
-	
-	@Test
-	public void should_show_error_dialog_not_set_entity_logical_physical_col_and_row()
-			throws Exception {
-		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
-				this.getClass().getResource("entityListModel.xls").getFile());
-		
-		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME)
-				.check();
-
-		
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
-		dialogFixture.optionPane().requireVisible();
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append(getMessage("error.required","explain_entity","entity.logicalname.row")).append(SystemUtils.LINE_SEPARATOR);
-		sb.append(getMessage("error.required","explain_entity","entity.logicalname.col")).append(SystemUtils.LINE_SEPARATOR);
-		sb.append(getMessage("error.required","explain_entity","entity.physicalname.row")).append(SystemUtils.LINE_SEPARATOR);
-		sb.append(getMessage("error.required","explain_entity","entity.physicalname.col"));
-		
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
-				.text(), is(sb.toString()));
-		
 	}
 	
 	private String getMessage(String key, String parameter, String subparameter) {

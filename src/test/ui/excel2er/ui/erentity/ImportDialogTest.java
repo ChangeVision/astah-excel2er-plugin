@@ -1,4 +1,4 @@
-package excel2er.ui;
+package excel2er.ui.erentity;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -17,6 +17,10 @@ import org.junit.runner.RunWith;
 
 import excel2er.Messages;
 import excel2er.services.ImportERModelService.Result;
+import excel2er.ui.erentity.ERAttributePanel;
+import excel2er.ui.erentity.EntityPanel;
+import excel2er.ui.erentity.ImportDialog;
+import excel2er.ui.erentity.InputFilePanel;
 
 @RunWith(GUITestRunner.class)
 public class ImportDialogTest {

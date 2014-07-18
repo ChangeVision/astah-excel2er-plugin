@@ -1,4 +1,4 @@
-package excel2er.ui;
+package excel2er.ui.erentity;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -14,6 +14,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import excel2er.ui.erentity.InputFilePanel;
 
 @RunWith(GUITestRunner.class)
 public class InputFilePanelTest {

@@ -1,4 +1,4 @@
-package excel2er.ui;
+package excel2er.ui.erentity;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import excel2er.Messages;
+import excel2er.ui.Empty;
 
 public class InputFilePanel extends JPanel {
 	private static final long serialVersionUID = 6227307820865854523L;

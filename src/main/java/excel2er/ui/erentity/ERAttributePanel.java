@@ -1,4 +1,4 @@
-package excel2er.ui;
+package excel2er.ui.erentity;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -12,6 +12,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import excel2er.Messages;
+import excel2er.ui.Empty;
 
 public class ERAttributePanel extends JPanel {
 

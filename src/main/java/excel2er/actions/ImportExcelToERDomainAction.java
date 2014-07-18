@@ -12,11 +12,11 @@ import com.change_vision.jude.api.inf.ui.IPluginActionDelegate;
 import com.change_vision.jude.api.inf.ui.IWindow;
 
 import excel2er.Messages;
-import excel2er.ui.ImportDialog;
+import excel2er.ui.erentity.ImportDialog;
 
-public class ImportExcelToERModelAction implements IPluginActionDelegate {
+public class ImportExcelToERDomainAction implements IPluginActionDelegate {
 	private static final Logger logger = LoggerFactory
-			.getLogger(ImportExcelToERModelAction.class);
+			.getLogger(ImportExcelToERDomainAction.class);
 	
 	public Object run(IWindow window) throws UnExpectedException {
 		try {

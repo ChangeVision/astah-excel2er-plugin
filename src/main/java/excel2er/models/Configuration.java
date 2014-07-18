@@ -19,7 +19,7 @@ public class Configuration {
 	private String entityPhysicalRow;
 	private String attributeLogicalCol;
 	private String entityPhysicalCol;
-	private String AttributePhysicalCol;
+	private String attributePhysicalCol;
 	private String primaryKeyCol;
 	private String notNullCol;
 	private String defaultValueCol;
@@ -65,7 +65,7 @@ public class Configuration {
 	}
 
 	public String getAttributePhysicalCol() {
-		return AttributePhysicalCol;
+		return attributePhysicalCol;
 	}
 
 	public String getPrimaryKeyCol() {
@@ -125,7 +125,7 @@ public class Configuration {
 	}
 
 	public void setAttributePhysicalCol(String physicalCol) {
-		this.AttributePhysicalCol = physicalCol;
+		this.attributePhysicalCol = physicalCol;
 	}
 
 	public void setPrimaryKeyCol(String primaryKeyCol) {

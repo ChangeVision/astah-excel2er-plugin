@@ -1,4 +1,4 @@
-package excel2er.ui.erentity;
+package excel2er.ui;
 
 import java.awt.Component;
 import java.awt.Cursor;

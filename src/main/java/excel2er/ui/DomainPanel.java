@@ -1,4 +1,4 @@
-package excel2er.ui.erentity;
+package excel2er.ui;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -12,29 +12,27 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import excel2er.Messages;
-import excel2er.ui.Empty;
 
-public class ERAttributePanel extends JPanel {
+public class DomainPanel extends JPanel {
 
-	private static final long serialVersionUID = 2225522938156327518L;
-	static final String NAME = "entitypanel";
+	private static final long serialVersionUID = 3038249479574243112L;
+	static final String NAME = "domainpanel";
 	private StartRow startRow;
 	private ItemCol logicalCol;
 	private ItemCol physicalCol;
-	private ItemCol primaryKeyCol;
 	private ItemCol notNullCol;
 	private ItemCol defaultValueCol;
 	private ItemCol dataTypeCol;
 	private ItemCol lengthCol;
 	private ItemCol definitionCol;
 
-	public ERAttributePanel() {
+	public DomainPanel() {
 		setName(NAME);
 		GridBagLayout manager = new GridBagLayout();
 		setLayout(manager);
 		setAlignmentX(Component.LEFT_ALIGNMENT);
 		setBorder(BorderFactory.createTitledBorder(Messages
-				.getMessage("explain_attribute")));
+				.getMessage("explain_domain")));
 		createContents();
 		
 		setDefaultValueForAstahEREntityDocument();
@@ -43,15 +41,14 @@ public class ERAttributePanel extends JPanel {
 	}
 
 	private void setDefaultValueForAstahEREntityDocument() {
-		startRow.setText("9");
+		startRow.setText("4");
 		logicalCol.setText("B");
 		physicalCol.setText("G");
-		primaryKeyCol.setText("L");
-		notNullCol.setText("P");
-		dataTypeCol.setText("Q");
-		lengthCol.setText("U");
-		defaultValueCol.setText("Y");
-		definitionCol.setText("AC");
+		dataTypeCol.setText("V");
+		lengthCol.setText("Z");
+		notNullCol.setText("AD");
+		defaultValueCol.setText("");
+		definitionCol.setText("AJ");
 	}
 
 	private void createContents() {
@@ -109,21 +106,17 @@ public class ERAttributePanel extends JPanel {
 		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
 		gbc.gridy = 8;
 		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.PRIMARYKEY)), gbc);
-		add(primaryKeyCol = new ItemCol(ItemCol.PRIMARYKEY), gbc);
+		add(new JLabel(Messages.getMessage(ItemCol.LENGTH)), gbc);
+		add(lengthCol = new ItemCol(ItemCol.LENGTH), gbc);
 		gbc.gridy = 9;
-		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
-		add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
-		gbc.gridy = 10;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFAULT_VALUE)), gbc);
 		add(defaultValueCol = new ItemCol(ItemCol.DEFAULT_VALUE), gbc);
-		gbc.gridy = 11;
+		gbc.gridy = 10;
 		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.LENGTH)), gbc);
-		add(lengthCol = new ItemCol(ItemCol.LENGTH), gbc);
-		gbc.gridy = 12;
+		add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
+		add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
+		gbc.gridy = 11;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFINITION)), gbc);
 		add(definitionCol = new ItemCol(ItemCol.DEFINITION), gbc);
@@ -145,15 +138,15 @@ public class ERAttributePanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		static final String LOGICAL = "item_logical";
 		static final String PHYSICAL = "item_physical";
-		static final String PRIMARYKEY = "item_primarykey";
 		static final String NOTNULL = "item_notnull";
 		static final String DEFAULT_VALUE = "item_defaultvalue";
 		static final String DATATYPE = "item_datatype";
 		static final String LENGTH = "item_length";
 		static final String DEFINITION = "item_definition";
-
+		static final String SUFFIX = "_domain";
+		
 		public ItemCol(String key) {
-			setName(key);
+			setName(key + SUFFIX);
 			setColumns(2);
 		}
 	}
@@ -168,10 +161,6 @@ public class ERAttributePanel extends JPanel {
 
 	public String getPhysicalCol() {
 		return physicalCol.getText();
-	}
-
-	public String getPrimaryKeyCol() {
-		return primaryKeyCol.getText();
 	}
 
 	public String getNotNullCol() {

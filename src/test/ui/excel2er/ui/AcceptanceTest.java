@@ -1,4 +1,4 @@
-package excel2er.ui.erentity;
+package excel2er.ui;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,10 +23,10 @@ import com.change_vision.jude.api.inf.model.INamedElement;
 
 import excel2er.AstahModelManager;
 import excel2er.Messages;
-import excel2er.ui.erentity.ERAttributePanel;
-import excel2er.ui.erentity.EntityPanel;
-import excel2er.ui.erentity.ImportDialog;
-import excel2er.ui.erentity.InputFilePanel;
+import excel2er.ui.ERAttributePanel;
+import excel2er.ui.EntityPanel;
+import excel2er.ui.ImportDialog;
+import excel2er.ui.InputFilePanel;
 
 @RunWith(GUITestRunner.class)
 public class AcceptanceTest {

@@ -12,7 +12,7 @@ import com.change_vision.jude.api.inf.ui.IPluginActionDelegate;
 import com.change_vision.jude.api.inf.ui.IWindow;
 
 import excel2er.Messages;
-import excel2er.ui.erentity.ImportDialog;
+import excel2er.ui.ImportDialog;
 
 public class ImportExcelToERDomainAction implements IPluginActionDelegate {
 	private static final Logger logger = LoggerFactory

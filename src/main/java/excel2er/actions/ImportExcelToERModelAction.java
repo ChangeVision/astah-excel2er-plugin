@@ -25,8 +25,8 @@ public class ImportExcelToERModelAction implements IPluginActionDelegate {
 
 			JFrame frame = (JFrame) window.getParent();
 			ImportDialog dialog = new ImportDialog(frame);
+			dialog.pack();
 			dialog.setVisible(true);
-
 		} catch (ProjectNotFoundException e) {
 			JOptionPane.showMessageDialog(window.getParent(),
 					Messages.getMessage("error.project.not.found"), "Warn",

@@ -27,11 +27,13 @@
     </appender>
 
 
-    <root level="TRACE">
-        <logger name="com.change_vision" level="${rootLevel:-OFF}">
-            <appender-ref ref="STDOUT" />
-            <appender-ref ref="FILE" />
-        </logger>
-    </root>
+	<root level="TRACE">
+		<appender-ref ref="excel2er"/>
+	</root>
+
+    <logger name="excel2er" level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
 
 </configuration>

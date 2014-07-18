@@ -13,7 +13,7 @@
          <action
 			   label="%menu_label"
                icon="icons/sample.gif"
-               class="excel2er.TemplateAction"
+               class="excel2er.actions.ImportExcelToERModelAction"
                tooltip="%menu_tooltip"
                menubarPath="tool/excel2er/"
                id="excel2er">

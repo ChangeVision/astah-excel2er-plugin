@@ -1,6 +1,7 @@
 package excel2er.ui;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -85,15 +86,18 @@ public class ImportDialog extends JDialog {
 	}
 
 	private void execute() {
-		List<ValidationError> errors = validateInput();
-
-		if (errors.size() > 0) {
-			showErrorResultDialog(getValidationErrorMessage(errors));
-			return;
-		}
+		Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+		this.setCursor(waitCursor);
 
 		ImportERModelService service = new ImportERModelService();
 		try {
+			List<ValidationError> errors = validateInput();
+
+			if (errors.size() > 0) {
+				showErrorResultDialog(getValidationErrorMessage(errors));
+				return;
+			}
+
 			Result result = service.importERModel(getConfiguration());
 
 			showResultDialog(Status.NORMAL, result);
@@ -103,15 +107,19 @@ public class ImportDialog extends JDialog {
 			t.printStackTrace(w);
 			showErrorResultDialog(sw.toString());
 			throw new ApplicationException(t);
+		} finally {
+			Cursor defaultCursor = Cursor.getDefaultCursor();
+			this.setCursor(defaultCursor);
+			close();
 		}
 	}
-	
-	private String getValidationErrorMessage(List<ValidationError> errors){
+
+	private String getValidationErrorMessage(List<ValidationError> errors) {
 		StringBuilder sb = new StringBuilder();
-		for(int i =0; i < errors.size();i++){
+		for (int i = 0; i < errors.size(); i++) {
 			ValidationError error = errors.get(i);
 			sb.append(error.getMessage());
-			if(i < errors.size() -1){
+			if (i < errors.size() - 1) {
 				sb.append(SystemUtils.LINE_SEPARATOR);
 			}
 		}
@@ -121,9 +129,9 @@ public class ImportDialog extends JDialog {
 	void showErrorResultDialog(String errorMessage) {
 		ImportERModelService.Result result = new ImportERModelService.Result();
 		result.appendMessage(errorMessage);
-		showResultDialog(Status.ERROR,result);
+		showResultDialog(Status.ERROR, result);
 	}
-	
+
 	void showResultDialog(Status status, Result result) {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -131,10 +139,13 @@ public class ImportDialog extends JDialog {
 		int messageType = JOptionPane.INFORMATION_MESSAGE;
 		String mainMessage = null;
 		if (status.equals(Status.NORMAL)) {
-			if(result.isErrorOccured()){
-				mainMessage = Messages.getMessage("result.dialog.normal_with_error", result.getCreatedEntitiesCount());
-			}else{
-				mainMessage = Messages.getMessage("result.dialog.normal",result.getCreatedEntitiesCount());
+			if (result.isErrorOccured()) {
+				mainMessage = Messages.getMessage(
+						"result.dialog.normal_with_error",
+						result.getCreatedEntitiesCount());
+			} else {
+				mainMessage = Messages.getMessage("result.dialog.normal",
+						result.getCreatedEntitiesCount());
 			}
 		} else if (status.equals(Status.ERROR)) {
 			messageType = JOptionPane.ERROR_MESSAGE;
@@ -236,7 +247,7 @@ public class ImportDialog extends JDialog {
 	List<ValidationError> validateInput() {
 		return getConfiguration().validate();
 	}
-	
+
 	enum Status {
 		NORMAL, ERROR;
 	}

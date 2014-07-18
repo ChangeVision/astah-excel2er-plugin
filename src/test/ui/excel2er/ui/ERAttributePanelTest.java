@@ -41,7 +41,7 @@ public class ERAttributePanelTest {
 	@Test
 	public void should_get_initial_value_of_start_row() throws Exception {
 		assertThat(((ERAttributePanel) panelFixture.target).getStartRow(),
-				is("1"));
+				is("9"));
 	}
 
 	@Test

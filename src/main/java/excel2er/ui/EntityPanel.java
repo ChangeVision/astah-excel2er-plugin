@@ -41,7 +41,15 @@ public class EntityPanel extends JPanel {
 				.getMessage("explain_entity")));
 		createContents();
 		createAdvanceTab();
+		setDefaultValueForAstahEREntityDocument();
 		setVisible(true);
+	}
+
+	private void setDefaultValueForAstahEREntityDocument() {
+		logicalrow.setText("1");
+		logicalcol.setText("H");
+		physicalrow.setText("2");
+		physicalcol.setText("H");
 	}
 
 	private void createAdvanceTab() {

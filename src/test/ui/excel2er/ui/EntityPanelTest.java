@@ -76,8 +76,8 @@ public class EntityPanelTest {
 	public void should_get_logical_row_and_col() throws Exception {
 		panelFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
 
-		assertThat(((EntityPanel) panelFixture.target).getLogicalRow(), is(""));
-		assertThat(((EntityPanel) panelFixture.target).getLogicalCol(), is(""));
+		assertThat(((EntityPanel) panelFixture.target).getLogicalRow(), is("1"));
+		assertThat(((EntityPanel) panelFixture.target).getLogicalCol(), is("H"));
 
 		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_ROW)
 				.setText("3");
@@ -92,8 +92,8 @@ public class EntityPanelTest {
 	public void should_get_physical_row_and_col() throws Exception {
 		panelFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
 
-		assertThat(((EntityPanel) panelFixture.target).getPhysicalRow(), is(""));
-		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(), is(""));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalRow(), is("2"));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(), is("H"));
 
 		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW)
 				.setText("8");

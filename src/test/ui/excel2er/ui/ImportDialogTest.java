@@ -1,17 +1,22 @@
 package excel2er.ui;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import javax.swing.JFrame;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import excel2er.Messages;
+import excel2er.services.ImportERModelService.Result;
 
 @RunWith(GUITestRunner.class)
 public class ImportDialogTest {
@@ -115,9 +120,88 @@ public class ImportDialogTest {
 		assertThat(target.getConfiguration().getLengthCol(), is("7"));
 		assertThat(target.getConfiguration().getDefinitionCol(), is("8"));
 	}
-	
+
 	@Test
-	public void should_validate_necessary_property() throws Exception {
-		target.validateInput();
+	public void should_show_error_dialog_not_set_inputfile() throws Exception {
+		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.optionPane().requireVisible();
+		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+				.text(), is(Messages.getMessage("error.inputfile_required")));
+	}
+
+	@Test
+	public void should_show_error_dialog_not_set_startrow() throws Exception {
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				"/tmp/dummy");
+		dialogFixture.textBox(ERAttributePanel.StartRow.NAME).setText("");
+
+		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.optionPane().requireVisible();
+
+		assertThat(
+				dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+						.text(),
+				is(Messages.getMessage("error.required",
+						Messages.getMessage("explain_attribute") + " - "
+								+ Messages.getMessage("start_row"))));
+	}
+
+	@Test
+	public void should_show_error_dialog_not_set_entity_logical_physical_col_and_row()
+			throws Exception {
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				this.getClass().getResource("entityListModel.xls").getFile());
+		
+		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME)
+				.check();
+
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_COL).setText("");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_ROW).setText("");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL).setText("");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW).setText("");
+		
+		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.optionPane().requireVisible();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(buildMessage("explain_entity","entity.logicalname.row")).append(SystemUtils.LINE_SEPARATOR);
+		sb.append(buildMessage("explain_entity","entity.logicalname.col")).append(SystemUtils.LINE_SEPARATOR);
+		sb.append(buildMessage("explain_entity","entity.physicalname.row")).append(SystemUtils.LINE_SEPARATOR);
+		sb.append(buildMessage("explain_entity","entity.physicalname.col"));
+		
+		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+				.text(), is(sb.toString()));
+		
+	}
+	
+	@Ignore
+	@Test
+	public void show_error_result() throws Exception {
+		target.showErrorResultDialog("error message");
+	}
+	
+	@Ignore
+	@Test
+	public void show_normal_result() throws Exception {
+		Result result = new Result();
+		result.inclementEntitesCount();
+		result.appendMessage("aaaa\nbbbbb\nccccc");
+		result.setErrorOccured(false);
+		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+	}
+	
+	@Ignore
+	@Test
+	public void show_normal_result_with_error() throws Exception {
+		Result result = new Result();
+		result.inclementEntitesCount();
+		result.appendMessage("aaaa\nbbbbb\nccccc");
+		result.setErrorOccured(true);
+		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+	}
+	
+	private String buildMessage(String key,String subkey){
+		return Messages.getMessage(
+				"error.required",Messages.getMessage(key) + " - " + Messages.getMessage(subkey));
 	}
 }

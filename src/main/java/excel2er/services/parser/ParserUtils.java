@@ -55,7 +55,7 @@ public class ParserUtils {
 
 	public static String getCellValue(Sheet sheet, int refRow, String refCol) {
 		try{
-			if (refRow < 0 || refCol == null)
+			if (refRow < 0 || StringUtils.isEmpty(refCol))
 				return null;
 	
 			Row row = sheet.getRow(refRow - POI_OFFSET_START_INDEX);

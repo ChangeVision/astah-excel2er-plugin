@@ -1,7 +1,7 @@
 package excel2er.models;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -15,9 +15,9 @@ public class ConfigurationTest {
 
 	private Configuration conf = null;
 	
-	private String getMessage(String key, String subKey) {
-		return Messages.getMessage("error.not.digit", Messages.getMessage(key)
-				+ " - " + Messages.getMessage(subKey));
+	private String getMessage(String key, String parameter, String subparameter) {
+		return Messages.getMessage(key, Messages.getMessage(parameter)
+				+ " - " + Messages.getMessage(subparameter));
 	}
 
 	private void assertNotErrorExist(Configuration conf) {
@@ -25,29 +25,46 @@ public class ConfigurationTest {
 		assertThat(errors.size(), is(0));
 	}
 
-	private void assertErrorExist(Configuration conf, String key) {
+	private void assertRequireErrorExist(Configuration conf, String key, String subkey) {
+		List<ValidationError> errors = conf.validate();
+		assertThat(errors.size(), is(1));
+		assertThat(errors.get(0).getMessage(), is(getMessage("error.required",key, subkey)));
+	}
+	
+	private void assertDigitErrorExist(Configuration conf, String key) {
 		List<ValidationError> errors = conf.validate();
 		assertThat(errors.size(), is(1));
 		assertThat(errors.get(0).getMessage(), is(Messages.getMessage(key)));
 	}
 
-	private void assertErrorExist(Configuration conf, String key, String subkey) {
+	private void assertDigitErrorExist(Configuration conf, String key, String subkey) {
 		List<ValidationError> errors = conf.validate();
 		assertThat(errors.size(), is(1));
-		assertThat(errors.get(0).getMessage(), is(getMessage(key, subkey)));
+		assertThat(errors.get(0).getMessage(), is(getMessage("error.not.digit",key, subkey)));
 	}
 
 	@Before
 	public void setUp(){
 		conf = new Configuration();
 		conf.setUseSheetName(true);
+		conf.setStartRow("9");
+		conf.setDataTypeCol("VARCHAR");
 		conf.setInputFilePath("/tmp/dummypath");
+	}
+	
+	@Test
+	public void validate_necessary_property() throws Exception {
+		conf = new Configuration();
+		
+		List<ValidationError> errors = conf.validate();
+		assertThat(errors.size(),is(4));
+		
 	}
 	
 	@Test
 	public void validate_inputfile() throws Exception {
 		conf.setInputFilePath("");
-		assertErrorExist(conf, "error.inputfile_required");
+		assertDigitErrorExist(conf, "error.inputfile_required");
 		
 		conf.setInputFilePath("/tmp/dummypath");
 		assertNotErrorExist(conf);
@@ -74,7 +91,7 @@ public class ConfigurationTest {
 	@Test
 	public void validate_multiply() throws Exception {
 		conf.setStartRow("a1");
-		conf.setEntityLogicalRow("a2");
+		conf.setInputFilePath("");
 
 		assertThat(conf.validate().size(), is(2));
 	}
@@ -104,6 +121,13 @@ public class ConfigurationTest {
 
 		conf.setDataTypeCol("a");
 		assertNotErrorExist(conf);
+		
+		conf.setDataTypeCol("");
+		assertRequireErrorExist(conf, "explain_attribute", "item_datatype");
+
+		conf.setDataTypeCol(null);
+		assertRequireErrorExist(conf, "explain_attribute", "item_datatype");
+
 	}
 
 	@Test
@@ -126,38 +150,60 @@ public class ConfigurationTest {
 
 	@Test
 	public void validate_entitylogical_col() {
+		conf.setAdvanceSetting(true);
+		conf.setEntityLogicalRow("1");
 		conf.setEntityLogicalCol("1");
+		conf.setEntityPhysicalRow("1");
+		conf.setEntityPhysicalCol("1");
 		assertNotErrorExist(conf);
 
 		conf.setEntityLogicalCol("a");
 		assertNotErrorExist(conf);
+
+		conf.setEntityLogicalCol("");
+		assertRequireErrorExist(conf, "explain_entity", "entity.logicalname.col");
 	}
 
 	@Test
 	public void validate_entitylogical_row() {
+		conf.setAdvanceSetting(true);
 		conf.setEntityLogicalRow("1");
+		conf.setEntityLogicalCol("1");
+		conf.setEntityPhysicalRow("1");
+		conf.setEntityPhysicalCol("1");
 		assertNotErrorExist(conf);
 
 		conf.setEntityLogicalRow("a");
-		assertErrorExist(conf, "explain_entity", "entity.logicalname.row");
+		assertDigitErrorExist(conf, "explain_entity", "entity.logicalname.row");
 	}
 
 	@Test
 	public void validate_entityphysical_col() {
+		conf.setAdvanceSetting(true);
+		conf.setEntityLogicalRow("1");
+		conf.setEntityLogicalCol("1");
+		conf.setEntityPhysicalRow("1");
 		conf.setEntityPhysicalCol("1");
 		assertNotErrorExist(conf);
 
-		conf.setEntityPhysicalCol("a");
+		conf.setEntityLogicalCol("a");
 		assertNotErrorExist(conf);
+		
+		conf.setEntityPhysicalCol("");
+		assertRequireErrorExist(conf, "explain_entity", "entity.physicalname.col");
 	}
 
 	@Test
 	public void validate_entityphysical_row() {
+		conf.setAdvanceSetting(true);
+		conf.setEntityLogicalRow("1");
+		conf.setEntityLogicalCol("1");
 		conf.setEntityPhysicalRow("1");
+		conf.setEntityPhysicalCol("1");
 		assertNotErrorExist(conf);
 
 		conf.setEntityPhysicalRow("a");
-		assertErrorExist(conf, "explain_entity", "entity.physicalname.row");
+		assertDigitErrorExist(conf, "explain_entity", "entity.physicalname.row");
 	}
 
 	@Test
@@ -193,7 +239,7 @@ public class ConfigurationTest {
 		assertNotErrorExist(conf);
 
 		conf.setStartRow("a");
-		assertErrorExist(conf, "explain_attribute", "start_row");
+		assertDigitErrorExist(conf, "explain_attribute", "start_row");
 	}
 
 }

@@ -32,19 +32,19 @@ public class ImportERModelService {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ImportERModelService.class);
 
-	private StringBuilder importLog;
+	private Result result;
 	
 	public ImportERModelService() {
-		initImprtLog();
+		init();
 	}
 	
-	private void initImprtLog() {
-		importLog = new StringBuilder();
+	private void init() {
+		result = new Result();
 	}
 
-	public void importERModel(Configuration configuration) {
+	public Result importERModel(Configuration configuration) {
 		
-		initImprtLog();
+		init();
 		
 		ParseExcelToEntityModelService parseService = new ParseExcelToEntityModelService();
 
@@ -59,14 +59,13 @@ public class ImportERModelService {
 				log_info(Messages.getMessage("log.error.create_entity_end", entityName));
 			}
 		}
-	}
-
-	public String getImportLog(){
-		return importLog.toString();
+		
+		return result;
 	}
 
 	private void log_append(String message) {
-		importLog.append(message).append(SystemUtils.LINE_SEPARATOR);
+		result.appendMessage(message);
+		result.appendMessage(SystemUtils.LINE_SEPARATOR);
 	}
 	
 	private void log_info(String message){
@@ -74,19 +73,16 @@ public class ImportERModelService {
 		log_append(message);
 	}
 
-	private void log_warn(String message) {
-		logger.warn(message);
-		log_append(message);
-	}
-
 	private void log_error(String message) {
 		logger.error(message);
 		log_append(message);
+		result.setErrorOccured(true);
 	}
 	
 	private void log_error(String message,Throwable e) {
 		logger.error(message,e);
 		log_append(message);
+		result.setErrorOccured(true);
 	}
 	
 	IEREntity createAstahModel(Entity entity) {
@@ -115,7 +111,7 @@ public class ImportERModelService {
 					erModel.getSchemata()[0], entityName,
 					entity.getEntityPhysicalName());
 
-			log_info(Messages.getMessage("log.create_entity", entityName));
+			logger.info(Messages.getMessage("log.create_entity", entityName));
 
 			DomainFinder domainFinder = new DomainFinder();
 			DataTypeFinder dataTypeFinder = new DataTypeFinder();
@@ -132,7 +128,7 @@ public class ImportERModelService {
 					IERDatatype dataType = dataTypeFinder.find(attr
 							.getDataType());
 					if (dataType == null) {
-						log_warn(Messages.getMessage(
+						log_error(Messages.getMessage(
 								"log.error.create_attribute.missing_datatype",
 								entityName, attr.getLogicalName()));
 						continue;
@@ -145,6 +141,7 @@ public class ImportERModelService {
 
 			}
 			projectAccessor.getTransactionManager().endTransaction();
+			result.inclementEntitesCount();
 			log_info(Messages.getMessage("log.create_entity_end", entityName));
 			return entityModel;
 		} catch (ClassNotFoundException e) {
@@ -170,8 +167,7 @@ public class ImportERModelService {
 			
 			throw new ApplicationException(e);
 		} catch (ProjectNotFoundException e) {
-			log_error(Messages.getMessage("log.error.create_entity",
-					entityName, e.getMessage()), e);
+			log_error(Messages.getMessage("error.project.not.found"), e);
 			
 			aboartTransaction();
 			throw new ApplicationException(e);
@@ -210,7 +206,7 @@ public class ImportERModelService {
 	private IERAttribute createAttribute(ERModelEditor editor,
 			IEREntity entityModel, Attribute attr, IERDatatype dataType)
 			throws InvalidEditingException {
-		log_info(Messages.getMessage("log.create_attribute",
+		logger.info(Messages.getMessage("log.create_attribute",
 				entityModel.getName(), attr.getLogicalName()));
 
 		IERAttribute attrModel = editor.createERAttribute(entityModel,
@@ -223,7 +219,7 @@ public class ImportERModelService {
 			IEREntity entityModel, Attribute attr, IERDomain domain)
 			throws InvalidEditingException {
 
-		log_info(Messages.getMessage("log.create_attribute_using_domain",
+		logger.info(Messages.getMessage("log.create_attribute_using_domain",
 				entityModel.getName(), attr.getLogicalName(), domain.getName()));
 
 		IERAttribute attrModel = editor.createERAttribute(entityModel,
@@ -242,4 +238,33 @@ public class ImportERModelService {
 		}
 	}
 
+	public static class Result {
+		private int createdEntitiesCount = 0;
+		private StringBuilder sb = new StringBuilder();
+		private boolean errorOccured = false;
+		
+		public void inclementEntitesCount(){
+			createdEntitiesCount++;
+		}
+		
+		public void appendMessage(String message){
+			sb.append(message);
+		}
+		
+		public String getMessage(){
+			return sb.toString();
+		}
+		
+		public int getCreatedEntitiesCount(){
+			return createdEntitiesCount;
+		}
+		
+		public void setErrorOccured(boolean value){
+			errorOccured = value;
+		}
+		
+		public boolean isErrorOccured(){
+			return errorOccured;
+		}
+	}
 }

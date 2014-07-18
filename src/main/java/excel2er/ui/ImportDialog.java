@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -26,18 +28,20 @@ import excel2er.exceptions.ApplicationException;
 import excel2er.exceptions.ValidationError;
 import excel2er.models.Configuration;
 import excel2er.services.ImportERModelService;
+import excel2er.services.ImportERModelService.Result;
 
 public class ImportDialog extends JDialog {
 
 	private static final long serialVersionUID = 8758963086319476079L;
 	private InputFilePanel inputFilePanel;
-	private GenerateButton generateButton;
+	private ImportButton generateButton;
 	private EntityPanel entityPanel;
 	private ERAttributePanel attributePanel;
 	private static final String NAME = "ImportDialog";
 	private static int WIDTH = 510;
 	private static int HEIGHT = 140;
 	protected static final int GAP = 1;
+	static final String DETAIL_TEXT = "detail_text";
 
 	public ImportDialog(JFrame window) {
 		super(window, true);
@@ -84,37 +88,56 @@ public class ImportDialog extends JDialog {
 		List<ValidationError> errors = validateInput();
 
 		if (errors.size() > 0) {
-			showResultDialog(Status.ERROR, getValidationErrorMessage(errors));
+			showErrorResultDialog(getValidationErrorMessage(errors));
 			return;
 		}
 
 		ImportERModelService service = new ImportERModelService();
 		try {
-			service.importERModel(getConfiguration());
+			Result result = service.importERModel(getConfiguration());
 
-			showResultDialog(Status.NORMAL, service.getImportLog());
+			showResultDialog(Status.NORMAL, result);
 		} catch (Throwable t) {
-			showResultDialog(Status.ERROR, service.getImportLog());
+			StringWriter sw = new StringWriter();
+			PrintWriter w = new PrintWriter(sw);
+			t.printStackTrace(w);
+			showErrorResultDialog(sw.toString());
 			throw new ApplicationException(t);
 		}
 	}
 	
 	private String getValidationErrorMessage(List<ValidationError> errors){
 		StringBuilder sb = new StringBuilder();
-		for(ValidationError error : errors){
-			sb.append(error.getMessage()).append(SystemUtils.LINE_SEPARATOR);
+		for(int i =0; i < errors.size();i++){
+			ValidationError error = errors.get(i);
+			sb.append(error.getMessage());
+			if(i < errors.size() -1){
+				sb.append(SystemUtils.LINE_SEPARATOR);
+			}
 		}
 		return sb.toString();
 	}
 
-	private void showResultDialog(Status status, String detailMessage) {
+	void showErrorResultDialog(String errorMessage) {
+		ImportERModelService.Result result = new ImportERModelService.Result();
+		result.appendMessage(errorMessage);
+		showResultDialog(Status.ERROR,result);
+	}
+	
+	void showResultDialog(Status status, Result result) {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+		int messageType = JOptionPane.INFORMATION_MESSAGE;
 		String mainMessage = null;
 		if (status.equals(Status.NORMAL)) {
-			mainMessage = Messages.getMessage("result.dialog.normal");
+			if(result.isErrorOccured()){
+				mainMessage = Messages.getMessage("result.dialog.normal_with_error", result.getCreatedEntitiesCount());
+			}else{
+				mainMessage = Messages.getMessage("result.dialog.normal",result.getCreatedEntitiesCount());
+			}
 		} else if (status.equals(Status.ERROR)) {
+			messageType = JOptionPane.ERROR_MESSAGE;
 			mainMessage = Messages.getMessage("result.dialog.error");
 		}
 
@@ -123,8 +146,10 @@ public class ImportDialog extends JDialog {
 		messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(messageLabel);
 
+		String detailMessage = result.getMessage();
 		if (StringUtils.isNotEmpty(detailMessage)) {
-			final JTextArea detailTextArea = new JTextArea(detailMessage, 5, 10);
+			JTextArea detailTextArea = new JTextArea(detailMessage, 5, 10);
+			detailTextArea.setName(DETAIL_TEXT);
 			detailTextArea.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 			detailTextArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 			detailTextArea.setEditable(false);
@@ -136,21 +161,13 @@ public class ImportDialog extends JDialog {
 			panel.add(scrollPane);
 		}
 
-		int messageType = JOptionPane.INFORMATION_MESSAGE;
-		if (status.equals(Status.ERROR)) {
-			messageType = JOptionPane.ERROR_MESSAGE;
-		}
 		JOptionPane.showMessageDialog(this, panel,
 				Messages.getMessage("result.dialog.title"), messageType);
 	}
 
-	private enum Status {
-		NORMAL, ERROR;
-	}
-
 	private void createSouthContent() {
 		JPanel sourthContentPanel = new JPanel(new GridLayout(1, 2, GAP, GAP));
-		generateButton = new GenerateButton(new ActionListener() {
+		generateButton = new ImportButton(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				execute();
 			}
@@ -165,10 +182,10 @@ public class ImportDialog extends JDialog {
 	}
 
 	@SuppressWarnings("serial")
-	class GenerateButton extends JButton {
-		static final String NAME = "generate";
+	class ImportButton extends JButton {
+		static final String NAME = "import";
 
-		private GenerateButton(ActionListener listener) {
+		private ImportButton(ActionListener listener) {
 			setName(NAME);
 			setText(Messages.getMessage(NAME));
 			addActionListener(listener);
@@ -218,5 +235,9 @@ public class ImportDialog extends JDialog {
 
 	List<ValidationError> validateInput() {
 		return getConfiguration().validate();
+	}
+	
+	enum Status {
+		NORMAL, ERROR;
 	}
 }

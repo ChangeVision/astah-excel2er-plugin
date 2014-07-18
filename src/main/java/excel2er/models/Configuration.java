@@ -94,10 +94,14 @@ public class Configuration {
 
 	public void setUseSheetName(boolean useSheetName) {
 		this.useSheetName = useSheetName;
+		if(useSheetName)
+			advanceSetting = false;
 	}
 
 	public void setAdvanceSetting(boolean advanceSetting) {
 		this.advanceSetting = advanceSetting;
+		if(advanceSetting)
+			useSheetName = false;
 	}
 
 	public void setEntityLogicalRow(String logicalRow) {
@@ -171,24 +175,44 @@ public class Configuration {
 		}
 		
 		if (!useSheetName && !advanceSetting) {
-			throw new IllegalArgumentException(
-					"useSheetName or advanceSetting must true");
+			errors.add(new ValidationError(Messages.getMessage("error.usesheetname_or_advancesetting")));
 		}
 
-		// for entity
-		validateDigit(errors, getEntityLogicalRow(), "explain_entity",
-				"entity.logicalname.row");
-		validateDigit(errors, getEntityPhysicalRow(), "explain_entity",
-				"entity.physicalname.row");
+		if(advanceSetting){
+			validateDigit(errors, getEntityLogicalRow(), "explain_entity",
+					"entity.logicalname.row");
+			validRequired(errors, getEntityLogicalCol(), "explain_entity",
+					"entity.logicalname.col");
+			validateDigit(errors, getEntityPhysicalRow(), "explain_entity",
+					"entity.physicalname.row");
+			validRequired(errors, getEntityPhysicalCol(), "explain_entity",
+					"entity.physicalname.col");
+		}
 
 		// for attribute
+		validRequired(errors, getDataTypeCol() , "explain_attribute", "item_datatype");
 		validateDigit(errors, getStartRow(), "explain_attribute", "start_row");
 
 		return errors;
 	}
 
+	private void validRequired(List<ValidationError> errors, String value,
+			String key, String subkey){
+		
+		if(StringUtils.isEmpty(value)){
+			String message = Messages.getMessage(
+					"error.required",
+					Messages.getMessage(key) + " - "
+							+ Messages.getMessage(subkey));
+			errors.add(new ValidationError(message));
+		}
+	}
+	
 	private void validateDigit(List<ValidationError> errors, String value,
 			String key, String subkey) {
+		
+		validRequired(errors, value, key, subkey);
+		
 		if (!StringUtils.isEmpty(value) && !NumberUtils.isDigits(value)) {
 			String message = Messages.getMessage(
 					"error.not.digit",

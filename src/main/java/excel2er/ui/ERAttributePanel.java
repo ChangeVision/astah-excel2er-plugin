@@ -35,7 +35,22 @@ public class ERAttributePanel extends JPanel {
 		setBorder(BorderFactory.createTitledBorder(Messages
 				.getMessage("explain_attribute")));
 		createContents();
+		
+		setDefaultValueForAstahEREntityDocument();
+		
 		setVisible(true);
+	}
+
+	private void setDefaultValueForAstahEREntityDocument() {
+		startRow.setText("9");
+		logicalCol.setText("B");
+		physicalCol.setText("G");
+		primaryKeyCol.setText("L");
+		notNullCol.setText("P");
+		dataTypeCol.setText("Q");
+		lengthCol.setText("U");
+		defaultValueCol.setText("Y");
+		definitionCol.setText("AC");
 	}
 
 	private void createContents() {
@@ -79,31 +94,30 @@ public class ERAttributePanel extends JPanel {
 		add(sep, separatorConstraint);
 		add(new Empty(), gbc);
 
-		gbc.gridy = 5;
+		gbc.gridy =5;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.LOGICAL)), gbc);
 		add(logicalCol = new ItemCol(ItemCol.LOGICAL), gbc);
-		gbc.weightx = 0.2d;
 		gbc.gridy = 6;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.PHYSICAL)), gbc);
 		add(physicalCol = new ItemCol(ItemCol.PHYSICAL), gbc);
 		gbc.gridy = 7;
 		add(new Empty(), gbc);
+		add(new JLabel(Messages.getMessage(ItemCol.DATATYPE)), gbc);
+		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
+		gbc.gridy = 8;
+		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.PRIMARYKEY)), gbc);
 		add(primaryKeyCol = new ItemCol(ItemCol.PRIMARYKEY), gbc);
-		gbc.gridy = 8;
+		gbc.gridy = 9;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
 		add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
-		gbc.gridy = 9;
+		gbc.gridy = 10;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFAULT_VALUE)), gbc);
 		add(defaultValueCol = new ItemCol(ItemCol.DEFAULT_VALUE), gbc);
-		gbc.gridy = 10;
-		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.DATATYPE)), gbc);
-		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
 		gbc.gridy = 11;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.LENGTH)), gbc);
@@ -122,7 +136,6 @@ public class ERAttributePanel extends JPanel {
 		public StartRow() {
 			setName(NAME);
 			setColumns(2);
-			setText("1");
 		}
 	}
 

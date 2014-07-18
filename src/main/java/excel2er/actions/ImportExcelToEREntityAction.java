@@ -14,9 +14,9 @@ import com.change_vision.jude.api.inf.ui.IWindow;
 import excel2er.Messages;
 import excel2er.ui.erentity.ImportDialog;
 
-public class ImportExcelToEREntityction implements IPluginActionDelegate {
+public class ImportExcelToEREntityAction implements IPluginActionDelegate {
 	private static final Logger logger = LoggerFactory
-			.getLogger(ImportExcelToEREntityction.class);
+			.getLogger(ImportExcelToEREntityAction.class);
 	
 	public Object run(IWindow window) throws UnExpectedException {
 		try {

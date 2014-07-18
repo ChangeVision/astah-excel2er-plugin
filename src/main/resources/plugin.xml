@@ -13,10 +13,18 @@
          <action
 			   label="%menu_label"
                icon="icons/sample.gif"
-               class="excel2er.actions.ImportExcelToERModelAction"
+               class="excel2er.actions.ImportExcelToEREntityAction"
                tooltip="%menu_tooltip"
                menubarPath="tool/er"
-               id="excel2er.actions.ImportExcelToERModelAction">
+               id="excel2er.actions.ImportExcelToEREntityAction">
+         </action>
+         <action
+			   label="%menu_domain_label"
+               icon="icons/sample.gif"
+               class="excel2er.actions.ImportExcelToERDomainAction"
+               tooltip="%menu_domain_tooltip"
+               menubarPath="tool/er"
+               id="excel2er.actions.ImportExcelToERDomainAction">
          </action>
      </actionSet>
    </extension>

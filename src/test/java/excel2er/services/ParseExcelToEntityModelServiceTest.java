@@ -23,7 +23,7 @@ public class ParseExcelToEntityModelServiceTest {
 		conf.setEntityLogicalRow("1");
 		conf.setEntityLogicalCol("H");
 		conf.setEntityPhysicalRow("2");
-		conf.setEntityPhysicalRow("H");
+		conf.setEntityPhysicalCol("H");
 
 		conf.setAttributeLogicalCol("B");
 		conf.setAttributePhysicalCol("G");

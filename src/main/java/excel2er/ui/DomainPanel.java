@@ -20,10 +20,7 @@ public class DomainPanel extends JPanel {
 	private StartRow startRow;
 	private ItemCol logicalCol;
 	private ItemCol physicalCol;
-	private ItemCol notNullCol;
-	private ItemCol defaultValueCol;
 	private ItemCol dataTypeCol;
-	private ItemCol lengthCol;
 	private ItemCol definitionCol;
 
 	public DomainPanel() {
@@ -45,9 +42,6 @@ public class DomainPanel extends JPanel {
 		logicalCol.setText("B");
 		physicalCol.setText("G");
 		dataTypeCol.setText("V");
-		lengthCol.setText("Z");
-		notNullCol.setText("AD");
-		defaultValueCol.setText("");
 		definitionCol.setText("AJ");
 	}
 
@@ -106,18 +100,6 @@ public class DomainPanel extends JPanel {
 		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
 		gbc.gridy = 8;
 		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.LENGTH)), gbc);
-		add(lengthCol = new ItemCol(ItemCol.LENGTH), gbc);
-		gbc.gridy = 9;
-		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.DEFAULT_VALUE)), gbc);
-		add(defaultValueCol = new ItemCol(ItemCol.DEFAULT_VALUE), gbc);
-		gbc.gridy = 10;
-		add(new Empty(), gbc);
-		add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
-		add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
-		gbc.gridy = 11;
-		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFINITION)), gbc);
 		add(definitionCol = new ItemCol(ItemCol.DEFINITION), gbc);
 
@@ -136,17 +118,13 @@ public class DomainPanel extends JPanel {
 	class ItemCol extends JTextField {
 
 		private static final long serialVersionUID = 1L;
-		static final String LOGICAL = "item_logical";
-		static final String PHYSICAL = "item_physical";
-		static final String NOTNULL = "item_notnull";
-		static final String DEFAULT_VALUE = "item_defaultvalue";
-		static final String DATATYPE = "item_datatype";
-		static final String LENGTH = "item_length";
-		static final String DEFINITION = "item_definition";
-		static final String SUFFIX = "_domain";
+		static final String LOGICAL = "item_logical_domain";
+		static final String PHYSICAL = "item_physical_domain";
+		static final String DATATYPE = "item_datatype_domain";
+		static final String DEFINITION = "item_definition_domain";
 		
 		public ItemCol(String key) {
-			setName(key + SUFFIX);
+			setName(key);
 			setColumns(2);
 		}
 	}
@@ -163,20 +141,8 @@ public class DomainPanel extends JPanel {
 		return physicalCol.getText();
 	}
 
-	public String getNotNullCol() {
-		return notNullCol.getText();
-	}
-
-	public String getDefaultValueCol() {
-		return defaultValueCol.getText();
-	}
-
 	public String getDataTypeCol() {
 		return dataTypeCol.getText();
-	}
-
-	public String getLengthCol() {
-		return lengthCol.getText();
 	}
 
 	public String getDefinitionCol() {

@@ -1,7 +1,7 @@
 package excel2er.models;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ConfigurationTest {
 		assertThat(errors.get(0).getMessage(), is(getMessage("error.required",key, subkey)));
 	}
 	
-	private void assertDigitErrorExist(Configuration conf, String key) {
+	private void assertErrorExist(Configuration conf, String key) {
 		List<ValidationError> errors = conf.validate();
 		assertThat(errors.size(), is(1));
 		assertThat(errors.get(0).getMessage(), is(Messages.getMessage(key)));
@@ -64,7 +64,7 @@ public class ConfigurationTest {
 	@Test
 	public void validate_inputfile() throws Exception {
 		conf.setInputFilePath("");
-		assertDigitErrorExist(conf, "error.inputfile_required");
+		assertErrorExist(conf, "error.inputfile_required");
 		
 		conf.setInputFilePath("/tmp/dummypath");
 		assertNotErrorExist(conf);

@@ -159,7 +159,7 @@ public class ImportERModelService {
 				log_error(Messages.getMessage("log.error.create_entity.duplicate_entity",
 						entityName));
 			}else { 
-				log_error(Messages.getMessage("log.error.create_entity.invalideditiongexception",
+				log_error(Messages.getMessage("log.error.create_entity.invalideditingexception",
 						entityName,e.getKey()), e);
 			}
 			
@@ -235,36 +235,6 @@ public class ImportERModelService {
 			projectAccessor.getTransactionManager().abortTransaction();
 		} catch (Exception e) {
 			//
-		}
-	}
-
-	public static class Result {
-		private int createdEntitiesCount = 0;
-		private StringBuilder sb = new StringBuilder();
-		private boolean errorOccured = false;
-		
-		public void inclementEntitesCount(){
-			createdEntitiesCount++;
-		}
-		
-		public void appendMessage(String message){
-			sb.append(message);
-		}
-		
-		public String getMessage(){
-			return sb.toString();
-		}
-		
-		public int getCreatedEntitiesCount(){
-			return createdEntitiesCount;
-		}
-		
-		public void setErrorOccured(boolean value){
-			errorOccured = value;
-		}
-		
-		public boolean isErrorOccured(){
-			return errorOccured;
 		}
 	}
 }

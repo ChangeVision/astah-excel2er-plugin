@@ -16,11 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import excel2er.Messages;
-import excel2er.services.ImportERModelService.Result;
-import excel2er.ui.ERAttributePanel;
-import excel2er.ui.EntityPanel;
-import excel2er.ui.ImportDialog;
-import excel2er.ui.InputFilePanel;
+import excel2er.models.Configuration;
+import excel2er.services.Result;
 
 @RunWith(GUITestRunner.class)
 public class ImportDialogTest {
@@ -56,7 +53,7 @@ public class ImportDialogTest {
 		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
 				"/tmp/test/path");
 
-		assertThat(target.getConfiguration().getInputFilePath(),
+		assertThat(((Configuration)target.getConfiguration()).getInputFilePath(),
 				is("/tmp/test/path"));
 	}
 
@@ -64,7 +61,7 @@ public class ImportDialogTest {
 	public void should_get_isUseSheetName() throws Exception {
 		dialogFixture.radioButton(EntityPanel.UseSheetNameButton.NAME).check();
 
-		assertThat(target.getConfiguration().isUseSheetName(), is(true));
+		assertThat(((Configuration)target.getConfiguration()).isUseSheetName(), is(true));
 	}
 
 	@Test
@@ -72,7 +69,7 @@ public class ImportDialogTest {
 		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME)
 				.check();
 
-		assertThat(target.getConfiguration().isAdvanceSetting(), is(true));
+		assertThat(((Configuration)target.getConfiguration()).isAdvanceSetting(), is(true));
 	}
 
 	@Test
@@ -85,8 +82,8 @@ public class ImportDialogTest {
 		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_COL)
 				.setText("5");
 
-		assertThat(target.getConfiguration().getEntityLogicalRow(), is("4"));
-		assertThat(target.getConfiguration().getEntityLogicalCol(), is("5"));
+		assertThat(((Configuration)target.getConfiguration()).getEntityLogicalRow(), is("4"));
+		assertThat(((Configuration)target.getConfiguration()).getEntityLogicalCol(), is("5"));
 	}
 
 	@Test
@@ -99,8 +96,8 @@ public class ImportDialogTest {
 		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL)
 				.setText("50");
 
-		assertThat(target.getConfiguration().getEntityPhysicalRow(), is("40"));
-		assertThat(target.getConfiguration().getEntityPhysicalCol(), is("50"));
+		assertThat(((Configuration)target.getConfiguration()).getEntityPhysicalRow(), is("40"));
+		assertThat(((Configuration)target.getConfiguration()).getEntityPhysicalCol(), is("50"));
 	}
 
 	@Test
@@ -115,14 +112,14 @@ public class ImportDialogTest {
 		dialogFixture.textBox(ERAttributePanel.ItemCol.LENGTH).setText("7");
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("8");
 
-		assertThat(target.getConfiguration().getAttributeLogicalCol(), is("1"));
-		assertThat(target.getConfiguration().getAttributePhysicalCol(), is("2"));
-		assertThat(target.getConfiguration().getPrimaryKeyCol(), is("3"));
-		assertThat(target.getConfiguration().getNotNullCol(), is("4"));
-		assertThat(target.getConfiguration().getDefaultValueCol(), is("5"));
-		assertThat(target.getConfiguration().getDataTypeCol(), is("6"));
-		assertThat(target.getConfiguration().getLengthCol(), is("7"));
-		assertThat(target.getConfiguration().getDefinitionCol(), is("8"));
+		assertThat(((Configuration)target.getConfiguration()).getAttributeLogicalCol(), is("1"));
+		assertThat(((Configuration)target.getConfiguration()).getAttributePhysicalCol(), is("2"));
+		assertThat(((Configuration)target.getConfiguration()).getPrimaryKeyCol(), is("3"));
+		assertThat(((Configuration)target.getConfiguration()).getNotNullCol(), is("4"));
+		assertThat(((Configuration)target.getConfiguration()).getDefaultValueCol(), is("5"));
+		assertThat(((Configuration)target.getConfiguration()).getDataTypeCol(), is("6"));
+		assertThat(((Configuration)target.getConfiguration()).getLengthCol(), is("7"));
+		assertThat(((Configuration)target.getConfiguration()).getDefinitionCol(), is("8"));
 	}
 
 	@Test

@@ -27,7 +27,7 @@ public class ImportERModelServiceTest {
 	@Rule
 	public TestName testName = new TestName();
 
-	private boolean debug = true;
+	private boolean debug = false;
 
 	@After
 	public void tearDown() throws Exception {

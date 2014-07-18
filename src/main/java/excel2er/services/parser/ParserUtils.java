@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
-import excel2er.models.Configuration;
+import excel2er.models.ConfigurationBase;
 
 public class ParserUtils {
 
@@ -34,7 +34,7 @@ public class ParserUtils {
 		return StringUtils.isEmpty(one) && StringUtils.isEmpty(other);
 	}
 
-	public static Workbook getWorkbook(Configuration configuration) {
+	public static Workbook getWorkbook(ConfigurationBase configuration) {
 		String inputFilePath = configuration.getInputFilePath();
 		try {
 			Workbook workbook = WorkbookFactory.create(new File(inputFilePath));

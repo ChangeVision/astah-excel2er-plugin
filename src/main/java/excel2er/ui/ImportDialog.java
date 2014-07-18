@@ -1,37 +1,23 @@
 package excel2er.ui;
 
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import excel2er.Messages;
-import excel2er.exceptions.ApplicationException;
-import excel2er.exceptions.ValidationError;
 import excel2er.models.Configuration;
+import excel2er.models.ConfigurationBase;
 import excel2er.services.ImportERModelService;
-import excel2er.services.ImportERModelService.Result;
+import excel2er.services.Result;
 
-public class ImportDialog extends JDialog {
+public class ImportDialog extends ImportDialogBase {
 
 	private static final long serialVersionUID = 8758963086319476079L;
 	private InputFilePanel inputFilePanel;
@@ -42,7 +28,6 @@ public class ImportDialog extends JDialog {
 	private static int WIDTH = 510;
 	private static int HEIGHT = 140;
 	protected static final int GAP = 1;
-	static final String DETAIL_TEXT = "detail_text";
 
 	public ImportDialog(JFrame window) {
 		super(window, true);
@@ -81,100 +66,13 @@ public class ImportDialog extends JDialog {
 		getContentPane().add(mainContentPanel);
 	}
 
-	protected void close() {
-		setVisible(false);
-	}
-
-	private void execute() {
-		Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-		this.setCursor(waitCursor);
-
+	protected void executeService() {
 		ImportERModelService service = new ImportERModelService();
-		try {
-			List<ValidationError> errors = validateInput();
+		Result result = service.importERModel((Configuration)getConfiguration());
 
-			if (errors.size() > 0) {
-				showErrorResultDialog(getValidationErrorMessage(errors));
-				return;
-			}
-
-			Result result = service.importERModel(getConfiguration());
-
-			showResultDialog(Status.NORMAL, result);
-		} catch (Throwable t) {
-			StringWriter sw = new StringWriter();
-			PrintWriter w = new PrintWriter(sw);
-			t.printStackTrace(w);
-			showErrorResultDialog(sw.toString());
-			throw new ApplicationException(t);
-		} finally {
-			Cursor defaultCursor = Cursor.getDefaultCursor();
-			this.setCursor(defaultCursor);
-			close();
-		}
+		showResultDialog(Status.NORMAL, result);
 	}
 
-	private String getValidationErrorMessage(List<ValidationError> errors) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < errors.size(); i++) {
-			ValidationError error = errors.get(i);
-			sb.append(error.getMessage());
-			if (i < errors.size() - 1) {
-				sb.append(SystemUtils.LINE_SEPARATOR);
-			}
-		}
-		return sb.toString();
-	}
-
-	void showErrorResultDialog(String errorMessage) {
-		ImportERModelService.Result result = new ImportERModelService.Result();
-		result.appendMessage(errorMessage);
-		showResultDialog(Status.ERROR, result);
-	}
-
-	void showResultDialog(Status status, Result result) {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-		int messageType = JOptionPane.INFORMATION_MESSAGE;
-		String mainMessage = null;
-		if (status.equals(Status.NORMAL)) {
-			if (result.isErrorOccured()) {
-				mainMessage = Messages.getMessage(
-						"result.dialog.normal_with_error",
-						result.getCreatedEntitiesCount());
-			} else {
-				mainMessage = Messages.getMessage("result.dialog.normal",
-						result.getCreatedEntitiesCount());
-			}
-		} else if (status.equals(Status.ERROR)) {
-			messageType = JOptionPane.ERROR_MESSAGE;
-			mainMessage = Messages.getMessage("result.dialog.error");
-		}
-
-		final JLabel messageLabel = new JLabel(mainMessage);
-		messageLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-		messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		panel.add(messageLabel);
-
-		String detailMessage = result.getMessage();
-		if (StringUtils.isNotEmpty(detailMessage)) {
-			JTextArea detailTextArea = new JTextArea(detailMessage, 5, 10);
-			detailTextArea.setName(DETAIL_TEXT);
-			detailTextArea.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-			detailTextArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-			detailTextArea.setEditable(false);
-			detailTextArea.setLineWrap(true);
-
-			JScrollPane scrollPane = new JScrollPane();
-			scrollPane.setViewportView(detailTextArea);
-
-			panel.add(scrollPane);
-		}
-
-		JOptionPane.showMessageDialog(this, panel,
-				Messages.getMessage("result.dialog.title"), messageType);
-	}
 
 	private void createSouthContent() {
 		JPanel sourthContentPanel = new JPanel(new GridLayout(1, 2, GAP, GAP));
@@ -221,7 +119,7 @@ public class ImportDialog extends JDialog {
 		p.setVisible(true);
 	}
 
-	public Configuration getConfiguration() {
+	public ConfigurationBase getConfiguration() {
 		Configuration configuration = new Configuration();
 
 		configuration.setInputFilePath(inputFilePanel.getInputFilePath());
@@ -244,11 +142,4 @@ public class ImportDialog extends JDialog {
 		return configuration;
 	}
 
-	List<ValidationError> validateInput() {
-		return getConfiguration().validate();
-	}
-
-	enum Status {
-		NORMAL, ERROR;
-	}
 }

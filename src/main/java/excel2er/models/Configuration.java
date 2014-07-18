@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import excel2er.Messages;
 import excel2er.exceptions.ValidationError;
 
-public class Configuration {
+public class Configuration extends ConfigurationBase{
 
-	private String inputFilePath;
 	private boolean useSheetName = false;
 	private boolean advanceSetting = false;
 	private String entityLogicalRow;
@@ -27,14 +25,6 @@ public class Configuration {
 	private String lengthCol;
 	private String definitionCol;
 	private String startRow;
-
-	public void setInputFilePath(String inputFilePath) {
-		this.inputFilePath = inputFilePath;
-	}
-
-	public String getInputFilePath() {
-		return inputFilePath;
-	}
 
 	public boolean isUseSheetName() {
 		return useSheetName;
@@ -194,32 +184,6 @@ public class Configuration {
 		validateDigit(errors, getStartRow(), "explain_attribute", "start_row");
 
 		return errors;
-	}
-
-	private void validRequired(List<ValidationError> errors, String value,
-			String key, String subkey){
-		
-		if(StringUtils.isEmpty(value)){
-			String message = Messages.getMessage(
-					"error.required",
-					Messages.getMessage(key) + " - "
-							+ Messages.getMessage(subkey));
-			errors.add(new ValidationError(message));
-		}
-	}
-	
-	private void validateDigit(List<ValidationError> errors, String value,
-			String key, String subkey) {
-		
-		validRequired(errors, value, key, subkey);
-		
-		if (!StringUtils.isEmpty(value) && !NumberUtils.isDigits(value)) {
-			String message = Messages.getMessage(
-					"error.not.digit",
-					Messages.getMessage(key) + " - "
-							+ Messages.getMessage(subkey));
-			errors.add(new ValidationError(message));
-		}
 	}
 
 }

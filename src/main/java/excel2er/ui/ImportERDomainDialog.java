@@ -8,13 +8,16 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import excel2er.Messages;
+import excel2er.models.ConfigurationBase;
+import excel2er.models.DomainConfiguration;
+import excel2er.services.ImportERDomainService;
+import excel2er.services.Result;
 
-public class ImportERDomainDialog extends JDialog{
+public class ImportERDomainDialog extends ImportDialogBase{
 
 	private static final long serialVersionUID = -4227686440674677417L;
 
@@ -61,13 +64,6 @@ public class ImportERDomainDialog extends JDialog{
 		getContentPane().add(mainContentPanel);
 	}
 
-	protected void close() {
-		setVisible(false);
-	}
-
-	private void execute() {
-	}
-
 	private void createSouthContent() {
 		JPanel sourthContentPanel = new JPanel(new GridLayout(1, 2, GAP, GAP));
 		importButton = new ImportButton(new ActionListener() {
@@ -111,6 +107,28 @@ public class ImportERDomainDialog extends JDialog{
 		ImportERDomainDialog p = new ImportERDomainDialog(frame);
 		p.pack();
 		p.setVisible(true);
+	}
+
+	@Override
+	protected ConfigurationBase getConfiguration() {
+		DomainConfiguration configuration = new DomainConfiguration();
+
+		configuration.setInputFilePath(inputFilePanel.getInputFilePath());
+		configuration.setLogicalCol(domainPanel.getLogicalCol());
+		configuration.setPhysicalCol(domainPanel.getPhysicalCol());
+		configuration.setStartRow(domainPanel.getStartRow());
+		configuration.setDataTypeCol(domainPanel.getDataTypeCol());
+		configuration.setDefinitionCol(domainPanel.getDefinitionCol());
+
+		return configuration;
+	}
+
+	@Override
+	protected void executeService() {
+		ImportERDomainService service = new ImportERDomainService();
+		Result result = service.importERDomain((DomainConfiguration)getConfiguration());
+
+		showResultDialog(Status.NORMAL, result);
 	}
 
 }

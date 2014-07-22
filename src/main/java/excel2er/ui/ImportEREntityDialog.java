@@ -17,7 +17,7 @@ import excel2er.models.ConfigurationBase;
 import excel2er.services.ImportERModelService;
 import excel2er.services.Result;
 
-public class ImportDialog extends ImportDialogBase {
+public class ImportEREntityDialog extends ImportDialogBase {
 
 	private static final long serialVersionUID = 8758963086319476079L;
 	private InputFilePanel inputFilePanel;
@@ -29,7 +29,7 @@ public class ImportDialog extends ImportDialogBase {
 	private static int HEIGHT = 140;
 	protected static final int GAP = 1;
 
-	public ImportDialog(JFrame window) {
+	public ImportEREntityDialog(JFrame window) {
 		super(window, true);
 		setName(NAME);
 		setTitle(Messages.getMessage("dialog.title"));
@@ -114,7 +114,7 @@ public class ImportDialog extends ImportDialogBase {
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Test");
-		ImportDialog p = new ImportDialog(frame);
+		ImportEREntityDialog p = new ImportEREntityDialog(frame);
 		p.pack();
 		p.setVisible(true);
 	}

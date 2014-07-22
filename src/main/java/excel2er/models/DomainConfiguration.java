@@ -82,6 +82,7 @@ public class DomainConfiguration extends ConfigurationBase {
 		validRequired(errors, getDataTypeCol(), "explain_domain",
 				"item_datatype");
 		validateDigit(errors, getStartRow(), "explain_domain", "start_row");
+		validRequired(errors, getLogicalCol(), "explain_domain", "item_logical_domain");
 
 		return errors;
 	}

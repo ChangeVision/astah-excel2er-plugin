@@ -8,3 +8,4 @@ failed-gui-tests
 build
 *.~lock
 *~
+**/.~lock.domainLists.xls#

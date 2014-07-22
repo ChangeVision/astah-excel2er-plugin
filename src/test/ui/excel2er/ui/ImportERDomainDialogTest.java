@@ -96,9 +96,9 @@ public class ImportERDomainDialogTest {
 	
 	@Test
 	public void should_show_error_dialog_not_set_inputfile() throws Exception {
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportERDomainDialog.ImportButton.NAME).click();
 		dialogFixture.optionPane().requireVisible();
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
 				.text(), is(Messages.getMessage("error.inputfile_required")));
 	}
 	
@@ -106,12 +106,29 @@ public class ImportERDomainDialogTest {
 	public void should_show_error_dialog_when_startrow_set_not_digit_value() throws Exception {
 		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
 				"/tmp/test/path");
+		dialogFixture.textBox(DomainPanel.ItemCol.LOGICAL).setText("A");
+		dialogFixture.textBox(DomainPanel.ItemCol.DATATYPE).setText("B");
+		
 		dialogFixture.textBox(DomainPanel.StartRow.NAME).setText("abc");
 		
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportERDomainDialog.ImportButton.NAME).click();
 		dialogFixture.optionPane().requireVisible();
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
 				.text(), is(Messages.getMessage("error.not.digit",Messages.getMessage("explain_domain") + " - " + Messages.getMessage("start_row"))));
+	}
+	
+	@Test
+	public void should_show_error_dialog_not_set_logicalname() throws Exception {
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				"/tmp/test/path");
+		dialogFixture.textBox(DomainPanel.ItemCol.LOGICAL).setText("");
+		dialogFixture.textBox(DomainPanel.ItemCol.DATATYPE).setText("B");
+		dialogFixture.textBox(DomainPanel.StartRow.NAME).setText("9");
+		
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
+		dialogFixture.optionPane().requireVisible();
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
+				.text(), is(Messages.getMessage("error.required",Messages.getMessage("explain_domain") + " - " + Messages.getMessage("item_logical_domain"))));
 	}
 	
 	@Ignore
@@ -127,7 +144,7 @@ public class ImportERDomainDialogTest {
 		result.inclementEntitesCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(false);
-		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);
 	}
 	
 	@Ignore
@@ -137,6 +154,6 @@ public class ImportERDomainDialogTest {
 		result.inclementEntitesCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(true);
-		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);
 	}
 }

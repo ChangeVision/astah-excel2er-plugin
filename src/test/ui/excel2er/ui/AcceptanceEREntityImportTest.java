@@ -25,22 +25,22 @@ import excel2er.AstahModelManager;
 import excel2er.Messages;
 import excel2er.ui.ERAttributePanel;
 import excel2er.ui.EntityPanel;
-import excel2er.ui.ImportDialog;
+import excel2er.ui.ImportEREntityDialog;
 import excel2er.ui.InputFilePanel;
 
 @RunWith(GUITestRunner.class)
-public class AcceptanceTest {
+public class AcceptanceEREntityImportTest {
 
 	private FrameFixture frameFixture;
 	private DialogFixture dialogFixture;
-	private ImportDialog target;
+	private ImportEREntityDialog target;
 
 	@Before
 	public void setUp() throws Exception {
 
 		JFrame frame = new JFrame();
 		frameFixture = new FrameFixture(frame);
-		target = new ImportDialog(frame);
+		target = new ImportEREntityDialog(frame);
 		dialogFixture = new DialogFixture(frameFixture.robot, target);
 		dialogFixture.moveToFront();
 		dialogFixture.show();
@@ -61,7 +61,8 @@ public class AcceptanceTest {
 	 * <pre>
 	 * - userSheetname for Entity's logicalName 
 	 * - following attribute property set... 
-	 *   - logical - datatype
+	 *   - logical 
+	 *   - datatype
 	 * </pre>
 	 * 
 	 * @throws Exception
@@ -85,7 +86,7 @@ public class AcceptanceTest {
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).setText("");
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("");
 
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 
 		dialogFixture.optionPane().requireVisible();
 		dialogFixture.optionPane().requireInformationMessage();
@@ -113,7 +114,8 @@ public class AcceptanceTest {
 	 * <pre>
 	 * - set Entity's logicalName and physicalName
 	 * - following attribute property set... 
-	 *   - logical - datatype
+	 *   - logical 
+	 *   - datatype
 	 * </pre>
 	 * 
 	 * @throws Exception
@@ -146,7 +148,7 @@ public class AcceptanceTest {
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).setText("");
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("");
 
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 
 		dialogFixture.optionPane().requireVisible();
 		dialogFixture.optionPane().requireInformationMessage();
@@ -202,7 +204,7 @@ public class AcceptanceTest {
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).setText("Y");
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("AC");
 
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 
 		dialogFixture.optionPane().requireVisible();
 		dialogFixture.optionPane().requireInformationMessage();
@@ -282,7 +284,7 @@ public class AcceptanceTest {
 		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME)
 				.check();
 
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 
 		dialogFixture.optionPane().requireVisible();
 		dialogFixture.optionPane().requireInformationMessage();
@@ -345,7 +347,7 @@ public class AcceptanceTest {
 		dialogFixture.textBox(ERAttributePanel.StartRow.NAME).setText("");
 		dialogFixture.textBox(ERAttributePanel.ItemCol.DATATYPE).setText("");
 		
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 		
 		dialogFixture.optionPane().requireErrorMessage();
 		
@@ -353,7 +355,7 @@ public class AcceptanceTest {
 		message.append(Messages.getMessage("error.inputfile_required")).append(SystemUtils.LINE_SEPARATOR);
 		message.append(getMessage("error.required","explain_attribute","item_datatype")).append(SystemUtils.LINE_SEPARATOR);
 		message.append(getMessage("error.required","explain_attribute","start_row"));
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT).text(),is(message.toString()));
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT).text(),is(message.toString()));
 	}
 	
 	private String getMessage(String key, String parameter, String subparameter) {

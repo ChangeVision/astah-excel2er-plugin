@@ -51,6 +51,7 @@ public class DomainConfigurationTest {
 	public void setUp() {
 		conf = new DomainConfiguration();
 		conf.setStartRow("9");
+		conf.setLogicalCol("B");
 		conf.setDataTypeCol("VARCHAR");
 		conf.setInputFilePath("/tmp/dummypath");
 	}
@@ -60,7 +61,7 @@ public class DomainConfigurationTest {
 		conf = new DomainConfiguration();
 
 		List<ValidationError> errors = conf.validate();
-		assertThat(errors.size(), is(3));
+		assertThat(errors.size(), is(4));
 
 	}
 	
@@ -98,6 +99,9 @@ public class DomainConfigurationTest {
 
 		conf.setLogicalCol("a");
 		assertNotErrorExist(conf);
+		
+		conf.setLogicalCol("");
+		assertRequireErrorExist(conf, "explain_domain", "item_logical_domain");
 	}
 	
 	@Test

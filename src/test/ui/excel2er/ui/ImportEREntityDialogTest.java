@@ -20,18 +20,18 @@ import excel2er.models.Configuration;
 import excel2er.services.Result;
 
 @RunWith(GUITestRunner.class)
-public class ImportDialogTest {
+public class ImportEREntityDialogTest {
 
 	private FrameFixture frameFixture;
 	private DialogFixture dialogFixture;
-	private ImportDialog target;
+	private ImportEREntityDialog target;
 
 	@Before
 	public void setUp() throws Exception {
 
 		JFrame frame = new JFrame();
 		frameFixture = new FrameFixture(frame);
-		target = new ImportDialog(frame);
+		target = new ImportEREntityDialog(frame);
 		dialogFixture = new DialogFixture(frameFixture.robot, target);
 		dialogFixture.moveToFront();
 		dialogFixture.show();
@@ -124,9 +124,9 @@ public class ImportDialogTest {
 
 	@Test
 	public void should_show_error_dialog_not_set_inputfile() throws Exception {
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 		dialogFixture.optionPane().requireVisible();
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
 				.text(), is(Messages.getMessage("error.inputfile_required")));
 	}
 
@@ -136,11 +136,11 @@ public class ImportDialogTest {
 				"/tmp/dummy");
 		dialogFixture.textBox(ERAttributePanel.StartRow.NAME).setText("");
 
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 		dialogFixture.optionPane().requireVisible();
 
 		assertThat(
-				dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+				dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
 						.text(),
 				is(Messages.getMessage("error.required",
 						Messages.getMessage("explain_attribute") + " - "
@@ -161,7 +161,7 @@ public class ImportDialogTest {
 		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL).setText("");
 		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW).setText("");
 		
-		dialogFixture.button(ImportDialog.ImportButton.NAME).click();
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 		dialogFixture.optionPane().requireVisible();
 		
 		StringBuilder sb = new StringBuilder();
@@ -170,7 +170,7 @@ public class ImportDialogTest {
 		sb.append(buildMessage("explain_entity","entity.physicalname.row")).append(SystemUtils.LINE_SEPARATOR);
 		sb.append(buildMessage("explain_entity","entity.physicalname.col"));
 		
-		assertThat(dialogFixture.optionPane().textBox(ImportDialog.DETAIL_TEXT)
+		assertThat(dialogFixture.optionPane().textBox(ImportEREntityDialog.DETAIL_TEXT)
 				.text(), is(sb.toString()));
 		
 	}
@@ -188,7 +188,7 @@ public class ImportDialogTest {
 		result.inclementEntitesCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(false);
-		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);
 	}
 	
 	@Ignore
@@ -198,7 +198,7 @@ public class ImportDialogTest {
 		result.inclementEntitesCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(true);
-		target.showResultDialog(ImportDialog.Status.NORMAL, result);
+		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);
 	}
 	
 	private String buildMessage(String key,String subkey){

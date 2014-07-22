@@ -1,8 +1,6 @@
 Excel-ERModel Import Plugin
 ===============================
 
-![demo](https://raw.github.com/ChangeVision/astah-excel2er-plugin/master/docs/images/screenshot.png)
-
 Version
 ----------------
 1.0.0
@@ -32,6 +30,8 @@ Features
   * Data Type(存在しないData Typeは指定できません。Astahが用意していないデータ型を利用する場合は、事前に"Tool-ER Diagram-Set ER Data Type"メニューより、Data Typeを追加してください)
   * Length/Precision
   * Definition
+
+ また、Excelで指定された属性の"論理名、物理名、データ型、長さ(精度)、NOT NULL"が一致する、ERドメインモデルが現在開いているモデルに存在する場合、そのERドメインが属性のドメインとして利用されます。
 
 * ExcelファイルからのERドメインモデルのインポート
  指定されたExcelファイルの最初のシートに定義された以下の項目を、AstahのERドメインモデルとしてインポートできます。

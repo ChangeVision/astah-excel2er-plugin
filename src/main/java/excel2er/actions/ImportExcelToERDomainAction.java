@@ -12,7 +12,7 @@ import com.change_vision.jude.api.inf.ui.IPluginActionDelegate;
 import com.change_vision.jude.api.inf.ui.IWindow;
 
 import excel2er.Messages;
-import excel2er.ui.ImportEREntityDialog;
+import excel2er.ui.ImportERDomainDialog;
 
 public class ImportExcelToERDomainAction implements IPluginActionDelegate {
 	private static final Logger logger = LoggerFactory
@@ -24,7 +24,7 @@ public class ImportExcelToERDomainAction implements IPluginActionDelegate {
 			checkOpenProject();
 
 			JFrame frame = (JFrame) window.getParent();
-			ImportEREntityDialog dialog = new ImportEREntityDialog(frame);
+			ImportERDomainDialog dialog = new ImportERDomainDialog(frame);
 			dialog.pack();
 			dialog.setVisible(true);
 		} catch (ProjectNotFoundException e) {

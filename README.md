@@ -15,6 +15,32 @@ Description
 ----------------
 This Plugin enables you to import ER Model into Astah models by Excel file.
 
+Features
+--------------------
+* ExcelファイルからのERエンティティモデルのインポート
+ 指定されたExcelファイルに定義された以下の項目を、AstahのERエンティティモデルとしてインポートできます。
+
+ * Entity
+  * Logical Name
+  * Physical Name
+ * Attribute
+  * Logical Name
+  * Physical Name
+  * Primary Key(指定されたセルに、何かしらの値が設定されている場合に、Primary Keyとして設定されます) 
+  * NOT NULL(指定されたセルに、何かしらの値が設定されている場合に、NOT NULLとして設定されます) 
+  * Default Value
+  * Data Type(存在しないData Typeは指定できません。Astahが用意していないデータ型を利用する場合は、事前に"Tool-ER Diagram-Set ER Data Type"メニューより、Data Typeを追加してください)
+  * Length/Precision
+  * Definition
+
+* ExcelファイルからのERドメインモデルのインポート
+ 指定されたExcelファイルの最初のシートに定義された以下の項目を、AstahのERドメインモデルとしてインポートできます。
+
+ * Logical Name
+ * Physical Name
+ * Data Type
+ * Definition
+
 How to install
 ----------------
 0. [Download the jar file.](http://cdn.change-vision.com/plugins/excel2er-1.0.0.jar)

@@ -52,7 +52,7 @@ How to build
 ------------
 1. Install the Astah Plug-in SDK - <http://astah.net/features/sdk>
 2. `git clone git://github.com/ChangeVision/astah-excel2er-plugin.git`
-3. `cd excel2er`
+3. `cd astah-excel2er-plugin`
 4. `astah-build`
 5. `astah-launch`
 

@@ -32,7 +32,6 @@
 	</root>
 
     <logger name="excel2er" level="DEBUG">
-        <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </logger>
 

@@ -130,9 +130,14 @@ public class ImportERDomainDialog extends ImportDialogBase{
 		ImportERDomainService service = new ImportERDomainService();
 		Result result = service.importERDomain((DomainConfiguration)getConfiguration());
 
-		ConfigUtil.saveDomainLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		saveLatestSettingToConfigurationFile();
 		
 		showResultDialog(Status.NORMAL, result);
 	}
 
+	private void saveLatestSettingToConfigurationFile(){
+		ConfigUtil.saveDomainLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		
+		domainPanel.saveLatestSetting();
+	}
 }

@@ -14,6 +14,7 @@ import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,6 +23,8 @@ import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.INamedElement;
 
 import excel2er.AstahModelManager;
+import excel2er.ConfigClearRule;
+import excel2er.ConfigNotClear;
 import excel2er.Messages;
 
 @RunWith(GUITestRunner.class)
@@ -31,6 +34,9 @@ public class AcceptanceDomainImportTest {
 	private DialogFixture dialogFixture;
 	private ImportERDomainDialog target;
 
+	@Rule
+	public ConfigClearRule rule = new ConfigClearRule();
+	
 	@Before
 	public void setUp() throws Exception {
 
@@ -53,20 +59,39 @@ public class AcceptanceDomainImportTest {
 		}
 	}
 
+	@ConfigNotClear
 	@Test
-	public void should_set_latest_loaded_filepath_to_inputfile_property() throws Exception {
+	public void should_set_latest_loaded_property() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 
 		String pathToFile = getWorkspaceFilePath("domainLists.xls").getFile();
 		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
 				pathToFile);
 
+		dialogFixture.textBox(DomainPanel.StartRow.NAME).setText("40");
+		dialogFixture.textBox(DomainPanel.ItemCol.LOGICAL).setText("BZ");
+		dialogFixture.textBox(DomainPanel.ItemCol.DATATYPE).setText("VQ");
+		
+		dialogFixture.textBox(DomainPanel.ItemCol.PHYSICAL).setText("50");
+		dialogFixture.textBox(DomainPanel.ItemCol.DEFINITION).setText("ZZ");
+		
 		dialogFixture.button(ImportERDomainDialog.ImportButton.NAME).click();
 
 		tearDown();
 		setUp();
 		
 		assertThat(dialogFixture.textBox(InputFilePanel.InputFileText.NAME).text(), is(pathToFile));
+		
+		assertThat(dialogFixture.textBox(DomainPanel.StartRow.NAME).text(),
+				is("40"));
+		assertThat(dialogFixture.textBox(DomainPanel.ItemCol.LOGICAL).text(),
+				is("BZ"));
+		assertThat(dialogFixture.textBox(DomainPanel.ItemCol.DATATYPE).text(),
+				is("VQ"));
+		assertThat(dialogFixture.textBox(DomainPanel.ItemCol.PHYSICAL).text(),
+				is("50"));
+		assertThat(dialogFixture.textBox(DomainPanel.ItemCol.DEFINITION).text(),
+				is("ZZ"));
 	}
 	
 	/**

@@ -11,10 +11,12 @@ import org.fest.swing.fixture.JPanelFixture;
 import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import excel2er.ui.EntityPanel;
+import excel2er.ConfigNotClear;
+import excel2er.ConfigClearRule;
 
 @RunWith(GUITestRunner.class)
 public class EntityPanelTest {
@@ -22,9 +24,11 @@ public class EntityPanelTest {
 	private FrameFixture frameFixture;
 	private JPanelFixture panelFixture;
 
+	@Rule
+	public ConfigClearRule rule = new ConfigClearRule();
+	
 	@Before
 	public void setUp() throws Exception {
-
 		JFrame frame = new JFrame();
 		frameFixture = new FrameFixture(frame);
 		EntityPanel target = new EntityPanel(new JDialog());
@@ -94,8 +98,10 @@ public class EntityPanelTest {
 	public void should_get_physical_row_and_col() throws Exception {
 		panelFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
 
-		assertThat(((EntityPanel) panelFixture.target).getPhysicalRow(), is("2"));
-		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(), is("H"));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalRow(),
+				is("2"));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(),
+				is("H"));
 
 		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW)
 				.setText("8");
@@ -106,5 +112,35 @@ public class EntityPanelTest {
 				is("8"));
 		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(),
 				is("9"));
+	}
+
+	@ConfigNotClear
+	@Test
+	public void should_save_latest_setting() throws Exception {
+		panelFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
+
+		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_ROW)
+				.setText("10");
+		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_COL)
+				.setText("AX");
+		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW)
+				.setText("20");
+		panelFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL)
+				.setText("AZ");
+		
+		((EntityPanel) panelFixture.target).saveLatestSetting();
+
+		tearDown();
+		setUp();
+
+		assertThat(((EntityPanel) panelFixture.target).getLogicalRow(),
+				is("10"));
+		assertThat(((EntityPanel) panelFixture.target).getLogicalCol(),
+				is("AX"));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalRow(),
+				is("20"));
+		assertThat(((EntityPanel) panelFixture.target).getPhysicalCol(),
+				is("AZ"));
+
 	}
 }

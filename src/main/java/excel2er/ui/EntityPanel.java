@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang3.StringUtils;
+
 import excel2er.Messages;
 
 public class EntityPanel extends JPanel {
@@ -46,10 +48,17 @@ public class EntityPanel extends JPanel {
 	}
 
 	private void setDefaultValueForAstahEREntityDocument() {
-		logicalrow.setText("1");
-		logicalcol.setText("H");
-		physicalrow.setText("2");
-		physicalcol.setText("H");
+		logicalrow.setText(StringUtils.defaultString(ConfigUtil.getEntityAdvanceLogicalRow(),"1"));
+		logicalcol.setText(StringUtils.defaultString(ConfigUtil.getEntityAdvanceLogicalCol(),"H"));
+		physicalrow.setText(StringUtils.defaultString(ConfigUtil.getEntityAdvancePhysicalRow(),"2"));
+		physicalcol.setText(StringUtils.defaultString(ConfigUtil.getEntityAdvancePhysicalCol(),"H"));
+	}
+	
+	public void saveLatestSetting() {
+		ConfigUtil.saveEntityAdvanceLogicalRow(getLogicalRow());
+		ConfigUtil.saveEntityAdvanceLogicalCol(getLogicalCol());
+		ConfigUtil.saveEntityAdvancePhysicalRow(getPhysicalRow());
+		ConfigUtil.saveEntityAdvancePhysicalCol(getPhysicalCol());
 	}
 
 	private void createAdvanceTab() {

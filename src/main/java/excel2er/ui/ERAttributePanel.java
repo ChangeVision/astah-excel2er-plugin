@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang3.StringUtils;
+
 import excel2er.Messages;
 
 public class ERAttributePanel extends JPanel {
@@ -42,15 +44,27 @@ public class ERAttributePanel extends JPanel {
 	}
 
 	private void setDefaultValueForAstahEREntityDocument() {
-		startRow.setText("9");
-		logicalCol.setText("B");
-		physicalCol.setText("G");
-		primaryKeyCol.setText("L");
-		notNullCol.setText("P");
-		dataTypeCol.setText("Q");
-		lengthCol.setText("U");
-		defaultValueCol.setText("Y");
-		definitionCol.setText("AC");
+		startRow.setText(StringUtils.defaultString(ConfigUtil.getEntityStartRow(),"9"));
+		logicalCol.setText(StringUtils.defaultString(ConfigUtil.getEntityLogicalCol(),"B"));
+		physicalCol.setText(StringUtils.defaultString(ConfigUtil.getEntityPhysicalCol(),"G"));
+		primaryKeyCol.setText(StringUtils.defaultString(ConfigUtil.getEntityPrimaryKeyCol(),"L"));
+		notNullCol.setText(StringUtils.defaultString(ConfigUtil.getEntityNotNullCol(),"P"));
+		dataTypeCol.setText(StringUtils.defaultString(ConfigUtil.getEntityDataTypeCol(),"Q"));
+		lengthCol.setText(StringUtils.defaultString(ConfigUtil.getEntityLengthCol(),"U"));
+		defaultValueCol.setText(StringUtils.defaultString(ConfigUtil.getEntityDefaultValueCol(),"Y"));
+		definitionCol.setText(StringUtils.defaultString(ConfigUtil.getEntityDefinitionCol(),"AC"));
+	}
+	
+	public void saveLatestSetting(){
+		ConfigUtil.saveEntityStartRow(getStartRow());
+		ConfigUtil.saveEntityLogicalCol(getLogicalCol());
+		ConfigUtil.saveEntityPhysicalCol(getPhysicalCol());
+		ConfigUtil.saveEntityPrimaryKeyCol(getPrimaryKeyCol());
+		ConfigUtil.saveEntityNotNullCol(getNotNullCol());
+		ConfigUtil.saveEntityDataTypeCol(getDataTypeCol());
+		ConfigUtil.saveEntityLengthCol(getLengthCol());
+		ConfigUtil.saveEntityDefaultValueCol(getDefaultValueCol());
+		ConfigUtil.saveEntityDefinitionCol(getDefinitionCol());
 	}
 
 	private void createContents() {

@@ -10,9 +10,12 @@ import org.fest.swing.fixture.JPanelFixture;
 import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import excel2er.ConfigClearRule;
+import excel2er.ConfigNotClear;
 import excel2er.ui.ERAttributePanel;
 
 @RunWith(GUITestRunner.class)
@@ -20,7 +23,10 @@ public class ERAttributePanelTest {
 
 	private FrameFixture frameFixture;
 	private JPanelFixture panelFixture;
-
+	
+	@Rule
+	public ConfigClearRule rule = new ConfigClearRule();
+	
 	@Before
 	public void setUp() throws Exception {
 
@@ -66,6 +72,43 @@ public class ERAttributePanelTest {
 		panelFixture.textBox(ERAttributePanel.ItemCol.LENGTH).setText("7");
 		panelFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("8");
 
+		assertThat(((ERAttributePanel) panelFixture.target).getLogicalCol(),
+				is("1"));
+		assertThat(((ERAttributePanel) panelFixture.target).getPhysicalCol(),
+				is("2"));
+		assertThat(((ERAttributePanel) panelFixture.target).getPrimaryKeyCol(),
+				is("3"));
+		assertThat(((ERAttributePanel) panelFixture.target).getNotNullCol(),
+				is("4"));
+		assertThat(
+				((ERAttributePanel) panelFixture.target).getDefaultValueCol(),
+				is("5"));
+		assertThat(((ERAttributePanel) panelFixture.target).getDataTypeCol(),
+				is("6"));
+		assertThat(((ERAttributePanel) panelFixture.target).getLengthCol(),
+				is("7"));
+		assertThat(((ERAttributePanel) panelFixture.target).getDefinitionCol(),
+				is("8"));
+	}
+	
+	@ConfigNotClear
+	@Test
+	public void should_save_latest_setting() throws Exception {
+		panelFixture.textBox(ERAttributePanel.ItemCol.LOGICAL).setText("1");
+		panelFixture.textBox(ERAttributePanel.ItemCol.PHYSICAL).setText("2");
+		panelFixture.textBox(ERAttributePanel.ItemCol.PRIMARYKEY).setText("3");
+		panelFixture.textBox(ERAttributePanel.ItemCol.NOTNULL).setText("4");
+		panelFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).setText(
+				"5");
+		panelFixture.textBox(ERAttributePanel.ItemCol.DATATYPE).setText("6");
+		panelFixture.textBox(ERAttributePanel.ItemCol.LENGTH).setText("7");
+		panelFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("8");
+
+		((ERAttributePanel)panelFixture.target).saveLatestSetting();
+
+		tearDown();
+		setUp();
+		
 		assertThat(((ERAttributePanel) panelFixture.target).getLogicalCol(),
 				is("1"));
 		assertThat(((ERAttributePanel) panelFixture.target).getPhysicalCol(),

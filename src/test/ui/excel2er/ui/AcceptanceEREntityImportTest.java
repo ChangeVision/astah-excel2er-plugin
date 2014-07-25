@@ -14,6 +14,7 @@ import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.junit.v4_5.runner.GUITestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,6 +23,8 @@ import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.INamedElement;
 
 import excel2er.AstahModelManager;
+import excel2er.ConfigClearRule;
+import excel2er.ConfigNotClear;
 import excel2er.Messages;
 import excel2er.ui.ERAttributePanel;
 import excel2er.ui.EntityPanel;
@@ -34,10 +37,12 @@ public class AcceptanceEREntityImportTest {
 	private FrameFixture frameFixture;
 	private DialogFixture dialogFixture;
 	private ImportEREntityDialog target;
-
+	
+	@Rule
+	public ConfigClearRule rule = new ConfigClearRule();
+	
 	@Before
 	public void setUp() throws Exception {
-
 		JFrame frame = new JFrame();
 		frameFixture = new FrameFixture(frame);
 		target = new ImportEREntityDialog(frame);
@@ -57,20 +62,69 @@ public class AcceptanceEREntityImportTest {
 		}
 	}
 
+	@ConfigNotClear
 	@Test
-	public void should_set_latest_loaded_filepath_to_inputfile_property() throws Exception {
+	public void should_set_latest_loaded_property() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 
 		String pathToFile = getWorkspaceFilePath("entityListModel.xls").getFile();
 		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
 				pathToFile);
+		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
 
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_ROW)
+				.setText("10");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_COL)
+				.setText("AX");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW)
+				.setText("20");
+		dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL)
+				.setText("AZ");
+		
+		dialogFixture.textBox(ERAttributePanel.ItemCol.LOGICAL).setText("1");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.PHYSICAL).setText("2");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.PRIMARYKEY).setText("3");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.NOTNULL).setText("4");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).setText(
+				"5");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.DATATYPE).setText("6");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.LENGTH).setText("7");
+		dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).setText("8");
+		
 		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
 
 		tearDown();
 		setUp();
 		
+		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME).click();
 		assertThat(dialogFixture.textBox(InputFilePanel.InputFileText.NAME).text(), is(pathToFile));
+		
+		assertThat(dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_ROW).text(),
+				is("10"));
+		assertThat(dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.LOGICAL_COL).text(),
+				is("AX"));
+		assertThat(dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_ROW).text(),
+				is("20"));
+		assertThat(dialogFixture.textBox(EntityPanel.AdvanceElementRowCol.PHYSICAL_COL).text(),
+				is("AZ"));
+		
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.LOGICAL).text(),
+				is("1"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.PHYSICAL).text(),
+				is("2"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.PRIMARYKEY).text(),
+				is("3"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.NOTNULL).text(),
+				is("4"));
+		assertThat(
+				dialogFixture.textBox(ERAttributePanel.ItemCol.DEFAULT_VALUE).text(),
+				is("5"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.DATATYPE).text(),
+				is("6"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.LENGTH).text(),
+				is("7"));
+		assertThat(dialogFixture.textBox(ERAttributePanel.ItemCol.DEFINITION).text(),
+				is("8"));
 	}
 	
 	/**

@@ -6,10 +6,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+
+import org.apache.commons.lang3.StringUtils;
 
 import excel2er.Messages;
 
@@ -38,13 +42,22 @@ public class DomainPanel extends JPanel {
 	}
 
 	private void setDefaultValueForAstahEREntityDocument() {
-		startRow.setText("4");
-		logicalCol.setText("B");
-		physicalCol.setText("G");
-		dataTypeCol.setText("V");
-		definitionCol.setText("AJ");
+		startRow.setText(StringUtils.defaultString(ConfigUtil.getDomainStartRow(),"4"));
+		logicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainLogicalCol(),"B"));
+		physicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainPhysicalCol(),"G"));
+		dataTypeCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDataTypeCol(),"V"));
+		definitionCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDefinitionCol(),"AJ"));
+	}
+	
+	public void saveLatestSetting() {
+		ConfigUtil.saveDomainStartRow(getStartRow());
+		ConfigUtil.saveDomainLogicalCol(getLogicalCol());
+		ConfigUtil.saveDomainPhysicalCol(getPhysicalCol());
+		ConfigUtil.saveDomainDataTypeCol(getDataTypeCol());
+		ConfigUtil.saveDomainDefinitionCol(getDefinitionCol());
 	}
 
+	
 	private void createContents() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
@@ -149,4 +162,13 @@ public class DomainPanel extends JPanel {
 		return definitionCol.getText();
 	}
 
+	public static void main(String[] args) {
+		JFrame frame = new JFrame(DomainPanel.class.getName());
+		JDialog dialog = new JDialog(frame);
+		DomainPanel p = new DomainPanel();
+		dialog.add(p);
+		frame.setSize(800, 600);
+		dialog.pack();
+		dialog.setVisible(true);
+	}
 }

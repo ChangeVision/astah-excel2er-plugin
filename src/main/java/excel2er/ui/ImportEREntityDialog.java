@@ -71,11 +71,17 @@ public class ImportEREntityDialog extends ImportDialogBase {
 		ImportERModelService service = new ImportERModelService();
 		Result result = service.importERModel((Configuration)getConfiguration());
 
-		ConfigUtil.saveEntityLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		saveLatestSettingToConfigurationFile();
 		
 		showResultDialog(Status.NORMAL, result);
 	}
 
+	private void saveLatestSettingToConfigurationFile(){
+		ConfigUtil.saveEntityLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		
+		entityPanel.saveLatestSetting();
+		attributePanel.saveLatestSetting();
+	}
 
 	private void createSouthContent() {
 		JPanel sourthContentPanel = new JPanel(new GridLayout(1, 2, GAP, GAP));

@@ -54,6 +54,7 @@ public class ImportEREntityDialog extends ImportDialogBase {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		inputFilePanel = new InputFilePanel();
+		inputFilePanel.setInputFileText(ConfigUtil.getEntityLatestLoadedFile());
 		mainContentPanel.add(inputFilePanel, gbc);
 		gbc.gridy = 1;
 		entityPanel = new EntityPanel(this);
@@ -70,6 +71,8 @@ public class ImportEREntityDialog extends ImportDialogBase {
 		ImportERModelService service = new ImportERModelService();
 		Result result = service.importERModel((Configuration)getConfiguration());
 
+		ConfigUtil.saveEntityLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		
 		showResultDialog(Status.NORMAL, result);
 	}
 

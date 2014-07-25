@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.io.FilenameUtils;
+
 import excel2er.Messages;
 
 public class InputFilePanel extends JPanel {
@@ -58,6 +60,10 @@ public class InputFilePanel extends JPanel {
 
 	}
 
+	public void setInputFileText(String pathToFile){
+		inputFileText.setText(pathToFile);
+	}
+	
 	class InputFileText extends JTextField {
 
 		private static final int WIDTH = 200;
@@ -88,6 +94,7 @@ public class InputFilePanel extends JPanel {
 							.getMessage("explain_input_file"));
 					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					chooser.setAcceptAllFileFilterUsed(false);
+					chooser.setCurrentDirectory(new File(FilenameUtils.getFullPath(getInputFilePath())));
 					chooser.addChoosableFileFilter(new FileNameExtensionFilter(
 							"Excel File(xls,xlsx)", "xls", "xlsx"));
 					int option = chooser.showOpenDialog(InputFilePanel.this);

@@ -13,7 +13,6 @@ import org.junit.Test;
 import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
 import excel2er.models.Configuration;
-import excel2er.services.parser.ParserUtils;
 
 public class ParserUtilsTest {
 
@@ -45,7 +44,7 @@ public class ParserUtilsTest {
 					is(true));
 		}
 	}
-
+	
 	@Test
 	public void should_get_workspace_when_load_xls_excel_file()
 			throws Exception {

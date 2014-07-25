@@ -56,6 +56,7 @@ public class ImportERDomainDialog extends ImportDialogBase{
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		inputFilePanel = new InputFilePanel();
+		inputFilePanel.setInputFileText(ConfigUtil.getDomainLatestLoadedFile());
 		mainContentPanel.add(inputFilePanel, gbc);
 		gbc.gridy = 1;
 		domainPanel = new DomainPanel();
@@ -125,9 +126,12 @@ public class ImportERDomainDialog extends ImportDialogBase{
 
 	@Override
 	protected void executeService() {
+		
 		ImportERDomainService service = new ImportERDomainService();
 		Result result = service.importERDomain((DomainConfiguration)getConfiguration());
 
+		ConfigUtil.saveDomainLatestLoadedFilePath(inputFilePanel.getInputFilePath());
+		
 		showResultDialog(Status.NORMAL, result);
 	}
 

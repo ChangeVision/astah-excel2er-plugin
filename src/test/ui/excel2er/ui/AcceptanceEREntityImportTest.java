@@ -57,6 +57,22 @@ public class AcceptanceEREntityImportTest {
 		}
 	}
 
+	@Test
+	public void should_set_latest_loaded_filepath_to_inputfile_property() throws Exception {
+		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
+
+		String pathToFile = getWorkspaceFilePath("entityListModel.xls").getFile();
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				pathToFile);
+
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
+
+		tearDown();
+		setUp();
+		
+		assertThat(dialogFixture.textBox(InputFilePanel.InputFileText.NAME).text(), is(pathToFile));
+	}
+	
 	/**
 	 * <pre>
 	 * - userSheetname for Entity's logicalName 

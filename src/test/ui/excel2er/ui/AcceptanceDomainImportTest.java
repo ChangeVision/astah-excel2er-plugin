@@ -53,6 +53,22 @@ public class AcceptanceDomainImportTest {
 		}
 	}
 
+	@Test
+	public void should_set_latest_loaded_filepath_to_inputfile_property() throws Exception {
+		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
+
+		String pathToFile = getWorkspaceFilePath("domainLists.xls").getFile();
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				pathToFile);
+
+		dialogFixture.button(ImportERDomainDialog.ImportButton.NAME).click();
+
+		tearDown();
+		setUp();
+		
+		assertThat(dialogFixture.textBox(InputFilePanel.InputFileText.NAME).text(), is(pathToFile));
+	}
+	
 	/**
 	 * <pre>
 	 * - following attribute property set... 

@@ -109,7 +109,7 @@ public class ImportERDomainService {
 			if (dataType == null) {
 				logger.debug(Messages.getMessage(
 						"log.create.datatype",
-						domainName, domain.getDataType()));
+						domain.getDataType()));
 				dataType = createDataType(editor,erModel,domain.getDataType());
 			}
 			

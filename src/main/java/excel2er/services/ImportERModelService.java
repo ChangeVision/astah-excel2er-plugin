@@ -130,7 +130,7 @@ public class ImportERModelService {
 					if (dataType == null) {
 						logger.debug(Messages.getMessage(
 								"log.create.datatype",
-								entityName, attr.getDataType()));
+								 attr.getDataType()));
 						dataType = createDataType(editor,erModel,attr.getDataType());
 					}
 					attrModel = createAttribute(editor, entityModel, attr,

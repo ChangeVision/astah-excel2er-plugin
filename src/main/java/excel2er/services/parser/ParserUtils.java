@@ -8,6 +8,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -29,18 +32,28 @@ public class ParserUtils {
 	private static FormulaEvaluator formulaEvaluator;
 	private static final Logger logger = LoggerFactory
 			.getLogger(ParserUtils.class);
-	
+
 	public static boolean isEmptyBoth(String one, String other) {
 		return StringUtils.isEmpty(one) && StringUtils.isEmpty(other);
 	}
 
 	public static Workbook getWorkbook(ConfigurationBase configuration) {
-		String inputFilePath = configuration.getInputFilePath();
+		NPOIFSFileSystem npoifs = null;
+		OPCPackage pkg = null;
+
+		File inputFile = new File(configuration.getInputFilePath());
+		Workbook workbook = null;
 		try {
-			Workbook workbook = WorkbookFactory.create(new File(inputFilePath));
+			try {
+				npoifs = new NPOIFSFileSystem(inputFile);
+				workbook = WorkbookFactory.create(npoifs);
+			} catch (OfficeXmlFileException ofe) {
+				pkg = OPCPackage.open(inputFile);
+				workbook = WorkbookFactory.create(pkg);
+			}
 			formulaEvaluator = workbook.getCreationHelper()
 					.createFormulaEvaluator();
-			return workbook;
+
 		} catch (POIXMLException e) {
 			throw new ApplicationException(Messages.getMessage(
 					"error.poi.exception",
@@ -50,19 +63,32 @@ public class ParserUtils {
 		} catch (IOException e) {
 			throw new ApplicationException(
 					Messages.getMessage("error.file_notfound"));
+		} finally {
+			try {
+				if (npoifs != null) {
+					npoifs.close();
+				}
+				if (pkg != null) {
+					pkg.close();
+				}
+			} catch (IOException e) {
+				logger.error("error occur when close resource", e);
+			}
 		}
+
+		return workbook;
 	}
 
 	public static String getCellValue(Sheet sheet, int refRow, String refCol) {
-		try{
+		try {
 			if (refRow < 0 || StringUtils.isEmpty(refCol))
 				return null;
-	
+
 			Row row = sheet.getRow(refRow - POI_OFFSET_START_INDEX);
 			if (row == null) {
 				return null;
 			}
-	
+
 			Cell cell = null;
 			if (NumberUtils.isDigits(refCol)) {
 				cell = row.getCell(NumberUtils.toInt(refCol)
@@ -73,11 +99,11 @@ public class ParserUtils {
 					cell = row.getCell(ref.getCol());
 				}
 			}
-	
+
 			if (cell == null) {
 				return null;
 			}
-	
+
 			try {
 				Object ret = getCellValue(cell);
 				if (ret != null) {
@@ -88,8 +114,10 @@ public class ParserUtils {
 				// ignore.
 				return null;
 			}
-		}catch(Throwable t){
-			logger.error(String.format("error occur when get cell value at sheet(%s) row,cell(%s,%s)",sheet.getSheetName(),refRow,refCol));
+		} catch (Throwable t) {
+			logger.error(String
+					.format("error occur when get cell value at sheet(%s) row,cell(%s,%s)",
+							sheet.getSheetName(), refRow, refCol));
 			throw new ApplicationException(t);
 		}
 	}

@@ -128,10 +128,10 @@ public class ImportERModelService {
 					IERDatatype dataType = dataTypeFinder.find(attr
 							.getDataType());
 					if (dataType == null) {
-						log_error(Messages.getMessage(
-								"log.error.create_attribute.missing_datatype",
-								entityName, attr.getLogicalName()));
-						continue;
+						logger.debug(Messages.getMessage(
+								"log.create.datatype",
+								entityName, attr.getDataType()));
+						dataType = createDataType(editor,erModel,attr.getDataType());
 					}
 					attrModel = createAttribute(editor, entityModel, attr,
 							dataType);
@@ -172,6 +172,10 @@ public class ImportERModelService {
 			aboartTransaction();
 			throw new ApplicationException(e);
 		}
+	}
+
+	private IERDatatype createDataType(ERModelEditor editor,IERModel erModel, String dataType) throws InvalidEditingException {
+		return editor.createERDatatype(erModel, dataType);
 	}
 
 	private void setEditablePropertyUsingDomain(Attribute attr, IERAttribute attrModel)

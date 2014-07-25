@@ -124,6 +124,26 @@ public class ImportERDomainServiceTest {
 		}
 	}
 	
+	@Test
+	public void should_create_domain_without_not_exist_datatype()
+			throws Exception {
+		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
+		
+		ImportERDomainService service = new ImportERDomainService();
+		Domain domain = new Domain();
+		domain.setLogicalName("test");
+		domain.setPhysicalName("TEST");
+		domain.setDataType("NEWTYPE");
+		domain.setDefinition("abc");
+		
+		IERDomain actual = service.createAstahModel(domain);
+
+		assertThat(actual.getLogicalName(), is("test"));
+		assertThat(actual.getPhysicalName(), is("TEST"));
+		assertThat(actual.getDatatypeName(), is("NEWTYPE"));
+		assertThat(actual.getDefinition(), is("abc"));
+	}
+	
 	private URL getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename);
 	}

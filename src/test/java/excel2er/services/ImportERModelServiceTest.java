@@ -271,7 +271,7 @@ public class ImportERModelServiceTest {
 	}
 	
 	@Test
-	public void should_not_create_attribute_when_set_not_exist_datatype() throws Exception {
+	public void should_create_attribute_when_set_not_exist_datatype() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 
 		ImportERModelService service = new ImportERModelService();
@@ -286,7 +286,11 @@ public class ImportERModelServiceTest {
 		
 		IEREntity actual = service.createAstahModel(entity);
 
-		assertThat(actual.getNonPrimaryKeys().length,is(0));
+		assertThat(actual.getNonPrimaryKeys().length,is(1));
+
+		IERAttribute actualAttr = actual.getNonPrimaryKeys()[0];
+		assertThat(actualAttr.getLogicalName(),is("attr1"));
+		assertThat(actualAttr.getDatatype().getName(),is("NOTEXIST"));
 	}
 	
 	@Test

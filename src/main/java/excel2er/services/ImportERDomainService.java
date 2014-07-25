@@ -107,10 +107,10 @@ public class ImportERDomainService {
 			IERDatatype dataType = dataTypeFinder.find(domain
 					.getDataType());
 			if (dataType == null) {
-				log_error(Messages.getMessage(
-						"log.error.create_domain.missing_datatype",
-						domainName, domain.getLogicalName()));
-				return null;
+				logger.debug(Messages.getMessage(
+						"log.create.datatype",
+						domainName, domain.getDataType()));
+				dataType = createDataType(editor,erModel,domain.getDataType());
 			}
 			
 			IERDomain domainModel = editor.createERDomain(erModel, 
@@ -152,6 +152,10 @@ public class ImportERDomainService {
 			aboartTransaction();
 			throw new ApplicationException(e);
 		}
+	}
+	
+	private IERDatatype createDataType(ERModelEditor editor,IERModel erModel, String dataType) throws InvalidEditingException {
+		return editor.createERDatatype(erModel, dataType);
 	}
 
 	private void setAdditionalProperty(Domain domain, IERDomain domainModel)

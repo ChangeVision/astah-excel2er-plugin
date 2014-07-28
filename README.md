@@ -27,7 +27,7 @@ Features
   * Primary Key (When any value exists in the cell specified as Primary Key)
   * NOT NULL (When any value exists in the cell specified as Not NULL) 
   * Default Value
-  * Data Type (Unknown Data Type cannot be specified. Please make sure that all the required Data Type is already added into Astah in advance from [Tool] - [ER Diagram] - [Set ER Data Type])
+  * Data Type (If there are any Data Types in excel that are unknown to Astah, it will be added to Astah automatically. To see added Data Types,  go to [Tool] - [ER Diagram] - [Set ER Data Type].)
   * Length/Precision
   * Definition
 

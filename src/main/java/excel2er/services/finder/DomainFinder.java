@@ -30,7 +30,7 @@ public class DomainFinder {
 						if (target instanceof IERDomain) {
 							IERDomain domain = (IERDomain) target;
 
-							logger.debug("matching " + domain.getName());
+							logger.trace("matching " + domain.getName());
 							EqualsBuilder eb = new EqualsBuilder();
 							append("getDatatypeName",eb, domain.getDatatypeName(),
 									convertNull(attr.getDataType()));
@@ -52,13 +52,13 @@ public class DomainFinder {
 
 					private void append(String message,EqualsBuilder eb, String one,
 							String other) {
-						logger.debug(message + " match(domain,importmodel) " + one + ":" + other);
+						logger.trace(message + " match(domain,importmodel) " + one + ":" + other);
 						eb.append(one, other);
 					}
 
 					private void append(String message,EqualsBuilder eb, boolean one,
 							boolean other) {
-						logger.debug(message + " match(domain,importmodel) " + one + ":" + other);
+						logger.trace(message + " match(domain,importmodel) " + one + ":" + other);
 						eb.append(one, other);
 					}
 

@@ -43,7 +43,7 @@ In case there is already an existing ER Domain Model that matches with the infor
 
 How to install
 ----------------
-0. [Download the jar file.](http://cdn.change-vision.com/plugins/excel2er-1.0.0.jar)
+0. [Download the jar file.](https://github.com/ChangeVision/astah-excel2er-plugin/releases/download/1.0.0/excel2er-1.0.0.jar)
 1. Start Astah Professional
 2. Install the plug-in at the Plugin List Dialog ([help]-[Plugin List] menu)
 3. You find that the [Import ER models from Excel] has been added under the [Tool] - [ER Diagram] menu

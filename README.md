@@ -7,7 +7,7 @@ Version
 
 Available for
 ----------------
-Astah Professional 6.6.8 or later
+Astah Professional 6.8 or later
 
 Description
 ----------------

@@ -72,6 +72,9 @@ public class AttributeParser {
 		String value = ParserUtils.getCellValue(sheet, startRow,
 				configuration.getLengthCol());
 		if (StringUtils.isNotEmpty(value)) {
+			if(ParserUtils.isDouble(value)){
+				value = String.valueOf((int)Double.parseDouble(value));
+			}
 			attr.setLength(value);
 		}
 	}

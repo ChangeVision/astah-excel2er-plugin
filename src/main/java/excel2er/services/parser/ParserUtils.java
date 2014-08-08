@@ -37,6 +37,15 @@ public class ParserUtils {
 		return StringUtils.isEmpty(one) && StringUtils.isEmpty(other);
 	}
 
+	public static boolean isDouble(String value) {
+		try {
+			Double.parseDouble(value);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+
 	public static Workbook getWorkbook(ConfigurationBase configuration) {
 		NPOIFSFileSystem npoifs = null;
 		OPCPackage pkg = null;

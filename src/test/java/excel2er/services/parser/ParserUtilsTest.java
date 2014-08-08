@@ -87,6 +87,8 @@ public class ParserUtilsTest {
 		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 7, "A")),
 				is(123.d));
 		assertThat(ParserUtils.getCellValue(sheet, 8, "A"), is("日本語"));
+		assertThat(ParserUtils.getCellValue(sheet, 9, "A"), is("50.51"));
+		assertThat(Double.valueOf(ParserUtils.getCellValue(sheet, 10, "A")), is(60.d));
 	}
 
 	private String getWorkspaceFilePath(String filename) {

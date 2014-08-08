@@ -117,18 +117,27 @@ public class AttributeParserTest {
 	}
 
 	@Test
-	public void should_set_length() throws Exception {
+	public void should_set_length_using_text_cell_value() throws Exception {
 		Configuration conf = createConf("entityListModel.xls", "9", "B");
 		conf.setLengthCol("U");
 		List<Attribute> attrs = parse(conf, "CustomerSheet");
 
 		assertThat(attrs.size(), is(6));
 		assertThat("CustomerID", attrs.get(0).getLength(), is("20"));
-		assertThat("Name", attrs.get(1).getLength(), is("30"));
 		assertThat("Mail", attrs.get(2).getLength(), is("50"));
 		assertThat("ZipCode", attrs.get(3).getLength(), is("20"));
 		assertThat("Address", attrs.get(4).getLength(), is("200"));
 		assertThat("Telephone", attrs.get(5).getLength(), is("20"));
+	}
+	
+	@Test
+	public void should_set_length_using_numeric_cell_value() throws Exception {
+		Configuration conf = createConf("entityListModel.xls", "9", "B");
+		conf.setLengthCol("U");
+		List<Attribute> attrs = parse(conf, "CustomerSheet");
+
+		assertThat(attrs.size(), is(6));
+		assertThat("Name", attrs.get(1).getLength(), is("30"));
 	}
 
 	@Test

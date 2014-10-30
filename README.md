@@ -3,7 +3,7 @@ Excel-ERModel Import Plugin
 
 Version
 ----------------
-1.0.1
+1.0.2 (Released on 2014/10/30)
 
 Available for
 ----------------

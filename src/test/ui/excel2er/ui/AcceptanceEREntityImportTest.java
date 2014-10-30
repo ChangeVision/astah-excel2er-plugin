@@ -437,6 +437,90 @@ public class AcceptanceEREntityImportTest {
 		assertThat(entity.getNonPrimaryKeys()[2].getDefinition(), is(""));
 	}
 
+	/**
+	 * https://github.com/ChangeVision/astah-excel2er-plugin/issues/2
+	 * @throws Exception
+	 */
+	@Test
+	public void accept_enhancement_id2_update_element_and_attribute_when_import_exist_objects() throws Exception {
+		AstahModelManager.open(getWorkspaceFilePath("enhancement_2.asta"));
+
+		dialogFixture.textBox(InputFilePanel.InputFileText.NAME).setText(
+				getWorkspaceFilePath("updates.xls").getFile());
+
+		dialogFixture.radioButton(EntityPanel.AdvanceSettingButton.NAME)
+				.check();
+
+		dialogFixture.button(ImportEREntityDialog.ImportButton.NAME).click();
+
+		dialogFixture.optionPane().requireVisible();
+		dialogFixture.optionPane().requireInformationMessage();
+
+		assertThat(countEREntity(), is(4));
+
+		assertThat(findEREntity("Customer"), is(notNullValue()));
+		assertThat(findEREntity("Order"), is(notNullValue()));
+
+		IEREntity entity = findEREntity("Customer");
+		assertThat(entity, is(notNullValue()));
+
+		assertThat(entity.getPrimaryKeys().length, is(2));
+		assertThat(entity.getPrimaryKeys()[0].getLogicalName(), is("CustomerID"));
+		assertThat(entity.getPrimaryKeys()[0].getPhysicalName(),
+				is("CUSTOMERID_E"));
+		assertThat(entity.getPrimaryKeys()[0].isPrimaryKey(), is(true));
+		assertThat(entity.getPrimaryKeys()[0].isNotNull(), is(true));
+		assertThat(entity.getPrimaryKeys()[0].getDatatype().getName(),
+				is("CHAR"));
+		assertThat(entity.getPrimaryKeys()[0].getLengthPrecision(), is("30"));
+		assertThat(entity.getPrimaryKeys()[0].getDefaultValue(), is("EDIT"));
+		assertThat(entity.getPrimaryKeys()[0].getDefinition(), is("EDIT_DEF"));
+		
+		assertThat(entity.getPrimaryKeys()[1].getLogicalName(), is("Name"));
+		assertThat(entity.getPrimaryKeys()[1].getPhysicalName(),
+				is("NAME"));
+		assertThat(entity.getPrimaryKeys()[1].isPrimaryKey(), is(true));
+		assertThat(entity.getPrimaryKeys()[1].isNotNull(), is(true));
+		assertThat(entity.getPrimaryKeys()[1].getDatatype().getName(),
+				is("INT"));
+		assertThat(entity.getPrimaryKeys()[1].getLengthPrecision(), is("30"));
+
+		assertThat(entity.getNonPrimaryKeys().length, is(4));
+
+		// mail
+		assertThat(entity.getNonPrimaryKeys()[0].getLogicalName(), is("Mail"));
+		assertThat(entity.getNonPrimaryKeys()[0].getPhysicalName(), is("MAIL"));
+		assertThat(entity.getNonPrimaryKeys()[0].isPrimaryKey(), is(false));
+		assertThat(entity.getNonPrimaryKeys()[0].isNotNull(), is(false));
+		assertThat(entity.getNonPrimaryKeys()[0].getDatatype().getName(),
+				is("VARCHAR"));
+		assertThat(entity.getNonPrimaryKeys()[0].getLengthPrecision(), is("50"));
+		assertThat(entity.getNonPrimaryKeys()[0].getDefaultValue(), is(""));
+		assertThat(entity.getNonPrimaryKeys()[0].getDefinition(), is(""));
+
+		// zipcode
+		assertThat(entity.getNonPrimaryKeys()[1].getLogicalName(), is("ZipCode"));
+		assertThat(entity.getNonPrimaryKeys()[1].getPhysicalName(), is("ZIPCODE2"));
+		assertThat(entity.getNonPrimaryKeys()[1].isPrimaryKey(), is(false));
+		assertThat(entity.getNonPrimaryKeys()[1].isNotNull(), is(true));
+		assertThat(entity.getNonPrimaryKeys()[1].getDatatype().getName(),
+				is("VARCHAR"));
+		assertThat(entity.getNonPrimaryKeys()[1].getLengthPrecision(), is("20"));
+		assertThat(entity.getNonPrimaryKeys()[1].getDefaultValue(), is(""));
+		assertThat(entity.getNonPrimaryKeys()[1].getDefinition(), is(""));
+
+		// Address
+		assertThat(entity.getNonPrimaryKeys()[2].getLogicalName(), is("Address"));
+		assertThat(entity.getNonPrimaryKeys()[2].getPhysicalName(), is("ADDRESS"));
+		assertThat(entity.getNonPrimaryKeys()[2].isPrimaryKey(), is(false));
+		assertThat(entity.getNonPrimaryKeys()[2].isNotNull(), is(false));
+		assertThat(entity.getNonPrimaryKeys()[2].getDatatype().getName(),
+				is("VARCHAR"));
+		assertThat(entity.getNonPrimaryKeys()[2].getLengthPrecision(), is("200"));
+		assertThat(entity.getNonPrimaryKeys()[2].getDefaultValue(), is(""));
+		assertThat(entity.getNonPrimaryKeys()[2].getDefinition(), is(""));
+	}
+	
 	@Test
 	public void validate_necessary_property() throws Exception {
 		dialogFixture.textBox(ERAttributePanel.StartRow.NAME).setText("");

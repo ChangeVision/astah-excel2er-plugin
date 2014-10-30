@@ -27,39 +27,44 @@ import excel2er.models.Configuration;
 import excel2er.models.Entity;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
+import excel2er.services.finder.IEREntityFinder;
 
 public class ImportERModelService {
 	private static final Logger logger = LoggerFactory
 			.getLogger(ImportERModelService.class);
 
 	private Result result;
-	
+
+	private IEREntityFinder erFinder;
+
 	public ImportERModelService() {
 		init();
 	}
-	
+
 	private void init() {
 		result = new Result();
+		erFinder = new IEREntityFinder();
 	}
 
 	public Result importERModel(Configuration configuration) {
-		
+
 		init();
-		
+
 		ParseExcelToEntityModelService parseService = new ParseExcelToEntityModelService();
 
 		List<Entity> entities = parseService.parse(configuration);
 
 		for (Entity entity : entities) {
 			String entityName = entity.getEntityLogicalName();
-			try{
+			try {
 				createAstahModel(entity);
-			}catch(ApplicationException e){
-				//continue import
-				log_info(Messages.getMessage("log.error.create_entity_end", entityName));
+			} catch (ApplicationException e) {
+				// continue import
+				log_info(Messages.getMessage("log.error.create_entity_end",
+						entityName));
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -67,8 +72,8 @@ public class ImportERModelService {
 		result.appendMessage(message);
 		result.appendMessage(SystemUtils.LINE_SEPARATOR);
 	}
-	
-	private void log_info(String message){
+
+	private void log_info(String message) {
 		logger.info(message);
 		log_append(message);
 	}
@@ -78,13 +83,13 @@ public class ImportERModelService {
 		log_append(message);
 		result.setErrorOccured(true);
 	}
-	
-	private void log_error(String message,Throwable e) {
-		logger.error(message,e);
+
+	private void log_error(String message, Throwable e) {
+		logger.error(message, e);
 		log_append(message);
 		result.setErrorOccured(true);
 	}
-	
+
 	IEREntity createAstahModel(Entity entity) {
 		String entityName = entity.getEntityLogicalName();
 		try {
@@ -107,11 +112,8 @@ public class ImportERModelService {
 				erModel = (IERModel) candidate[0];
 			}
 
-			IEREntity entityModel = editor.createEREntity(
-					erModel.getSchemata()[0], entityName,
-					entity.getEntityPhysicalName());
-
-			logger.info(Messages.getMessage("log.create_entity", entityName));
+			IEREntity entityModel = mergeEntity(entity, entityName,
+					editor, erModel);
 
 			DomainFinder domainFinder = new DomainFinder();
 			DataTypeFinder dataTypeFinder = new DataTypeFinder();
@@ -120,7 +122,7 @@ public class ImportERModelService {
 				IERDomain domain = domainFinder.find(attr);
 				IERAttribute attrModel = null;
 				if (domain != null) {
-					attrModel = createAttributeUsingDomain(editor, entityModel,
+					attrModel = mergeAttributeUsingDomain(editor, entityModel,
 							attr, domain);
 
 					setEditablePropertyUsingDomain(attr, attrModel);
@@ -128,12 +130,12 @@ public class ImportERModelService {
 					IERDatatype dataType = dataTypeFinder.find(attr
 							.getDataType());
 					if (dataType == null) {
-						logger.debug(Messages.getMessage(
-								"log.create.datatype",
-								 attr.getDataType()));
-						dataType = createDataType(editor,erModel,attr.getDataType());
+						logger.debug(Messages.getMessage("log.create.datatype",
+								attr.getDataType()));
+						dataType = createDataType(editor, erModel,
+								attr.getDataType());
 					}
-					attrModel = createAttribute(editor, entityModel, attr,
+					attrModel = mergeAttribute(editor, entityModel, attr,
 							dataType);
 
 					setAdditionalProperty(attr, attrModel);
@@ -142,46 +144,78 @@ public class ImportERModelService {
 			}
 			projectAccessor.getTransactionManager().endTransaction();
 			result.inclementEntitesCount();
-			log_info(Messages.getMessage("log.create_entity_end", entityName));
 			return entityModel;
 		} catch (ClassNotFoundException e) {
 			log_error(Messages.getMessage("log.error.create_entity",
 					entityName, e.getMessage()), e);
-			
+
 			aboartTransaction();
-			
+
 			throw new ApplicationException(e);
 		} catch (InvalidEditingException e) {
-			if(StringUtils.equals(e.getKey(),InvalidEditingException.PARAMETER_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_entity.parameter_error",
-						entityName));
-			}else if(StringUtils.equals(e.getKey(),InvalidEditingException.NAME_DOUBLE_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_entity.duplicate_entity",
-						entityName));
-			}else { 
-				log_error(Messages.getMessage("log.error.create_entity.invalideditingexception",
-						entityName,e.getKey()), e);
+			if (StringUtils.equals(e.getKey(),
+					InvalidEditingException.PARAMETER_ERROR_KEY)) {
+				log_error(Messages.getMessage(
+						"log.error.create_entity.parameter_error", entityName));
+			} else if (StringUtils.equals(e.getKey(),
+					InvalidEditingException.NAME_DOUBLE_ERROR_KEY)) {
+				log_error(Messages.getMessage(
+						"log.error.create_entity.duplicate_entity", entityName));
+			} else {
+				log_error(Messages.getMessage(
+						"log.error.create_entity.invalideditingexception",
+						entityName, e.getKey()), e);
 			}
-			
+
 			aboartTransaction();
-			
+
 			throw new ApplicationException(e);
 		} catch (ProjectNotFoundException e) {
 			log_error(Messages.getMessage("error.project.not.found"), e);
-			
+
 			aboartTransaction();
 			throw new ApplicationException(e);
 		}
 	}
 
-	private IERDatatype createDataType(ERModelEditor editor,IERModel erModel, String dataType) throws InvalidEditingException {
+	private IEREntity mergeEntity(Entity entity, String entityName,
+			ERModelEditor editor, IERModel erModel)
+			throws InvalidEditingException, ClassNotFoundException,
+			ProjectNotFoundException {
+
+		IEREntity model = erFinder.findEREntity(entityName);
+		if (model == null) {
+			logger.info(Messages.getMessage("log.create_entity", entityName));
+			
+			return editor.createEREntity(erModel.getSchemata()[0], entityName,
+					entity.getEntityPhysicalName());
+		}
+		
+		logger.info(Messages.getMessage("log.update_entity", entityName));
+		updateEntity(entity, model);
+
+		return model;
+	}
+
+	private void updateEntity(Entity entity, IEREntity model)
+			throws InvalidEditingException {
+		model.setPhysicalName(entity.getEntityPhysicalName());
+	}
+
+	private IERDatatype createDataType(ERModelEditor editor, IERModel erModel,
+			String dataType) throws InvalidEditingException {
 		return editor.createERDatatype(erModel, dataType);
 	}
 
-	private void setEditablePropertyUsingDomain(Attribute attr, IERAttribute attrModel)
-			throws InvalidEditingException {
+	private void setEditablePropertyUsingDomain(Attribute attr,
+			IERAttribute attrModel) throws InvalidEditingException {
+
+		attrModel.setPhysicalName(attr.getPhysicalName());
 		
 		attrModel.setPrimaryKey(attr.isPrimaryKey());
+		if(attr.isPrimaryKey()){
+			attrModel.setNotNull(true);
+		}
 
 		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
 			attrModel.setDefaultValue(attr.getDefaultValue());
@@ -194,8 +228,11 @@ public class ImportERModelService {
 			throws InvalidEditingException {
 
 		attrModel.setPrimaryKey(attr.isPrimaryKey());
-
-		attrModel.setNotNull(attr.isNotNull());
+		if(attr.isPrimaryKey()){
+			attrModel.setNotNull(true);
+		}else{
+			attrModel.setNotNull(attr.isNotNull());
+		}
 
 		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
 			attrModel.setDefaultValue(attr.getDefaultValue());
@@ -207,29 +244,53 @@ public class ImportERModelService {
 			attrModel.setLengthPrecision(attr.getLength());
 	}
 
-	private IERAttribute createAttribute(ERModelEditor editor,
+	private IERAttribute mergeAttribute(ERModelEditor editor,
 			IEREntity entityModel, Attribute attr, IERDatatype dataType)
-			throws InvalidEditingException {
-		logger.info(Messages.getMessage("log.create_attribute",
+			throws InvalidEditingException, ClassNotFoundException, ProjectNotFoundException {
+
+
+		IERAttribute attribute = erFinder.findERAttribute(entityModel, attr.getLogicalName());
+		
+		if(attribute == null){
+			logger.info(Messages.getMessage("log.create_attribute",
+					entityModel.getName(), attr.getLogicalName()));
+			
+			return editor.createERAttribute(entityModel,
+					attr.getLogicalName(), attr.getPhysicalName(), dataType);
+		}
+		
+		logger.info(Messages.getMessage("log.update_attribute",
 				entityModel.getName(), attr.getLogicalName()));
 
-		IERAttribute attrModel = editor.createERAttribute(entityModel,
-				attr.getLogicalName(), attr.getPhysicalName(), dataType);
-
-		return attrModel;
+		updateAttribute(attr, dataType, attribute);
+		
+		return attribute;
 	}
 
-	private IERAttribute createAttributeUsingDomain(ERModelEditor editor,
-			IEREntity entityModel, Attribute attr, IERDomain domain)
-			throws InvalidEditingException {
+	private void updateAttribute(Attribute attr, IERDatatype dataType,
+			IERAttribute attribute) throws InvalidEditingException {
+		attribute.setPhysicalName(attr.getPhysicalName());
+		attribute.setDatatype(dataType);
+	}
 
-		logger.info(Messages.getMessage("log.create_attribute_using_domain",
+	private IERAttribute mergeAttributeUsingDomain(ERModelEditor editor,
+			IEREntity entityModel, Attribute attr, IERDomain domain)
+			throws InvalidEditingException, ClassNotFoundException, ProjectNotFoundException {
+		
+		IERAttribute attribute = erFinder.findERAttribute(entityModel, attr.getLogicalName());
+
+		if(attribute == null){
+			logger.info(Messages.getMessage("log.create_attribute_using_domain",
+					entityModel.getName(), attr.getLogicalName(), domain.getName()));
+
+			return editor.createERAttribute(entityModel,
+				attr.getLogicalName(), attr.getPhysicalName(), domain);
+		}
+		
+		logger.info(Messages.getMessage("log.update_attribute_using_domain",
 				entityModel.getName(), attr.getLogicalName(), domain.getName()));
 
-		IERAttribute attrModel = editor.createERAttribute(entityModel,
-				attr.getLogicalName(), attr.getPhysicalName(), domain);
-
-		return attrModel;
+		return attribute;
 	}
 
 	private void aboartTransaction() {

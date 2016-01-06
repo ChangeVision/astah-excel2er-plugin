@@ -25,6 +25,7 @@ public class DomainPanel extends JPanel {
 	private ItemCol logicalCol;
 	private ItemCol physicalCol;
 	private ItemCol dataTypeCol;
+    private ItemCol parentDomainCol;
 	private ItemCol definitionCol;
 
 	public DomainPanel() {
@@ -46,6 +47,8 @@ public class DomainPanel extends JPanel {
 		logicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainLogicalCol(),"B"));
 		physicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainPhysicalCol(),"G"));
 		dataTypeCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDataTypeCol(),"V"));
+        parentDomainCol.setText(StringUtils.defaultString(ConfigUtil.getDomainParentDomainCol(),
+                "AE"));
 		definitionCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDefinitionCol(),"AJ"));
 	}
 	
@@ -54,6 +57,7 @@ public class DomainPanel extends JPanel {
 		ConfigUtil.saveDomainLogicalCol(getLogicalCol());
 		ConfigUtil.saveDomainPhysicalCol(getPhysicalCol());
 		ConfigUtil.saveDomainDataTypeCol(getDataTypeCol());
+        ConfigUtil.saveDomainParentDomainCol(getParentDomainCol());
 		ConfigUtil.saveDomainDefinitionCol(getDefinitionCol());
 	}
 
@@ -113,6 +117,10 @@ public class DomainPanel extends JPanel {
 		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
 		gbc.gridy = 8;
 		add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.PARENT_DOMAIN)), gbc);
+        add(parentDomainCol = new ItemCol(ItemCol.PARENT_DOMAIN), gbc);
+        gbc.gridy = 9;
+        add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFINITION)), gbc);
 		add(definitionCol = new ItemCol(ItemCol.DEFINITION), gbc);
 
@@ -134,6 +142,7 @@ public class DomainPanel extends JPanel {
 		static final String LOGICAL = "item_logical_domain";
 		static final String PHYSICAL = "item_physical_domain";
 		static final String DATATYPE = "item_datatype_domain";
+		static final String PARENT_DOMAIN = "item_parent_domain_domain";
 		static final String DEFINITION = "item_definition_domain";
 		
 		public ItemCol(String key) {
@@ -157,6 +166,10 @@ public class DomainPanel extends JPanel {
 	public String getDataTypeCol() {
 		return dataTypeCol.getText();
 	}
+
+    public String getParentDomainCol() {
+        return parentDomainCol.getText();
+    }
 
 	public String getDefinitionCol() {
 		return definitionCol.getText();

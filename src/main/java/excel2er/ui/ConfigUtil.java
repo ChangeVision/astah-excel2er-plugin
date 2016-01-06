@@ -29,6 +29,7 @@ public class ConfigUtil {
 	private static final String DOMAIN_LATEST_LOGICAL_COL = "DOMAIN_LATEST_LOGICAL_COL";
 	private static final String DOMAIN_LATEST_PHYSICAL_COL = "DOMAIN_LATEST_PHYSICAL_COL";
 	private static final String DOMAIN_LATEST_DATATYPE_COL = "DOMAIN_LATEST_DATATYPE_COL";
+    private static final String DOMAIN_LATEST_PARENT_DOMAIN_COL = "DOMAIN_LATEST_PARENT_DOMAIN_COL";
 	private static final String DOMAIN_LATEST_DEFINITION_COL = "DOMAIN_LATEST_DEFINITION_COL";
 	
 	private static final String DOMAIN_LATEST_LOADED_FILE = "DOMAIN_LATEST_LOADED_FILE";
@@ -257,6 +258,15 @@ public class ConfigUtil {
 		config.put(DOMAIN_LATEST_DATATYPE_COL, dataTypeCol);
 		store();
 	}
+
+    public static String getDomainParentDomainCol() {
+        return config.getProperty(DOMAIN_LATEST_PARENT_DOMAIN_COL);
+    }
+
+    public static void saveDomainParentDomainCol(String parentDomainCol) {
+        config.put(DOMAIN_LATEST_PARENT_DOMAIN_COL, parentDomainCol);
+        store();
+    }
 
 	public static String getDomainDefinitionCol() {
 		return config.getProperty(DOMAIN_LATEST_DEFINITION_COL);

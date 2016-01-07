@@ -5,6 +5,7 @@ public class Domain {
 	private String logicalName;
 	private String physicalName;
 	private String dataType;
+    private String parentDomain;
 	private String definition;
 
 	public void setLogicalName(String logicalName) {
@@ -30,6 +31,14 @@ public class Domain {
 	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
+
+    public String getParentDomain() {
+        return parentDomain;
+    }
+
+    public void setParentDomain(String parentDomain) {
+        this.parentDomain = parentDomain;
+    }
 
 	public String getDefinition() {
 		return definition;

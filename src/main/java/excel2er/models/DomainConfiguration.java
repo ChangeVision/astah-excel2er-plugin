@@ -14,6 +14,7 @@ public class DomainConfiguration extends ConfigurationBase {
 	private String logicalCol;
 	private String physicalCol;
 	private String dataTypeCol;
+    private String parentDomainCol;
 	private String definitionCol;
 	private String startRow;
 
@@ -48,6 +49,14 @@ public class DomainConfiguration extends ConfigurationBase {
 	public void setDataTypeCol(String dataTypeCol) {
 		this.dataTypeCol = dataTypeCol;
 	}
+
+    public String getParentDomainCol() {
+        return parentDomainCol;
+    }
+
+    public void setParentDomainCol(String parentDomainCol) {
+        this.parentDomainCol = parentDomainCol;
+    }
 
 	public String getDefinitionCol() {
 		return definitionCol;

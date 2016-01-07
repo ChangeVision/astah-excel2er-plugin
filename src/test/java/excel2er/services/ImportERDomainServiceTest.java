@@ -1,6 +1,7 @@
 package excel2er.services;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -143,7 +144,49 @@ public class ImportERDomainServiceTest {
 		assertThat(actual.getDatatypeName(), is("NEWTYPE"));
 		assertThat(actual.getDefinition(), is("abc"));
 	}
-	
+
+    @Test
+    public void createAstahModel_parent_difference_in_same_name_domain_creatable() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("addParentDomain.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("CHAR");
+        domain.setParentDomain(null);
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getDatatypeName(), is("CHAR"));
+        assertThat(actual.getContainer(), is(nullValue()));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein1");
+        domain.setDataType("CHAR");
+        domain.setParentDomain("Domein0");
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein1"));
+        assertThat(actual.getDatatypeName(), is("CHAR"));
+        IERDomain parentDomain = (IERDomain) actual.getContainer();
+        assertThat(parentDomain.getLogicalName(), is("Domein0"));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein2");
+        domain.setDataType("CHAR");
+        domain.setParentDomain("Domein0::Domein1");
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein2"));
+        assertThat(actual.getDatatypeName(), is("CHAR"));
+        parentDomain = (IERDomain) actual.getContainer();
+        assertThat(parentDomain.getLogicalName(), is("Domein1"));
+        assertThat(((IERDomain) parentDomain.getContainer()).getLogicalName(), is("Domein0"));
+    }
+
 	private URL getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename);
 	}

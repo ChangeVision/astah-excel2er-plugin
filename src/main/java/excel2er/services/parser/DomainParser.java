@@ -35,7 +35,7 @@ public class DomainParser {
 			domain.setPhysicalName(physicalName);
 
 			parseDataType(configuration, sheet, startRow, domain);
-
+            parseParentDomain(configuration, sheet, startRow, domain);
 			parseDefinition(configuration, sheet, startRow, domain);
 			
 			domains.add(domain);
@@ -44,6 +44,15 @@ public class DomainParser {
 		
 		return domains;
 	}
+
+    private void parseParentDomain(DomainConfiguration configuration, Sheet sheet, int startRow,
+            Domain domain) {
+        String value = ParserUtils
+                .getCellValue(sheet, startRow, configuration.getParentDomainCol());
+        if (StringUtils.isNotEmpty(value)) {
+            domain.setParentDomain(value);
+        }
+    }
 
 	private void parseDefinition(DomainConfiguration configuration, Sheet sheet,
 			int startRow, Domain domain) {

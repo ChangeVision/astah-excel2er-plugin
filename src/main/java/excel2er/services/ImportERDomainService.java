@@ -22,7 +22,9 @@ import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
 import excel2er.models.Domain;
 import excel2er.models.DomainConfiguration;
+import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
+import excel2er.services.finder.DomainFinder;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -45,6 +47,14 @@ public class ImportERDomainService {
 		ParseExcelToDomainModelService parseService = new ParseExcelToDomainModelService();
 
 		List<Domain> domains = parseService.parse(configuration);
+        try {
+            domains = new DomainOperations().addNeedCreateParentDomains(domains);
+        } catch (ClassNotFoundException e) {
+            log_error(Messages.getMessage("log.error.failed.get.parent.domain", e.getMessage()), e);
+        } catch (ProjectNotFoundException e) {
+            log_error(Messages.getMessage("error.project.not.found"), e);
+            throw new ApplicationException(e);
+        }
 
 		for (Domain domain : domains) {
 			String domainName = domain.getLogicalName();
@@ -82,7 +92,7 @@ public class ImportERDomainService {
 	}
 	
 	IERDomain createAstahModel(Domain domain) {
-		String domainName = domain.getLogicalName();
+        String domainFullName = domain.getFullLogicalName();
 		try {
 			ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
 					.getProjectAccessor();
@@ -113,34 +123,37 @@ public class ImportERDomainService {
 				dataType = createDataType(editor,erModel,domain.getDataType());
 			}
 			
-			IERDomain domainModel = editor.createERDomain(erModel, 
-					null,domain.getLogicalName(),domain.getPhysicalName(),dataType);
+            IERDomain parentERDomain = new DomainFinder().find(domain.getParentDomain(),
+                    domain.getNamespaceSeparator());
+            IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
+                    domain.getLogicalName(), domain.getPhysicalName(), dataType);
 
 			setAdditionalProperty(domain,domainModel);
 			
-			logger.info(Messages.getMessage("log.create_domain", domainName));
+            logger.info(Messages.getMessage("log.create_domain", domainFullName));
 			
 			projectAccessor.getTransactionManager().endTransaction();
 			result.inclementEntitesCount();
-			log_info(Messages.getMessage("log.create_domain_end", domainName));
+            log_info(Messages.getMessage("log.create_domain_end", domainFullName));
 			return domainModel;
 		} catch (ClassNotFoundException e) {
-			log_error(Messages.getMessage("log.error.create_domain",
-					domainName, e.getMessage()), e);
+            log_error(
+                    Messages.getMessage("log.error.create_domain", domainFullName, e.getMessage()),
+                    e);
 			
 			aboartTransaction();
 			
 			throw new ApplicationException(e);
 		} catch (InvalidEditingException e) {
 			if(StringUtils.equals(e.getKey(),InvalidEditingException.PARAMETER_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_domain.parameter_error",
-						domainName));
+                log_error(Messages.getMessage("log.error.create_domain.parameter_error",
+                        domainFullName));
 			}else if(StringUtils.equals(e.getKey(),InvalidEditingException.NAME_DOUBLE_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_domain.duplicate_entity",
-						domainName));
+                log_error(Messages.getMessage("log.error.create_domain.duplicate_entity",
+                        domainFullName));
 			}else { 
-				log_error(Messages.getMessage("log.error.create_domain.invalideditingexception",
-						domainName,e.getKey()), e);
+                log_error(Messages.getMessage("log.error.create_domain.invalideditingexception",
+                        domainFullName, e.getKey()), e);
 			}
 			
 			aboartTransaction();

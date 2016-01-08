@@ -42,6 +42,7 @@ public class DomainParserTest {
 		conf.setLogicalCol("B");
 		conf.setPhysicalCol("G");
 		conf.setDataTypeCol("V");
+        conf.setParentDomainCol("AE");
 		conf.setDefinitionCol("AJ");
 		
 		List<Domain> domains = parse(conf);
@@ -52,24 +53,28 @@ public class DomainParserTest {
 		assertThat(domain.getLogicalName(), is("Name"));
 		assertThat(domain.getPhysicalName(), is("NAME"));
 		assertThat(domain.getDataType(), is("VARCHAR"));
+        assertThat(domain.getParentDomain(), is("NamesParent"));
 		assertThat(domain.getDefinition(), is("name def"));
 		
 		domain = domains.get(1);
 		assertThat(domain.getLogicalName(), is("Address"));
 		assertThat(domain.getPhysicalName(), is("ADDRESS"));
 		assertThat(domain.getDataType(), is("VARCHAR"));
+        assertThat(domain.getParentDomain(), is("AddressesParent"));
 		assertThat(domain.getDefinition(), is("address def"));
 
 		domain = domains.get(2);
 		assertThat(domain.getLogicalName(), is("Age"));
 		assertThat(domain.getPhysicalName(), is("AGE"));
 		assertThat(domain.getDataType(), is("INT"));
+        assertThat(domain.getParentDomain(), is("AgesParent"));
 		assertThat(domain.getDefinition(), is("age def"));
 
 		domain = domains.get(3);
 		assertThat(domain.getLogicalName(), is("Birthday"));
 		assertThat(domain.getPhysicalName(), is("BIRTHDAY"));
 		assertThat(domain.getDataType(), is("DATE"));
+        assertThat(domain.getParentDomain(), is("BirthdaysParent"));
 		assertThat(domain.getDefinition(), is("birthday def"));
 
 	}

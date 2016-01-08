@@ -119,6 +119,7 @@ public class ImportERDomainDialog extends ImportDialogBase{
 		configuration.setPhysicalCol(domainPanel.getPhysicalCol());
 		configuration.setStartRow(domainPanel.getStartRow());
 		configuration.setDataTypeCol(domainPanel.getDataTypeCol());
+        configuration.setParentDomainCol(domainPanel.getParentDomainCol());
 		configuration.setDefinitionCol(domainPanel.getDefinitionCol());
 
 		return configuration;

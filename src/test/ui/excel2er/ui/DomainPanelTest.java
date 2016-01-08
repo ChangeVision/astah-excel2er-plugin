@@ -71,7 +71,14 @@ public class DomainPanelTest {
 		
 		assertThat(target.getDataTypeCol(),is("X"));
 	}
-	
+
+    @Test
+    public void should_get_parent_domain_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.PARENT_DOMAIN).setText("D");
+
+        assertThat(target.getDefinitionCol(), is("D"));
+    }
+
 	@Test
 	public void should_get_definition_col() throws Exception {
 		panelFixture.textBox(DomainPanel.ItemCol.DEFINITION).setText("W");

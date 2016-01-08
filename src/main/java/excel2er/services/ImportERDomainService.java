@@ -23,6 +23,7 @@ import excel2er.exceptions.ApplicationException;
 import excel2er.models.Domain;
 import excel2er.models.DomainConfiguration;
 import excel2er.services.finder.DataTypeFinder;
+import excel2er.services.finder.DomainFinder;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -113,8 +114,10 @@ public class ImportERDomainService {
 				dataType = createDataType(editor,erModel,domain.getDataType());
 			}
 			
-			IERDomain domainModel = editor.createERDomain(erModel, 
-					null,domain.getLogicalName(),domain.getPhysicalName(),dataType);
+            IERDomain parentERDomain = new DomainFinder().find(domain.getParentDomain(),
+                    domain.getNamespaceSeparator());
+            IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
+                    domain.getLogicalName(), domain.getPhysicalName(), dataType);
 
 			setAdditionalProperty(domain,domainModel);
 			

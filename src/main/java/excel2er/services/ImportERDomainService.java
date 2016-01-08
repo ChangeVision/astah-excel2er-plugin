@@ -92,7 +92,7 @@ public class ImportERDomainService {
 	}
 	
 	IERDomain createAstahModel(Domain domain) {
-		String domainName = domain.getLogicalName();
+        String domainFullName = domain.getFullLogicalName();
 		try {
 			ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
 					.getProjectAccessor();
@@ -130,29 +130,30 @@ public class ImportERDomainService {
 
 			setAdditionalProperty(domain,domainModel);
 			
-			logger.info(Messages.getMessage("log.create_domain", domainName));
+            logger.info(Messages.getMessage("log.create_domain", domainFullName));
 			
 			projectAccessor.getTransactionManager().endTransaction();
 			result.inclementEntitesCount();
-			log_info(Messages.getMessage("log.create_domain_end", domainName));
+            log_info(Messages.getMessage("log.create_domain_end", domainFullName));
 			return domainModel;
 		} catch (ClassNotFoundException e) {
-			log_error(Messages.getMessage("log.error.create_domain",
-					domainName, e.getMessage()), e);
+            log_error(
+                    Messages.getMessage("log.error.create_domain", domainFullName, e.getMessage()),
+                    e);
 			
 			aboartTransaction();
 			
 			throw new ApplicationException(e);
 		} catch (InvalidEditingException e) {
 			if(StringUtils.equals(e.getKey(),InvalidEditingException.PARAMETER_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_domain.parameter_error",
-						domainName));
+                log_error(Messages.getMessage("log.error.create_domain.parameter_error",
+                        domainFullName));
 			}else if(StringUtils.equals(e.getKey(),InvalidEditingException.NAME_DOUBLE_ERROR_KEY)){
-				log_error(Messages.getMessage("log.error.create_domain.duplicate_entity",
-						domainName));
+                log_error(Messages.getMessage("log.error.create_domain.duplicate_entity",
+                        domainFullName));
 			}else { 
-				log_error(Messages.getMessage("log.error.create_domain.invalideditingexception",
-						domainName,e.getKey()), e);
+                log_error(Messages.getMessage("log.error.create_domain.invalideditingexception",
+                        domainFullName, e.getKey()), e);
 			}
 			
 			aboartTransaction();

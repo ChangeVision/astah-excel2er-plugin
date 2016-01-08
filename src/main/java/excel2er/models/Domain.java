@@ -1,6 +1,10 @@
 package excel2er.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Domain {
+
+    private String namespaceSeparator = "::";
 
 	private String logicalName;
 	private String physicalName;
@@ -8,7 +12,15 @@ public class Domain {
     private String parentDomain;
 	private String definition;
 
-	public void setLogicalName(String logicalName) {
+	public String getNamespaceSeparator() {
+        return namespaceSeparator;
+    }
+
+    public void setNamespaceSeparator(String namespaceSeparator) {
+        this.namespaceSeparator = namespaceSeparator;
+    }
+
+    public void setLogicalName(String logicalName) {
 		this.logicalName = logicalName;
 	}
 
@@ -47,5 +59,15 @@ public class Domain {
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}
+
+    public String getFullLogicalName() {
+        StringBuffer fullLogicalNameBuffer = new StringBuffer(getLogicalName());
+        String parentDomainFullLogicalName = StringUtils.defaultString(getParentDomain());
+        if (!parentDomainFullLogicalName.isEmpty()) {
+            fullLogicalNameBuffer.insert(0, getNamespaceSeparator());
+            fullLogicalNameBuffer.insert(0, parentDomainFullLogicalName);
+        }
+        return fullLogicalNameBuffer.toString();
+    }
 
 }

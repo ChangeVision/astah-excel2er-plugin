@@ -70,4 +70,18 @@ public class Domain {
         return fullLogicalNameBuffer.toString();
     }
 
+    public void setFullLogicalName(String fullLogicalName, String nameSpaceSeparator) {
+        setNamespaceSeparator(nameSpaceSeparator);
+        String[] splitLogicalName = fullLogicalName.split(nameSpaceSeparator);
+        String logicalName = splitLogicalName[splitLogicalName.length - 1];
+        setLogicalName(logicalName);
+        if (splitLogicalName.length > 1) {
+            String[] parentDomainSplitLogicalName = new String[splitLogicalName.length - 1];
+            for (int i = 0; i < parentDomainSplitLogicalName.length; i++) {
+                parentDomainSplitLogicalName[i] = splitLogicalName[i];
+            }
+            setParentDomain(StringUtils.join(parentDomainSplitLogicalName, nameSpaceSeparator));
+        }
+    }
+
 }

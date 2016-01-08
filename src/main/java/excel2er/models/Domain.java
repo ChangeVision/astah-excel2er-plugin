@@ -61,6 +61,9 @@ public class Domain {
 	}
 
     public String getFullLogicalName() {
+        if (getLogicalName() == null) {
+            return null;
+        }
         StringBuffer fullLogicalNameBuffer = new StringBuffer(getLogicalName());
         String parentDomainFullLogicalName = StringUtils.defaultString(getParentDomain());
         if (!parentDomainFullLogicalName.isEmpty()) {
@@ -72,6 +75,10 @@ public class Domain {
 
     public void setFullLogicalName(String fullLogicalName, String nameSpaceSeparator) {
         setNamespaceSeparator(nameSpaceSeparator);
+        if (fullLogicalName == null) {
+            setLogicalName(null);
+            return;
+        }
         String[] splitLogicalName = fullLogicalName.split(nameSpaceSeparator);
         String logicalName = splitLogicalName[splitLogicalName.length - 1];
         setLogicalName(logicalName);

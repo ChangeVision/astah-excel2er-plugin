@@ -22,6 +22,7 @@ import excel2er.Messages;
 import excel2er.exceptions.ApplicationException;
 import excel2er.models.Domain;
 import excel2er.models.DomainConfiguration;
+import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
 
@@ -46,6 +47,14 @@ public class ImportERDomainService {
 		ParseExcelToDomainModelService parseService = new ParseExcelToDomainModelService();
 
 		List<Domain> domains = parseService.parse(configuration);
+        try {
+            domains = new DomainOperations().addNeedCreateParentDomains(domains);
+        } catch (ClassNotFoundException e) {
+            log_error(Messages.getMessage("log.error.failed.get.parent.domain", e.getMessage()), e);
+        } catch (ProjectNotFoundException e) {
+            log_error(Messages.getMessage("error.project.not.found"), e);
+            throw new ApplicationException(e);
+        }
 
 		for (Domain domain : domains) {
 			String domainName = domain.getLogicalName();

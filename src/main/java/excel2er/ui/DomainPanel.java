@@ -24,7 +24,11 @@ public class DomainPanel extends JPanel {
 	private StartRow startRow;
 	private ItemCol logicalCol;
 	private ItemCol physicalCol;
+    private ItemCol alias1Col;
+    private ItemCol alias2Col;
 	private ItemCol dataTypeCol;
+    private ItemCol lengthAndPrecisionCol;
+    private ItemCol notNullCol;
     private ItemCol parentDomainCol;
 	private ItemCol definitionCol;
 
@@ -46,7 +50,12 @@ public class DomainPanel extends JPanel {
 		startRow.setText(StringUtils.defaultString(ConfigUtil.getDomainStartRow(),"4"));
 		logicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainLogicalCol(),"B"));
 		physicalCol.setText(StringUtils.defaultString(ConfigUtil.getDomainPhysicalCol(),"G"));
+        alias1Col.setText(StringUtils.defaultString(ConfigUtil.getAlias1Col(), "L"));
+        alias2Col.setText(StringUtils.defaultString(ConfigUtil.getAlias2Col(), "Q"));
 		dataTypeCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDataTypeCol(),"V"));
+        lengthAndPrecisionCol.setText(StringUtils.defaultString(
+                ConfigUtil.getLengthAndPrecisionCol(), "Z"));
+        notNullCol.setText(StringUtils.defaultString(ConfigUtil.getNotNullCol(), "AD"));
         parentDomainCol.setText(StringUtils.defaultString(ConfigUtil.getDomainParentDomainCol(),
                 "AE"));
 		definitionCol.setText(StringUtils.defaultString(ConfigUtil.getDomainDefinitionCol(),"AJ"));
@@ -56,7 +65,11 @@ public class DomainPanel extends JPanel {
 		ConfigUtil.saveDomainStartRow(getStartRow());
 		ConfigUtil.saveDomainLogicalCol(getLogicalCol());
 		ConfigUtil.saveDomainPhysicalCol(getPhysicalCol());
+        ConfigUtil.saveAlias1Col(getAlias1Col());
+        ConfigUtil.saveAlias2Col(getAlias2Col());
 		ConfigUtil.saveDomainDataTypeCol(getDataTypeCol());
+        ConfigUtil.saveLengthAndPrecisionCol(getLengthAndPrecisionCol());
+        ConfigUtil.saveNotNullCol(getNotNullCol());
         ConfigUtil.saveDomainParentDomainCol(getParentDomainCol());
 		ConfigUtil.saveDomainDefinitionCol(getDefinitionCol());
 	}
@@ -112,14 +125,30 @@ public class DomainPanel extends JPanel {
 		add(new JLabel(Messages.getMessage(ItemCol.PHYSICAL)), gbc);
 		add(physicalCol = new ItemCol(ItemCol.PHYSICAL), gbc);
 		gbc.gridy = 7;
+        add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.ALIAS1)), gbc);
+        add(alias1Col = new ItemCol(ItemCol.ALIAS1), gbc);
+        gbc.gridy = 8;
+        add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.ALIAS2)), gbc);
+        add(alias2Col = new ItemCol(ItemCol.ALIAS2), gbc);
+        gbc.gridy = 9;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DATATYPE)), gbc);
 		add(dataTypeCol = new ItemCol(ItemCol.DATATYPE), gbc);
-		gbc.gridy = 8;
+        gbc.gridy = 10;
 		add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.LENGTH_AND_PRECISION)), gbc);
+        add(lengthAndPrecisionCol = new ItemCol(ItemCol.LENGTH_AND_PRECISION), gbc);
+        gbc.gridy = 11;
+        add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
+        add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
+        gbc.gridy = 12;
+        add(new Empty(), gbc);
         add(new JLabel(Messages.getMessage(ItemCol.PARENT_DOMAIN)), gbc);
         add(parentDomainCol = new ItemCol(ItemCol.PARENT_DOMAIN), gbc);
-        gbc.gridy = 9;
+        gbc.gridy = 13;
         add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFINITION)), gbc);
 		add(definitionCol = new ItemCol(ItemCol.DEFINITION), gbc);
@@ -141,7 +170,11 @@ public class DomainPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		static final String LOGICAL = "item_logical_domain";
 		static final String PHYSICAL = "item_physical_domain";
+        static final String ALIAS1 = "item_alias1_domain";
+        static final String ALIAS2 = "item_alias2_domain";
 		static final String DATATYPE = "item_datatype_domain";
+        static final String LENGTH_AND_PRECISION = "item_length_and_precision_domain";
+        static final String NOTNULL = "item_not_null_domain";
 		static final String PARENT_DOMAIN = "item_parent_domain_domain";
 		static final String DEFINITION = "item_definition_domain";
 		
@@ -163,9 +196,25 @@ public class DomainPanel extends JPanel {
 		return physicalCol.getText();
 	}
 
+    public String getAlias1Col() {
+        return alias1Col.getText();
+    }
+
+    public String getAlias2Col() {
+        return alias2Col.getText();
+    }
+
 	public String getDataTypeCol() {
 		return dataTypeCol.getText();
 	}
+
+    public String getLengthAndPrecisionCol() {
+        return lengthAndPrecisionCol.getText();
+    }
+
+    public String getNotNullCol() {
+        return notNullCol.getText();
+    }
 
     public String getParentDomainCol() {
         return parentDomainCol.getText();

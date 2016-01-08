@@ -13,7 +13,11 @@ public class DomainConfiguration extends ConfigurationBase {
 	private String sheetName;
 	private String logicalCol;
 	private String physicalCol;
+    private String alias1Col;
+    private String alias2Col;
 	private String dataTypeCol;
+    private String lengthAndPrecisionCol;
+    private String notNullCol;
     private String parentDomainCol;
 	private String definitionCol;
 	private String startRow;
@@ -42,6 +46,22 @@ public class DomainConfiguration extends ConfigurationBase {
 		this.physicalCol = physicalCol;
 	}
 
+    public String getAlias1Col() {
+        return alias1Col;
+    }
+
+    public void setAlias1Col(String alias1Col) {
+        this.alias1Col = alias1Col;
+    }
+
+    public String getAlias2Col() {
+        return alias2Col;
+    }
+
+    public void setAlias2Col(String alias2Col) {
+        this.alias2Col = alias2Col;
+    }
+
 	public String getDataTypeCol() {
 		return dataTypeCol;
 	}
@@ -49,6 +69,22 @@ public class DomainConfiguration extends ConfigurationBase {
 	public void setDataTypeCol(String dataTypeCol) {
 		this.dataTypeCol = dataTypeCol;
 	}
+
+    public String getLengthAndPrecisionCol() {
+        return lengthAndPrecisionCol;
+    }
+
+    public void setLengthAndPrecisionCol(String lengthAndPrecisionCol) {
+        this.lengthAndPrecisionCol = lengthAndPrecisionCol;
+    }
+
+    public String getNotNullCol() {
+        return notNullCol;
+    }
+
+    public void setNotNullCol(String notNullCol) {
+        this.notNullCol = notNullCol;
+    }
 
     public String getParentDomainCol() {
         return parentDomainCol;

@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
+import com.change_vision.jude.api.inf.model.IERDomain;
 
 import excel2er.models.Domain;
 import excel2er.services.finder.DomainFinder;
@@ -13,6 +14,7 @@ import excel2er.services.sorter.DomainSorter;
 
 public class DomainOperations {
 
+    private static final DomainFinder DOMAIN_FINDER = new DomainFinder();
     public static final String DEFAULT_DATA_TYPE = "CHAR";
 
     public List<Domain> addNeedCreateParentDomains(List<Domain> domains)
@@ -25,7 +27,6 @@ public class DomainOperations {
             domainFullLogicalNames.add(domain.getFullLogicalName());
         }
 
-        DomainFinder finder = new DomainFinder();
         for (Domain domain : domains) {
             String parentDomainFullLogicalName = StringUtils
                     .defaultString(domain.getParentDomain());
@@ -36,7 +37,7 @@ public class DomainOperations {
                 continue;
             }
             String separator = domain.getNamespaceSeparator();
-            if (finder.find(parentDomainFullLogicalName, separator) != null) {
+            if (isDomainInProject(domain.getParentDomain(), separator)) {
                 continue;
             }
             ArrayList<Domain> newDomains = new ArrayList<Domain>(domains);
@@ -53,6 +54,16 @@ public class DomainOperations {
             domain.setDataType(DEFAULT_DATA_TYPE);
         }
         return domain;
+    }
+
+    public boolean isDomainInProject(String domainFullLogicalName, String namespaceSeparator)
+            throws ClassNotFoundException, ProjectNotFoundException {
+        return getERDomainInProject(domainFullLogicalName, namespaceSeparator) != null;
+    }
+
+    public IERDomain getERDomainInProject(String domainFullLogicalName, String namespaceSeparator)
+            throws ClassNotFoundException, ProjectNotFoundException {
+        return DOMAIN_FINDER.find(domainFullLogicalName, namespaceSeparator);
     }
 
 }

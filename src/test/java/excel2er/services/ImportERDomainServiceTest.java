@@ -187,6 +187,170 @@ public class ImportERDomainServiceTest {
         assertThat(((IERDomain) parentDomain.getContainer()).getLogicalName(), is("Domein0"));
     }
 
+    @Test
+    public void createAstahModel_can_import_alias1() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("addAlias1.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("CHAR");
+        domain.setAlias1("Alias1");
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getAlias1(), is("Alias1"));
+    }
+    
+    @Test
+    public void createAstahModel_can_import_alias2() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("addAlias2.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("CHAR");
+        domain.setAlias2("Alias2");
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getAlias2(), is("Alias2"));
+    }
+    
+    @Test
+    public void createAstahModel_can_import_length_and_precision() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("addLengthAndPrecision.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("CHAR");
+        domain.setLengthAndPrecision("10");
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getLengthPrecision(), is("10"));
+    }
+
+    @Test
+    public void createAstahModel_can_import_not_null() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("addNotNull.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("CHAR");
+        domain.setNotNull("N");
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.isNotNull(), is(true));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein1");
+        domain.setDataType("CHAR");
+        domain.setNotNull("○");
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein1"));
+        assertThat(actual.isNotNull(), is(true));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein2");
+        domain.setDataType("CHAR");
+        domain.setNotNull(null);
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein2"));
+        assertThat(actual.isNotNull(), is(false));
+    }
+
+    @Test
+    public void createAstahModel_inputOfLengthPrecisionIsEssentialType_lengthHasNotBeenEntered_setDefaultLengthPrecision()
+            throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("setDefaultLengthPrecision.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("TYPE THAT REQUIRES A LENGTH");
+        domain.setLengthAndPrecision(null);
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A LENGTH"));
+        assertThat(actual.getLengthPrecision(), is("DefaultLength"));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein1");
+        domain.setDataType("TYPE THAT REQUIRES A PRECISION");
+        domain.setLengthAndPrecision(null);
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein1"));
+        assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A PRECISION"));
+        assertThat(actual.getLengthPrecision(), is("DefaultPrecision"));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein2");
+        domain.setDataType("TYPE THAT REQUIRES LENGTH AND PRECISION");
+        domain.setLengthAndPrecision(null);
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein2"));
+        assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES LENGTH AND PRECISION"));
+        assertThat(actual.getLengthPrecision(), is("DefaultLength,DefaultPrecision"));
+    }
+
+    @Test
+    public void createAstahModel_addNewDataType() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("add_data_type.asta"));
+
+        ImportERDomainService service = new ImportERDomainService();
+        Domain domain = new Domain();
+        domain.setLogicalName("Domein0");
+        domain.setDataType("AAA");
+        domain.setLengthAndPrecision(null);
+
+        IERDomain actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein0"));
+        assertThat(actual.getDatatypeName(), is("AAA"));
+        assertThat(actual.getLengthPrecision(), is(""));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein1");
+        domain.setDataType("BBB");
+        domain.setLengthAndPrecision("10");
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein1"));
+        assertThat(actual.getDatatypeName(), is("BBB"));
+        assertThat(actual.getLengthPrecision(), is("10"));
+
+        domain = new Domain();
+        domain.setLogicalName("Domein2");
+        domain.setDataType("CCC");
+        domain.setLengthAndPrecision("10,10");
+
+        actual = service.createAstahModel(domain);
+
+        assertThat(actual.getLogicalName(), is("Domein2"));
+        assertThat(actual.getDatatypeName(), is("CCC"));
+        assertThat(actual.getLengthPrecision(), is("10,10"));
+
+    }
+
 	private URL getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename);
 	}

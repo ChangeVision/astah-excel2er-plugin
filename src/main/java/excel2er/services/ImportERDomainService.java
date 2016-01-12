@@ -15,7 +15,6 @@ import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IERModel;
-import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.Messages;
@@ -25,6 +24,7 @@ import excel2er.models.DomainConfiguration;
 import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
+import excel2er.services.finder.ERModelFinder;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -103,28 +103,10 @@ public class ImportERDomainService {
 					.getTransactionManager();
 			transactionManager.beginTransaction();
 
-			INamedElement[] candidate = projectAccessor
-					.findElements(IERModel.class);
-			IERModel erModel = null;
-			if (candidate == null || candidate.length == 0) {
-				erModel = editor.createERModel(projectAccessor.getProject(),
-						"ER Model");
-			} else {
-				erModel = (IERModel) candidate[0];
-			}
+            IERModel erModel = getERModel();
+            IERDatatype dataType = getDataType(domain);
+            IERDomain parentERDomain = getParentERDomain(domain);
 
-			DataTypeFinder dataTypeFinder = new DataTypeFinder();
-			IERDatatype dataType = dataTypeFinder.find(domain
-					.getDataType());
-			if (dataType == null) {
-				logger.debug(Messages.getMessage(
-						"log.create.datatype",
-						domain.getDataType()));
-				dataType = createDataType(editor,erModel,domain.getDataType());
-			}
-			
-            IERDomain parentERDomain = new DomainFinder().find(domain.getParentDomain(),
-                    domain.getNamespaceSeparator());
             IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
                     domain.getLogicalName(), domain.getPhysicalName(), dataType);
 
@@ -166,6 +148,37 @@ public class ImportERDomainService {
 			throw new ApplicationException(e);
 		}
 	}
+
+    private IERDomain getParentERDomain(Domain domain) throws ClassNotFoundException,
+            ProjectNotFoundException {
+        return new DomainFinder().find(domain.getParentDomain(), domain.getNamespaceSeparator());
+    }
+
+    private IERModel getERModel() throws ProjectNotFoundException, InvalidEditingException,
+            ClassNotFoundException {
+        IERModel erModel = new ERModelFinder().find();
+        if (erModel != null) {
+          return erModel;
+        }
+        ProjectAccessor projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
+        ERModelEditor editor = projectAccessor.getModelEditorFactory().getERModelEditor();
+        return editor.createERModel(projectAccessor.getProject(), "ER Model");
+    }
+
+    private IERDatatype getDataType(Domain domain) throws ProjectNotFoundException,
+            ClassNotFoundException, InvalidEditingException {
+        if (StringUtils.isEmpty(domain.getDataType())) {
+            return null;
+        }
+        IERDatatype dataType = new DataTypeFinder().find(domain.getDataType());
+        if (dataType != null) {
+            return dataType;
+        }
+        logger.debug(Messages.getMessage("log.create.datatype", domain.getDataType()));
+        ProjectAccessor projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
+        ERModelEditor editor = projectAccessor.getModelEditorFactory().getERModelEditor();
+        return createDataType(editor, getERModel(), domain.getDataType());
+    }
 	
 	private IERDatatype createDataType(ERModelEditor editor,IERModel erModel, String dataType) throws InvalidEditingException {
 		return editor.createERDatatype(erModel, dataType);

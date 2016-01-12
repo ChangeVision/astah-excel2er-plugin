@@ -28,12 +28,11 @@ public class DomainOperations {
         }
 
         for (Domain domain : domains) {
-            String parentDomainFullLogicalName = StringUtils
-                    .defaultString(domain.getParentDomain());
-            if (parentDomainFullLogicalName.isEmpty()) {
+            String parentFullLogicalName = StringUtils.defaultString(domain.getParentDomain());
+            if (parentFullLogicalName.isEmpty()) {
                 continue;
             }
-            if (domainFullLogicalNames.contains(parentDomainFullLogicalName)) {
+            if (domainFullLogicalNames.contains(parentFullLogicalName)) {
                 continue;
             }
             String separator = domain.getNamespaceSeparator();
@@ -41,18 +40,25 @@ public class DomainOperations {
                 continue;
             }
             ArrayList<Domain> newDomains = new ArrayList<Domain>(domains);
-            newDomains.add(createDomain(parentDomainFullLogicalName, separator));
+            Domain newParent = createDomain(parentFullLogicalName, separator, domain.getDataType());
+            newDomains.add(newParent);
             return addNeedCreateParentDomains(newDomains);
         }
         return domains;
     }
 
-    private Domain createDomain(String fullLogicalName, String nameSpaceSeparator) {
+    private Domain createDomain(String fullLogicalName, String nameSpaceSeparator,
+            String dataTypeName) {
         Domain domain = new Domain();
         domain.setFullLogicalName(fullLogicalName, nameSpaceSeparator);
-        if (domain.getParentDomain() == null) {
-            domain.setDataType(DEFAULT_DATA_TYPE);
+        if (domain.getParentDomain() != null) {
+            return domain;
         }
+        if (StringUtils.isNotEmpty(dataTypeName)) {
+            domain.setDataType(dataTypeName);
+            return domain;
+        }
+        domain.setDataType(DEFAULT_DATA_TYPE);
         return domain;
     }
 

@@ -97,7 +97,7 @@ public class ImportERDomainService {
             overwritePhysicalName(erDomain, domain);
             overwriteDatatype(erDomain, domain);
             overwriteParentDomain(erDomain, domain);
-            setAdditionalProperty(domain, erDomain);
+            setAdditionalProperty(erDomain, domain);
 
             TransactionManager.endTransaction();
             log_info(Messages.getMessage("log.overwrite_domain_end", domainFullName));
@@ -259,7 +259,7 @@ public class ImportERDomainService {
             IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
                     domain.getLogicalName(), domain.getPhysicalName(), dataType);
 
-			setAdditionalProperty(domain,domainModel);
+			setAdditionalProperty(domainModel,domain);
 			
             logger.info(Messages.getMessage("log.create_domain", domainFullName));
 			
@@ -357,25 +357,43 @@ public class ImportERDomainService {
 		return editor.createERDatatype(erModel, dataType);
 	}
 
-	private void setAdditionalProperty(Domain domain, IERDomain domainModel)
-			throws InvalidEditingException {
+    private void setAdditionalProperty(IERDomain domainModel, Domain domain)
+            throws InvalidEditingException {
+        setAlias1(domainModel, domain);
+        setAlias2(domainModel, domain);
+        setLengthPrecision(domainModel, domain);
+        setNotNull(domainModel, domain);
+        setDefinition(domainModel, domain);
+	}
 
-        if (StringUtils.isNotEmpty(domain.getAlias1())) {
-            domainModel.setAlias1(domain.getAlias1());
+    private void setDefinition(IERDomain domainModel, Domain domain) throws InvalidEditingException {
+        if (StringUtils.isNotEmpty(domain.getDefinition())) {
+            domainModel.setDefinition(domain.getDefinition());
         }
-        if (StringUtils.isNotEmpty(domain.getAlias2())) {
-            domainModel.setAlias2(domain.getAlias2());
-        }
+    }
+
+    private void setNotNull(IERDomain domainModel, Domain domain) throws InvalidEditingException {
+        domainModel.setNotNull(StringUtils.isNotEmpty(domain.getNotNull()));
+    }
+
+    private void setLengthPrecision(IERDomain domainModel, Domain domain)
+            throws InvalidEditingException {
         if (StringUtils.isNotEmpty(domain.getLengthAndPrecision())) {
             domainModel.setLengthPrecision(domain.getLengthAndPrecision());
         }
+    }
 
-        domainModel.setNotNull(StringUtils.isNotEmpty(domain.getNotNull()));
-
-        if (StringUtils.isNotEmpty(domain.getDefinition())) {
-			domainModel.setDefinition(domain.getDefinition());
+    private void setAlias2(IERDomain domainModel, Domain domain) throws InvalidEditingException {
+        if (StringUtils.isNotEmpty(domain.getAlias2())) {
+            domainModel.setAlias2(domain.getAlias2());
         }
-	}
+    }
+
+    private void setAlias1(IERDomain domainModel, Domain domain) throws InvalidEditingException {
+        if (StringUtils.isNotEmpty(domain.getAlias1())) {
+            domainModel.setAlias1(domain.getAlias1());
+        }
+    }
 
 
 	private void aboartTransaction() {

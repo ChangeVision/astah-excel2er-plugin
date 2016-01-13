@@ -12,6 +12,7 @@ import java.net.URL;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -34,6 +35,13 @@ public class ImportERDomainServiceTest {
 
     private DomainFinder domainFinder = new DomainFinder();
 
+    private ImportERDomainService sut = null;
+
+    @Before
+    public void before() throws Exception {
+        sut = new ImportERDomainService();
+    }
+
 	@After
 	public void tearDown() throws Exception {
 		if (debug) {
@@ -50,12 +58,10 @@ public class ImportERDomainServiceTest {
 	public void should_create_domain_in_empty_astah_project() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 
-		ImportERDomainService service = new ImportERDomainService();
-
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setDataType("VARCHAR");
-		IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 	}
@@ -64,14 +70,12 @@ public class ImportERDomainServiceTest {
 	public void should_create_domain_with_all_properties() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 
-		ImportERDomainService service = new ImportERDomainService();
-
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setPhysicalName("TEST");
 		domain.setDataType("VARCHAR");
 		domain.setDefinition("abc");
-		IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 		assertThat(actual.getPhysicalName(), is("TEST"));
@@ -83,12 +87,10 @@ public class ImportERDomainServiceTest {
 	public void should_create_domain_in_already_exist_ermodel_astah_project() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("already_exist_ermodel.asta"));
 
-		ImportERDomainService service = new ImportERDomainService();
-
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setDataType("VARCHAR");
-		IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 	}
@@ -97,14 +99,12 @@ public class ImportERDomainServiceTest {
 	public void should_not_create_domain_in_already_exist_ermodel() throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("exist_domain.asta"));
 
-		ImportERDomainService service = new ImportERDomainService();
-
 		Domain domain = new Domain();
 		domain.setLogicalName("testdomain");
 		domain.setDataType("FLOAT");
 
 		try{
-			service.createAstahModel(domain);
+            sut.createAstahModel(domain);
 			fail();
 		}catch(ApplicationException e){
 			InvalidEditingException rootCause = (InvalidEditingException)ExceptionUtils.getRootCause(e);
@@ -117,12 +117,10 @@ public class ImportERDomainServiceTest {
 			throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 		
-		ImportERDomainService service = new ImportERDomainService();
-
 		Domain domain = new Domain();
 		domain.setDataType("FLOAT");
 		try{
-			service.createAstahModel(domain);
+            sut.createAstahModel(domain);
 			fail();
 		}catch(ApplicationException e){
 			InvalidEditingException rootCause = (InvalidEditingException)ExceptionUtils.getRootCause(e);
@@ -135,14 +133,13 @@ public class ImportERDomainServiceTest {
 			throws Exception {
 		AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
 		
-		ImportERDomainService service = new ImportERDomainService();
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setPhysicalName("TEST");
 		domain.setDataType("NEWTYPE");
 		domain.setDefinition("abc");
 		
-		IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 		assertThat(actual.getPhysicalName(), is("TEST"));
@@ -154,13 +151,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_parent_difference_in_same_name_domain_creatable() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("addParentDomain.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("CHAR");
         domain.setParentDomain(null);
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -171,7 +167,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setParentDomain("Domein0");
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -183,7 +179,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setParentDomain("Domein0::Domein1");
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -196,13 +192,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_can_import_alias1() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("addAlias1.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("CHAR");
         domain.setAlias1("Alias1");
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getAlias1(), is("Alias1"));
@@ -212,13 +207,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_can_import_alias2() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("addAlias2.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("CHAR");
         domain.setAlias2("Alias2");
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getAlias2(), is("Alias2"));
@@ -228,13 +222,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_can_import_length_and_precision() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("addLengthAndPrecision.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("CHAR");
         domain.setLengthAndPrecision("10");
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getLengthPrecision(), is("10"));
@@ -244,13 +237,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_can_import_not_null() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("addNotNull.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("CHAR");
         domain.setNotNull("N");
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.isNotNull(), is(true));
@@ -260,7 +252,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setNotNull("○");
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.isNotNull(), is(true));
@@ -270,7 +262,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setNotNull(null);
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.isNotNull(), is(false));
@@ -281,13 +273,12 @@ public class ImportERDomainServiceTest {
             throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("setDefaultLengthPrecision.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("TYPE THAT REQUIRES A LENGTH");
         domain.setLengthAndPrecision(null);
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A LENGTH"));
@@ -298,7 +289,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("TYPE THAT REQUIRES A PRECISION");
         domain.setLengthAndPrecision(null);
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A PRECISION"));
@@ -309,7 +300,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("TYPE THAT REQUIRES LENGTH AND PRECISION");
         domain.setLengthAndPrecision(null);
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES LENGTH AND PRECISION"));
@@ -320,13 +311,12 @@ public class ImportERDomainServiceTest {
     public void createAstahModel_addNewDataType() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("add_data_type.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
         Domain domain = new Domain();
         domain.setLogicalName("Domein0");
         domain.setDataType("AAA");
         domain.setLengthAndPrecision(null);
 
-        IERDomain actual = service.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("AAA"));
@@ -337,7 +327,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("BBB");
         domain.setLengthAndPrecision("10");
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("BBB"));
@@ -348,7 +338,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CCC");
         domain.setLengthAndPrecision("10,10");
 
-        actual = service.createAstahModel(domain);
+        actual = sut.createAstahModel(domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("CCC"));
@@ -360,8 +350,6 @@ public class ImportERDomainServiceTest {
     public void overwriteLogicalName_changeName() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
         assertThat(emptyDomain, is(notNullValue()));
 
@@ -370,7 +358,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwriteLogicalName(emptyDomain, domain);
+            sut.overwriteLogicalName(emptyDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -385,8 +373,6 @@ public class ImportERDomainServiceTest {
     public void overwritePhysicalName_addName() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
         assertThat(emptyDomain, is(notNullValue()));
         assertThat(emptyDomain.getPhysicalName(), is(""));
@@ -396,7 +382,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwritePhysicalName(emptyDomain, domain);
+            sut.overwritePhysicalName(emptyDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -411,8 +397,6 @@ public class ImportERDomainServiceTest {
     public void overwritePhysicalName_changeName() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain fullDomain = domainFinder.find("fullDomain", "::");
         assertThat(fullDomain, is(notNullValue()));
         assertThat(fullDomain.getPhysicalName(), is("FULL_DOMAIN"));
@@ -422,7 +406,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwritePhysicalName(fullDomain, domain);
+            sut.overwritePhysicalName(fullDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -437,8 +421,6 @@ public class ImportERDomainServiceTest {
     public void overwritePhysicalName_removeName() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain fullDomain = domainFinder.find("fullDomain", "::");
         assertThat(fullDomain, is(notNullValue()));
         assertThat(fullDomain.getPhysicalName(), is("FULL_DOMAIN"));
@@ -448,7 +430,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwritePhysicalName(fullDomain, domain);
+            sut.overwritePhysicalName(fullDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -463,8 +445,6 @@ public class ImportERDomainServiceTest {
     public void overwriteDatatype_changeExistingDataType() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
         assertThat(emptyDomain, is(notNullValue()));
 
@@ -473,7 +453,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwriteDatatype(emptyDomain, domain);
+            sut.overwriteDatatype(emptyDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -488,8 +468,6 @@ public class ImportERDomainServiceTest {
     public void overwriteDatatype_changeNewDataType() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
         assertThat(emptyDomain, is(notNullValue()));
 
@@ -498,7 +476,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwriteDatatype(emptyDomain, domain);
+            sut.overwriteDatatype(emptyDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -513,8 +491,6 @@ public class ImportERDomainServiceTest {
     public void overwriteParentDomain_addParent() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
         assertThat(emptyDomain, is(notNullValue()));
         IERDomain fullDomain = domainFinder.find("fullDomain", "::");
@@ -526,7 +502,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwriteParentDomain(emptyDomain, domain);
+            sut.overwriteParentDomain(emptyDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();
@@ -541,8 +517,6 @@ public class ImportERDomainServiceTest {
     public void overwriteParentDomain_removeParent() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
-        ImportERDomainService service = new ImportERDomainService();
-
         IERDomain hasParentDomain = domainFinder.find("fullDomain::hasParentDomain", "::");
         assertThat(hasParentDomain, is(notNullValue()));
 
@@ -552,7 +526,7 @@ public class ImportERDomainServiceTest {
 
         try {
             TransactionManager.beginTransaction();
-            service.overwriteParentDomain(hasParentDomain, domain);
+            sut.overwriteParentDomain(hasParentDomain, domain);
             TransactionManager.endTransaction();
         } catch (Exception e) {
             TransactionManager.abortTransaction();

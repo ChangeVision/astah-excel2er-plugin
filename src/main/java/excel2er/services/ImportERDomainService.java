@@ -157,6 +157,9 @@ public class ImportERDomainService {
                 throw new ApplicationException(e);
             }
             throw e;
+        } catch (ApplicationException e) {
+            TransactionManager.abortTransaction();
+            throw e;
         }
     }
 
@@ -292,6 +295,9 @@ public class ImportERDomainService {
 			
 			aboartTransaction();
 			throw new ApplicationException(e);
+        } catch (ApplicationException e) {
+            aboartTransaction();
+            throw e;
 		}
 	}
 
@@ -300,9 +306,25 @@ public class ImportERDomainService {
         return new DomainFinder().find(domain.getFullLogicalName(), domain.getNamespaceSeparator());
     }
 
-    private IERDomain getParentERDomain(Domain domain) throws ClassNotFoundException,
-            ProjectNotFoundException {
-        return new DomainFinder().find(domain.getParentDomain(), domain.getNamespaceSeparator());
+    IERDomain getParentERDomain(Domain domain) throws ProjectNotFoundException {
+        if (StringUtils.isEmpty(domain.getParentDomain())) {
+            return null;
+        }
+        IERDomain parentERDomain;
+        try {
+            parentERDomain = new DomainFinder().find(domain.getParentDomain(),
+                    domain.getNamespaceSeparator());
+        } catch (ClassNotFoundException e) {
+            throw new ApplicationException(Messages.getMessage(
+                    "log.error.failed.get.parent.domain",
+                    String.format("%s is not found.", domain.getParentDomain())), e);
+        }
+        if (parentERDomain == null) {
+            throw new ApplicationException(Messages.getMessage(
+                    "log.error.failed.get.parent.domain",
+                    String.format("%s is not found.", domain.getParentDomain())));
+        }
+        return parentERDomain;
     }
 
     private IERModel getERModel() throws ProjectNotFoundException, InvalidEditingException,

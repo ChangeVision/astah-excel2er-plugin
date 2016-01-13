@@ -537,6 +537,22 @@ public class ImportERDomainServiceTest {
 
     }
 
+    public void getParentERDomain_parentIsNull() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
+        Domain domain = new Domain();
+        domain.setLogicalName("aaa");
+        domain.setParentDomain(null);
+        assertThat(sut.getParentERDomain(domain), is(nullValue()));
+    }
+
+    @Test(expected = ApplicationException.class)
+    public void getParentERDomain_parentIsNotFound() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("empty.asta"));
+        Domain domain = new Domain();
+        domain.setFullLogicalName("aaa::bbb", "::");
+        sut.getParentERDomain(domain);
+    }
+
 	private URL getWorkspaceFilePath(String filename) {
 		return this.getClass().getResource(filename);
 	}

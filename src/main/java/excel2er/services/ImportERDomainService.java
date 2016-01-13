@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.ERModelEditor;
 import com.change_vision.jude.api.inf.editor.ITransactionManager;
+import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IERModel;
+import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.Messages;
@@ -25,6 +27,7 @@ import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
 import excel2er.services.finder.ERModelFinder;
+import excel2er.services.operations.ERDomainOperations;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -58,6 +61,16 @@ public class ImportERDomainService {
 
 		for (Domain domain : domains) {
 			String domainName = domain.getLogicalName();
+             IERDomain overwriteAstahModel = null;
+            try {
+                overwriteAstahModel = overwriteAstahModel(domain);
+            } catch (ApplicationException e) {
+                log_info(Messages.getMessage("log.error.overwrite_domain_end", domainName));
+                continue;
+            }
+            if (overwriteAstahModel != null) {
+                continue;
+            }
 			try{
 				createAstahModel(domain);
 			}catch(ApplicationException e){
@@ -68,6 +81,139 @@ public class ImportERDomainService {
 		
 		return result;
 	}
+
+    private IERDomain overwriteAstahModel(Domain domain) {
+        String domainFullName = domain.getFullLogicalName();
+        try {
+            IERDomain erDomain = getERDomain(domain);
+            if (erDomain == null) {
+                return null;
+            }
+
+            logger.info(Messages.getMessage("log.overwrite_domain", domainFullName));
+            TransactionManager.beginTransaction();
+
+            overwriteLogicalName(erDomain, domain);
+            overwritePhysicalName(erDomain, domain);
+            overwriteDatatype(erDomain, domain);
+            overwriteParentDomain(erDomain, domain);
+            setAdditionalProperty(domain, erDomain);
+
+            TransactionManager.endTransaction();
+            log_info(Messages.getMessage("log.overwrite_domain_end", domainFullName));
+
+            return erDomain;
+
+        } catch (ClassNotFoundException e) {
+            TransactionManager.abortTransaction();
+            log_error(
+                    Messages.getMessage("log.error.overwrite_domain", domainFullName,
+                            e.getMessage()), e);
+            throw new ApplicationException(e);
+        } catch (ProjectNotFoundException e) {
+            TransactionManager.abortTransaction();
+            log_error(Messages.getMessage("error.project.not.found"), e);
+            throw new ApplicationException(e);
+        } catch (InvalidEditingException e) {
+            TransactionManager.abortTransaction();
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage("log.error.overwrite_domain.parameter_error",
+                        domainFullName));
+                throw new ApplicationException(e);
+            }
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.NAME_DOUBLE_ERROR_KEY)) {
+                log_error(Messages.getMessage("log.error.overwrite_domain.duplicate_entity",
+                        domainFullName));
+                throw new ApplicationException(e);
+            }
+            log_error(Messages.getMessage("log.error.overwrite_domain.invalideditingexception",
+                    domainFullName, e.getKey()), e);
+            throw new ApplicationException(e);
+        }
+    }
+
+    void overwriteParentDomain(IERDomain erDomain, Domain domain) throws ClassNotFoundException,
+            ProjectNotFoundException, InvalidEditingException {
+        IElement container = erDomain.getContainer();
+        if ((container == null || !(container instanceof IERDomain))
+                && StringUtils.isEmpty(domain.getParentDomain())) {
+            return;
+        }
+        if (container != null
+                && StringUtils.equals(
+                        new ERDomainOperations().getFullLogicalName((IERDomain) container,
+                                domain.getNamespaceSeparator()), domain.getParentDomain())) {
+            return;
+        }
+        String domainFullName = domain.getFullLogicalName();
+        try {
+            erDomain.setParentDomain(getParentERDomain(domain));
+        } catch (InvalidEditingException e) {
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage(
+                        "log.error.overwrite_parent_domain_domain.parameter_error", domainFullName));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
+    }
+
+    void overwriteDatatype(IERDomain erDomain, Domain domain) throws ProjectNotFoundException,
+            ClassNotFoundException, InvalidEditingException {
+        if (StringUtils.equals(erDomain.getDatatypeName(), domain.getDataType())) {
+            return;
+        }
+        String domainFullName = domain.getFullLogicalName();
+        try {
+            erDomain.setDatatype(getDataType(domain));
+        } catch (InvalidEditingException e) {
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage(
+                        "log.error.overwrite_datatype_domain.parameter_error", domainFullName));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
+    }
+
+    void overwritePhysicalName(IERDomain erDomain, Domain domain) throws InvalidEditingException {
+        if (StringUtils.equals(erDomain.getPhysicalName(), domain.getPhysicalName())) {
+            return;
+        }
+        String domainFullName = domain.getFullLogicalName();
+        try {
+            erDomain.setPhysicalName(domain.getPhysicalName());
+        } catch (InvalidEditingException e) {
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage(
+                        "log.error.overwrite_physical_domain.parameter_error", domainFullName));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
+    }
+
+    void overwriteLogicalName(IERDomain erDomain, Domain domain) throws InvalidEditingException {
+        if (StringUtils.equals(erDomain.getLogicalName(), domain.getLogicalName())) {
+            return;
+        }
+        String domainFullName = domain.getFullLogicalName();
+        try {
+            erDomain.setLogicalName(domain.getLogicalName());
+        } catch (InvalidEditingException e) {
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage("log.error.overwrite_logical_domain.parameter_error",
+                        domainFullName));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
+    }
 
 	private void log_append(String message) {
 		result.appendMessage(message);
@@ -148,6 +294,11 @@ public class ImportERDomainService {
 			throw new ApplicationException(e);
 		}
 	}
+
+    private IERDomain getERDomain(Domain domain) throws ClassNotFoundException,
+            ProjectNotFoundException {
+        return new DomainFinder().find(domain.getFullLogicalName(), domain.getNamespaceSeparator());
+    }
 
     private IERDomain getParentERDomain(Domain domain) throws ClassNotFoundException,
             ProjectNotFoundException {

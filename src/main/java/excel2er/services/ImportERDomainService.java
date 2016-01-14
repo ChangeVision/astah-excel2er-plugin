@@ -128,6 +128,11 @@ public class ImportERDomainService {
                         domainFullName));
                 throw new ApplicationException(e);
             }
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.READ_ONLY_KEY)) {
+                log_error(Messages.getMessage("log.error.overwrite_domain.read_only_error",
+                        domainFullName));
+                throw new ApplicationException(e);
+            }
             log_error(Messages.getMessage("log.error.overwrite_domain.invalideditingexception",
                     domainFullName, e.getKey()), e);
             throw new ApplicationException(e);

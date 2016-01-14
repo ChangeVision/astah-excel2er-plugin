@@ -488,6 +488,79 @@ public class ImportERDomainServiceTest {
     }
 
     @Test
+    public void overwriteLengthAndPrecision_set() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.getLengthPrecision(), is(""));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(emptyDomain.getLogicalName());
+        domain.setLengthAndPrecision("LengthAndPrecision");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.overwriteLengthPrecision(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(emptyDomain.getLengthPrecision(), is("LengthAndPrecision"));
+
+    }
+
+    @Test
+    public void overwriteLengthAndPrecision_change() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getLengthPrecision(), is("10"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setLengthAndPrecision("newLengthAndPrecision");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.overwriteLengthPrecision(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(fullDomain.getLengthPrecision(), is("newLengthAndPrecision"));
+
+    }
+
+    @Test
+    public void overwriteLengthAndPrecision_remove() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getLengthPrecision(), is("10"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setLengthAndPrecision(null);
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.overwriteLengthPrecision(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(fullDomain.getLengthPrecision(), is(""));
+    }
+
+    @Test
     public void overwriteParentDomain_addParent() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 
@@ -535,6 +608,305 @@ public class ImportERDomainServiceTest {
 
         assertThat((IERDomain) hasParentDomain.getContainer(), is(nullValue()));
 
+    }
+
+    @Test
+    public void setAlias1_setName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.getAlias1(), is(""));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(emptyDomain.getLogicalName());
+        domain.setAlias1("Alias1");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias1(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(emptyDomain.getAlias1(), is("Alias1"));
+
+    }
+
+    @Test
+    public void setAlias1_changeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias1(), is("Alias1"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias1("newAlias1");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias1(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(fullDomain.getAlias1(), is("newAlias1"));
+
+    }
+
+    @Test
+    public void setAlias1_removeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias1(), is("Alias1"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias1(null);
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias1(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(fullDomain.getAlias1(), is(""));
+
+    }
+
+    @Test
+    public void setAlias2_setName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.getAlias2(), is(""));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(emptyDomain.getLogicalName());
+        domain.setAlias2("Alias2");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias2(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(emptyDomain.getAlias2(), is("Alias2"));
+
+    }
+
+    @Test
+    public void setAlias2_changeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias2(), is("Alias2"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias2("newAlias2");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias2(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(fullDomain.getAlias2(), is("newAlias2"));
+
+    }
+
+    @Test
+    public void setAlias2_removeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias2(), is("Alias2"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias2(null);
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setAlias2(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+    }
+
+    @Test
+    public void setLengthAndPrecision_set() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.getLengthPrecision(), is(""));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(emptyDomain.getLogicalName());
+        domain.setLengthAndPrecision("LengthAndPrecision");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setLengthPrecision(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(emptyDomain.getLengthPrecision(), is("LengthAndPrecision"));
+
+    }
+
+    @Test
+    public void setNotNull() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.isNotNull(), is(false));
+
+        Domain domain = new Domain();
+
+        domain.setNotNull("N");
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(true));
+
+        domain.setNotNull(null);
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(false));
+
+        domain.setNotNull("○");
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(true));
+
+        domain.setNotNull("");
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(false));
+    }
+
+    @Test
+    public void setDefinition_setName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
+        assertThat(emptyDomain, is(notNullValue()));
+        assertThat(emptyDomain.getDefinition(), is(""));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(emptyDomain.getLogicalName());
+        domain.setDefinition("newDefinition");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setDefinition(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(emptyDomain.getDefinition(), is("newDefinition"));
+
+    }
+
+    @Test
+    public void setDefinition_changeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getDefinition(), is("fullDomains Definition"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDefinition("newDefinition");
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setDefinition(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+
+        assertThat(fullDomain.getDefinition(), is("newDefinition"));
+
+    }
+
+    @Test
+    public void setDefinition_removeName() throws Exception {
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getDefinition(), is("fullDomains Definition"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDefinition(null);
+
+        try {
+            TransactionManager.beginTransaction();
+            sut.setDefinition(fullDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
     }
 
     public void getParentERDomain_parentIsNull() throws Exception {

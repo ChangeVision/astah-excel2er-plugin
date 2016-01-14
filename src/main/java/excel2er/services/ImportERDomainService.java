@@ -90,6 +90,12 @@ public class ImportERDomainService {
                 return null;
             }
 
+            if (!isNeedOverwrites(erDomain, domain)) {
+                log_info(Messages.getMessage(
+                        "log.info.overwrite_domain.is_unnecessary_change_value", domainFullName));
+                return erDomain;
+            }
+
             logger.info(Messages.getMessage("log.overwrite_domain", domainFullName));
             TransactionManager.beginTransaction();
 
@@ -139,17 +145,20 @@ public class ImportERDomainService {
         }
     }
 
+    private boolean isNeedOverwrites(IERDomain erDomain, Domain domain) {
+        return isNeedChangeLogicalName(erDomain, domain)
+                || isNeedChangePhysicalName(erDomain, domain)
+                || isNeedChangeAlias1(erDomain, domain) || isNeedChangeAlias2(erDomain, domain)
+                || isNeedChangeDatatype(erDomain, domain)
+                || isNeedChangeLengthPrecision(erDomain, domain)
+                || isNeedChangeNotNull(erDomain, domain)
+                || isNeedChangeParentDomain(erDomain, domain)
+                || isNeedChangeDefinition(erDomain, domain);
+    }
+
     void overwriteParentDomain(IERDomain erDomain, Domain domain) throws ClassNotFoundException,
             ProjectNotFoundException, InvalidEditingException {
-        IElement container = erDomain.getContainer();
-        if ((container == null || !(container instanceof IERDomain))
-                && StringUtils.isEmpty(domain.getParentDomain())) {
-            return;
-        }
-        if (container != null
-                && !isNeedChangeValue(
-                        new ERDomainOperations().getFullLogicalName((IERDomain) container,
-                                domain.getNamespaceSeparator()), domain.getParentDomain())) {
+        if (!isNeedChangeParentDomain(erDomain, domain)) {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
@@ -169,17 +178,36 @@ public class ImportERDomainService {
         }
     }
 
+    private boolean isNeedChangeParentDomain(IERDomain erDomain, Domain domain) {
+        IElement container = erDomain.getContainer();
+        if ((container == null || !(container instanceof IERDomain))
+                && StringUtils.isEmpty(domain.getParentDomain())) {
+            return false;
+        }
+        if (container != null
+                && !isNeedChangeValue(
+                        new ERDomainOperations().getFullLogicalName((IERDomain) container,
+                                domain.getNamespaceSeparator()), domain.getParentDomain())) {
+            return false;
+        }
+        return true;
+    }
+
     void overwriteLengthPrecision(IERDomain domainModel, Domain domain)
             throws InvalidEditingException {
-        if (!isNeedChangeValue(domainModel.getLengthPrecision(), domain.getLengthAndPrecision())) {
+        if (!isNeedChangeLengthPrecision(domainModel, domain)) {
             return;
         }
         domainModel.setLengthPrecision(StringUtils.defaultString(domain.getLengthAndPrecision()));
     }
 
+    private boolean isNeedChangeLengthPrecision(IERDomain domainModel, Domain domain) {
+        return isNeedChangeValue(domainModel.getLengthPrecision(), domain.getLengthAndPrecision());
+    }
+
     void overwriteDatatype(IERDomain erDomain, Domain domain) throws ProjectNotFoundException,
             ClassNotFoundException, InvalidEditingException {
-        if (!isNeedChangeValue(erDomain.getDatatypeName(), domain.getDataType())) {
+        if (!isNeedChangeDatatype(erDomain, domain)) {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
@@ -196,8 +224,12 @@ public class ImportERDomainService {
         }
     }
 
+    private boolean isNeedChangeDatatype(IERDomain erDomain, Domain domain) {
+        return isNeedChangeValue(erDomain.getDatatypeName(), domain.getDataType());
+    }
+
     void overwritePhysicalName(IERDomain erDomain, Domain domain) throws InvalidEditingException {
-        if (!isNeedChangeValue(erDomain.getPhysicalName(), domain.getPhysicalName())) {
+        if (!isNeedChangePhysicalName(erDomain, domain)) {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
@@ -214,8 +246,12 @@ public class ImportERDomainService {
         }
     }
 
+    private boolean isNeedChangePhysicalName(IERDomain erDomain, Domain domain) {
+        return isNeedChangeValue(erDomain.getPhysicalName(), domain.getPhysicalName());
+    }
+
     void overwriteLogicalName(IERDomain erDomain, Domain domain) throws InvalidEditingException {
-        if (!isNeedChangeValue(erDomain.getLogicalName(), domain.getLogicalName())) {
+        if (!isNeedChangeLogicalName(erDomain, domain)) {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
@@ -230,6 +266,10 @@ public class ImportERDomainService {
             }
             throw e;
         }
+    }
+
+    private boolean isNeedChangeLogicalName(IERDomain erDomain, Domain domain) {
+        return isNeedChangeValue(erDomain.getLogicalName(), domain.getLogicalName());
     }
 
 	private void log_append(String message) {
@@ -381,7 +421,7 @@ public class ImportERDomainService {
 	}
 
     void setDefinition(IERDomain domainModel, Domain domain) throws InvalidEditingException {
-        if (!isNeedChangeValue(domainModel.getDefinition(), domain.getDefinition())) {
+        if (!isNeedChangeDefinition(domainModel, domain)) {
             return;
         }
         try {
@@ -397,12 +437,20 @@ public class ImportERDomainService {
         }
     }
 
+    private boolean isNeedChangeDefinition(IERDomain domainModel, Domain domain) {
+        return isNeedChangeValue(domainModel.getDefinition(), domain.getDefinition());
+    }
+
     void setNotNull(IERDomain domainModel, Domain domain) throws InvalidEditingException {
-        boolean isNotNull = StringUtils.isNotEmpty(domain.getNotNull());
-        if (!isNeedChangeValue(domainModel.isNotNull(), isNotNull)) {
+        if (!isNeedChangeNotNull(domainModel, domain)) {
             return;
         }
         domainModel.setNotNull(StringUtils.isNotEmpty(domain.getNotNull()));
+    }
+
+    private boolean isNeedChangeNotNull(IERDomain domainModel, Domain domain) {
+        boolean isNotNull = StringUtils.isNotEmpty(domain.getNotNull());
+        return isNeedChangeValue(domainModel.isNotNull(), isNotNull);
     }
 
     void setLengthPrecision(IERDomain domainModel, Domain domain) throws InvalidEditingException {
@@ -422,17 +470,25 @@ public class ImportERDomainService {
     }
 
     void setAlias2(IERDomain domainModel, Domain domain) throws InvalidEditingException {
-        if (!isNeedChangeValue(domainModel.getAlias2(), domain.getAlias2())) {
+        if (!isNeedChangeAlias2(domainModel, domain)) {
             return;
         }
         domainModel.setAlias2(domain.getAlias2());
     }
 
+    private boolean isNeedChangeAlias2(IERDomain domainModel, Domain domain) {
+        return isNeedChangeValue(domainModel.getAlias2(), domain.getAlias2());
+    }
+
     void setAlias1(IERDomain domainModel, Domain domain) throws InvalidEditingException {
-        if (!isNeedChangeValue(domainModel.getAlias1(), domain.getAlias1())) {
+        if (!isNeedChangeAlias1(domainModel, domain)) {
             return;
         }
         domainModel.setAlias1(domain.getAlias1());
+    }
+
+    private boolean isNeedChangeAlias1(IERDomain domainModel, Domain domain) {
+        return isNeedChangeValue(domainModel.getAlias1(), domain.getAlias1());
     }
 
     private boolean isNeedChangeValue(boolean oldBoolean, boolean newBoolean) {

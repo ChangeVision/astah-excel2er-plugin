@@ -379,7 +379,17 @@ public class ImportERDomainService {
         if (!isNeedChangeValue(domainModel.getDefinition(), domain.getDefinition())) {
             return;
         }
-        domainModel.setDefinition(StringUtils.defaultString(domain.getDefinition()));
+        try {
+            domainModel.setDefinition(StringUtils.defaultString(domain.getDefinition()));
+        } catch (InvalidEditingException e) {
+            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage("log.error.set_definition_domain.parameter_error",
+                        domain.getFullLogicalName()));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
     }
 
     void setNotNull(IERDomain domainModel, Domain domain) throws InvalidEditingException {
@@ -392,7 +402,17 @@ public class ImportERDomainService {
 
     void setLengthPrecision(IERDomain domainModel, Domain domain) throws InvalidEditingException {
         if (StringUtils.isNotEmpty(domain.getLengthAndPrecision())) {
-            domainModel.setLengthPrecision(domain.getLengthAndPrecision());
+            try {
+                domainModel.setLengthPrecision(domain.getLengthAndPrecision());
+            } catch (InvalidEditingException e) {
+                if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                    TransactionManager.abortTransaction();
+                    log_error(Messages.getMessage("log.error.set_length_and_precision_domain.parameter_error",
+                            domain.getFullLogicalName()));
+                    throw new ApplicationException(e);
+                }
+                throw e;
+            }
         }
     }
 

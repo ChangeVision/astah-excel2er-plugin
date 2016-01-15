@@ -199,7 +199,19 @@ public class ImportERDomainService {
         if (!isNeedChangeLengthPrecision(domainModel, domain)) {
             return;
         }
-        domainModel.setLengthPrecision(StringUtils.defaultString(domain.getLengthAndPrecision()));
+        String lengthPrecision = StringUtils.defaultString(domain.getLengthAndPrecision());
+        try {
+            domainModel.setLengthPrecision(lengthPrecision);
+        } catch (InvalidEditingException e) {
+        if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                TransactionManager.abortTransaction();
+                log_error(Messages.getMessage(
+                        "log.error.set_length_and_precision_domain.parameter_error",
+                        domain.getFullLogicalName()));
+                throw new ApplicationException(e);
+            }
+            throw e;
+        }
     }
 
     private boolean isNeedChangeLengthPrecision(IERDomain domainModel, Domain domain) {

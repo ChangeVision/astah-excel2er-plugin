@@ -107,6 +107,7 @@ public class ImportERDomainService {
             setAdditionalProperty(erDomain, domain);
 
             TransactionManager.endTransaction();
+            result.inclementEntitesCount();
             log_info(Messages.getMessage("log.overwrite_domain_end", domainFullName));
 
             return erDomain;

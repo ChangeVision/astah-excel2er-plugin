@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
@@ -16,6 +17,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
@@ -24,8 +28,9 @@ import com.change_vision.jude.api.inf.model.IERDomain;
 import excel2er.AstahModelManager;
 import excel2er.exceptions.ApplicationException;
 import excel2er.models.Domain;
+import excel2er.models.DomainConfiguration;
 import excel2er.services.finder.DomainFinder;
-
+@RunWith(MockitoJUnitRunner.class)
 public class ImportERDomainServiceTest {
 
 	@Rule
@@ -37,9 +42,21 @@ public class ImportERDomainServiceTest {
 
     private ImportERDomainService sut = null;
 
+    @Mock
+    private DomainConfiguration configuration;
+
     @Before
     public void before() throws Exception {
         sut = new ImportERDomainService();
+        when(configuration.getLogicalCol()).thenReturn("B");
+        when(configuration.getPhysicalCol()).thenReturn("G");
+        when(configuration.getAlias1Col()).thenReturn("L");
+        when(configuration.getAlias2Col()).thenReturn("Q");
+        when(configuration.getDataTypeCol()).thenReturn("V");
+        when(configuration.getLengthAndPrecisionCol()).thenReturn("Z");
+        when(configuration.getNotNullCol()).thenReturn("AD");
+        when(configuration.getParentDomainCol()).thenReturn("AE");
+        when(configuration.getDefinitionCol()).thenReturn("AJ");
     }
 
 	@After
@@ -61,7 +78,7 @@ public class ImportERDomainServiceTest {
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setDataType("VARCHAR");
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 	}
@@ -75,7 +92,7 @@ public class ImportERDomainServiceTest {
 		domain.setPhysicalName("TEST");
 		domain.setDataType("VARCHAR");
 		domain.setDefinition("abc");
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 		assertThat(actual.getPhysicalName(), is("TEST"));
@@ -90,7 +107,7 @@ public class ImportERDomainServiceTest {
 		Domain domain = new Domain();
 		domain.setLogicalName("test");
 		domain.setDataType("VARCHAR");
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 	}
@@ -104,7 +121,7 @@ public class ImportERDomainServiceTest {
 		domain.setDataType("FLOAT");
 
 		try{
-            sut.createAstahModel(domain);
+            sut.createAstahModel(configuration,domain);
 			fail();
 		}catch(ApplicationException e){
 			InvalidEditingException rootCause = (InvalidEditingException)ExceptionUtils.getRootCause(e);
@@ -120,7 +137,7 @@ public class ImportERDomainServiceTest {
 		Domain domain = new Domain();
 		domain.setDataType("FLOAT");
 		try{
-            sut.createAstahModel(domain);
+            sut.createAstahModel(configuration,domain);
 			fail();
 		}catch(ApplicationException e){
 			InvalidEditingException rootCause = (InvalidEditingException)ExceptionUtils.getRootCause(e);
@@ -139,7 +156,7 @@ public class ImportERDomainServiceTest {
 		domain.setDataType("NEWTYPE");
 		domain.setDefinition("abc");
 		
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
 		assertThat(actual.getLogicalName(), is("test"));
 		assertThat(actual.getPhysicalName(), is("TEST"));
@@ -156,7 +173,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setParentDomain(null);
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -167,7 +184,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setParentDomain("Domein0");
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -179,7 +196,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setParentDomain("Domein0::Domein1");
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("CHAR"));
@@ -197,7 +214,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setAlias1("Alias1");
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getAlias1(), is("Alias1"));
@@ -212,7 +229,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setAlias2("Alias2");
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getAlias2(), is("Alias2"));
@@ -227,7 +244,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setLengthAndPrecision("10");
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getLengthPrecision(), is("10"));
@@ -242,7 +259,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setNotNull("N");
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.isNotNull(), is(true));
@@ -252,7 +269,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setNotNull("○");
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.isNotNull(), is(true));
@@ -262,7 +279,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CHAR");
         domain.setNotNull(null);
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.isNotNull(), is(false));
@@ -278,7 +295,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("TYPE THAT REQUIRES A LENGTH");
         domain.setLengthAndPrecision(null);
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A LENGTH"));
@@ -289,7 +306,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("TYPE THAT REQUIRES A PRECISION");
         domain.setLengthAndPrecision(null);
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES A PRECISION"));
@@ -300,7 +317,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("TYPE THAT REQUIRES LENGTH AND PRECISION");
         domain.setLengthAndPrecision(null);
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("TYPE THAT REQUIRES LENGTH AND PRECISION"));
@@ -316,7 +333,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("AAA");
         domain.setLengthAndPrecision(null);
 
-        IERDomain actual = sut.createAstahModel(domain);
+        IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
         assertThat(actual.getDatatypeName(), is("AAA"));
@@ -327,7 +344,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("BBB");
         domain.setLengthAndPrecision("10");
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein1"));
         assertThat(actual.getDatatypeName(), is("BBB"));
@@ -338,7 +355,7 @@ public class ImportERDomainServiceTest {
         domain.setDataType("CCC");
         domain.setLengthAndPrecision("10,10");
 
-        actual = sut.createAstahModel(domain);
+        actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein2"));
         assertThat(actual.getDatatypeName(), is("CCC"));
@@ -923,6 +940,321 @@ public class ImportERDomainServiceTest {
         Domain domain = new Domain();
         domain.setFullLogicalName("aaa::bbb", "::");
         sut.getParentERDomain(domain);
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesPhysicalName() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setPhysicalCol("G");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getPhysicalName(), is("FULL_DOMAIN"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setPhysicalName("newPhysicalName");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesPhysicalName() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setPhysicalCol("G");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getPhysicalName(), is("FULL_DOMAIN"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setPhysicalName("FULL_DOMAIN");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesAlias1() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setAlias1Col("L");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias1(), is("Alias1"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias1("newAlias1");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesAlias1() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setAlias1Col("L");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias1(), is("Alias1"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setAlias1("Alias1");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesAlias2() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setAlias2Col("Q");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias2(), is("Alias2"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setAlias2("newAlias2");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesAlias2() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setAlias2Col("Q");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getAlias2(), is("Alias2"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setAlias2("Alias2");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesLengthAndPrecision() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setLengthAndPrecisionCol("Z");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getLengthPrecision(), is("10"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setLengthAndPrecision("newLengthAndPrecision");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesLengthAndPrecision() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setLengthAndPrecisionCol("Z");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getLengthPrecision(), is("10"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setLengthAndPrecision("10");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesNotNull() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setNotNullCol("AD");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.isNotNull(), is(true));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setNotNull("N");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesNotNull() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setNotNullCol("AD");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.isNotNull(), is(true));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setNotNull("Y");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesParentDomain() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setParentDomainCol("L");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain::hasParentDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(((IERDomain) fullDomain.getContainer()).getLogicalName(), is("fullDomain"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setParentDomain("newParentDomain");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesParentDomain() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setParentDomainCol("L");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain::hasParentDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(((IERDomain) fullDomain.getContainer()).getLogicalName(), is("fullDomain"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setParentDomain("fullDomain");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNeedOverwritesDefinition() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setDefinitionCol("AJ");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getDefinition(), is("fullDomains Definition"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDefinition("newDefinition");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(true));
+
+    }
+
+    @Test
+    public void isNeedOverwrites_isNotNeedOverwritesDefinition() throws Exception {
+
+        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
+
+        DomainConfiguration configuration = new DomainConfiguration();
+        configuration.setDefinitionCol("AJ");
+
+        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
+        assertThat(fullDomain, is(notNullValue()));
+        assertThat(fullDomain.getDefinition(), is("fullDomains Definition"));
+
+        Domain domain = new Domain();
+        domain.setLogicalName(fullDomain.getLogicalName());
+        domain.setDataType(fullDomain.getDatatypeName());
+        domain.setDefinition("fullDomains Definition");
+
+        final boolean actual = sut.isNeedOverwrites(configuration, fullDomain, domain);
+
+        assertThat(actual, is(false));
+
     }
 
 	private URL getWorkspaceFilePath(String filename) {

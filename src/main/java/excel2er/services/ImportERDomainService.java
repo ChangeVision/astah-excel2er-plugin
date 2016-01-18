@@ -63,7 +63,7 @@ public class ImportERDomainService {
 			String domainName = domain.getLogicalName();
              IERDomain overwriteAstahModel = null;
             try {
-                overwriteAstahModel = overwriteAstahModel(domain);
+                overwriteAstahModel = overwriteAstahModel(configuration, domain);
             } catch (ApplicationException e) {
                 log_info(Messages.getMessage("log.error.overwrite_domain_end", domainName));
                 continue;
@@ -72,7 +72,7 @@ public class ImportERDomainService {
                 continue;
             }
 			try{
-				createAstahModel(domain);
+                createAstahModel(configuration, domain);
 			}catch(ApplicationException e){
 				//continue import
 				log_info(Messages.getMessage("log.error.create_domain_end", domainName));
@@ -82,7 +82,7 @@ public class ImportERDomainService {
 		return result;
 	}
 
-    private IERDomain overwriteAstahModel(Domain domain) {
+    private IERDomain overwriteAstahModel(DomainConfiguration configuration, Domain domain) {
         String domainFullName = domain.getFullLogicalName();
         try {
             IERDomain erDomain = getERDomain(domain);
@@ -90,7 +90,7 @@ public class ImportERDomainService {
                 return null;
             }
 
-            if (!isNeedOverwrites(erDomain, domain)) {
+            if (!isNeedOverwrites(configuration, erDomain, domain)) {
                 log_info(Messages.getMessage(
                         "log.info.overwrite_domain.is_unnecessary_change_value", domainFullName));
                 return erDomain;
@@ -100,11 +100,17 @@ public class ImportERDomainService {
             TransactionManager.beginTransaction();
 
             overwriteLogicalName(erDomain, domain);
-            overwritePhysicalName(erDomain, domain);
+            if (StringUtils.isNotEmpty(configuration.getPhysicalCol())) {
+                overwritePhysicalName(erDomain, domain);
+            }
             overwriteDatatype(erDomain, domain);
-            overwriteLengthPrecision(erDomain, domain);
-            overwriteParentDomain(erDomain, domain);
-            setAdditionalProperty(erDomain, domain);
+            if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
+                overwriteLengthPrecision(erDomain, domain);
+            }
+            if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
+                overwriteParentDomain(erDomain, domain);
+            }
+            setAdditionalProperty(configuration, erDomain, domain);
 
             TransactionManager.endTransaction();
             result.inclementImportedElementsCount();
@@ -146,15 +152,43 @@ public class ImportERDomainService {
         }
     }
 
-    private boolean isNeedOverwrites(IERDomain erDomain, Domain domain) {
-        return isNeedChangeLogicalName(erDomain, domain)
-                || isNeedChangePhysicalName(erDomain, domain)
-                || isNeedChangeAlias1(erDomain, domain) || isNeedChangeAlias2(erDomain, domain)
-                || isNeedChangeDatatype(erDomain, domain)
-                || isNeedChangeLengthPrecision(erDomain, domain)
-                || isNeedChangeNotNull(erDomain, domain)
-                || isNeedChangeParentDomain(erDomain, domain)
-                || isNeedChangeDefinition(erDomain, domain);
+    boolean isNeedOverwrites(DomainConfiguration configuration, IERDomain erDomain, Domain domain) {
+        if (StringUtils.isNotEmpty(configuration.getPhysicalCol())) {
+            if (isNeedChangePhysicalName(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getAlias1Col())) {
+            if (isNeedChangeAlias1(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getAlias2Col())) {
+            if (isNeedChangeAlias2(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
+            if (isNeedChangeLengthPrecision(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getNotNullCol())) {
+            if (isNeedChangeNotNull(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
+            if (isNeedChangeParentDomain(erDomain, domain)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotEmpty(configuration.getDefinitionCol())) {
+            if (isNeedChangeDefinition(erDomain, domain)) {
+                return true;
+            }
+        }
+        return isNeedChangeLogicalName(erDomain, domain) || isNeedChangeDatatype(erDomain, domain);
     }
 
     void overwriteParentDomain(IERDomain erDomain, Domain domain) throws ClassNotFoundException,
@@ -307,7 +341,7 @@ public class ImportERDomainService {
 		result.setErrorOccured(true);
 	}
 	
-	IERDomain createAstahModel(Domain domain) {
+    IERDomain createAstahModel(DomainConfiguration configuration, Domain domain) {
         String domainFullName = domain.getFullLogicalName();
 		try {
 			ProjectAccessor projectAccessor = AstahAPI.getAstahAPI()
@@ -321,13 +355,17 @@ public class ImportERDomainService {
 
             IERModel erModel = getERModel();
             IERDatatype dataType = getDataType(domain);
-            IERDomain parentERDomain = getParentERDomain(domain);
+            IERDomain parentERDomain = null;
+            if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
+                parentERDomain = getParentERDomain(domain);
+            }
 
             IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
                     domain.getLogicalName(), domain.getPhysicalName(), dataType);
-
-            setLengthPrecision(domainModel, domain);
-			setAdditionalProperty(domainModel,domain);
+            if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
+                setLengthPrecision(domainModel, domain);
+            }
+            setAdditionalProperty(configuration, domainModel, domain);
 			
             logger.info(Messages.getMessage("log.create_domain", domainFullName));
 			
@@ -425,12 +463,20 @@ public class ImportERDomainService {
 		return editor.createERDatatype(erModel, dataType);
 	}
 
-    private void setAdditionalProperty(IERDomain domainModel, Domain domain)
+    private void setAdditionalProperty(DomainConfiguration configuration, IERDomain domainModel, Domain domain)
             throws InvalidEditingException {
-        setAlias1(domainModel, domain);
-        setAlias2(domainModel, domain);
-        setNotNull(domainModel, domain);
-        setDefinition(domainModel, domain);
+        if (StringUtils.isNotEmpty(configuration.getAlias1Col())) {
+            setAlias1(domainModel, domain);
+        }
+        if (StringUtils.isNotEmpty(configuration.getAlias2Col())) {
+            setAlias2(domainModel, domain);
+        }
+        if (StringUtils.isNotEmpty(configuration.getNotNullCol())) {
+            setNotNull(domainModel, domain);
+        }
+        if (StringUtils.isNotEmpty(configuration.getDefinitionCol())) {
+            setDefinition(domainModel, domain);
+        }
 	}
 
     void setDefinition(IERDomain domainModel, Domain domain) throws InvalidEditingException {

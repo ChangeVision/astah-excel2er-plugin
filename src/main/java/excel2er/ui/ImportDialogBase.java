@@ -99,10 +99,10 @@ public abstract class ImportDialogBase extends JDialog{
 			if (result.isErrorOccured()) {
 				mainMessage = Messages.getMessage(
 						"result.dialog.normal_with_error",
-						result.getCreatedEntitiesCount());
+                        result.getImportedElementsCount());
 			} else {
 				mainMessage = Messages.getMessage("result.dialog.normal",
-						result.getCreatedEntitiesCount());
+                        result.getImportedElementsCount());
 			}
 		} else if (status.equals(Status.ERROR)) {
 			messageType = JOptionPane.ERROR_MESSAGE;

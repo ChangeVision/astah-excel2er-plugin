@@ -107,7 +107,7 @@ public class ImportERDomainService {
             setAdditionalProperty(erDomain, domain);
 
             TransactionManager.endTransaction();
-            result.inclementEntitesCount();
+            result.inclementImportedElementsCount();
             log_info(Messages.getMessage("log.overwrite_domain_end", domainFullName));
 
             return erDomain;
@@ -320,7 +320,7 @@ public class ImportERDomainService {
             logger.info(Messages.getMessage("log.create_domain", domainFullName));
 			
 			projectAccessor.getTransactionManager().endTransaction();
-			result.inclementEntitesCount();
+            result.inclementImportedElementsCount();
             log_info(Messages.getMessage("log.create_domain_end", domainFullName));
 			return domainModel;
 		} catch (ClassNotFoundException e) {

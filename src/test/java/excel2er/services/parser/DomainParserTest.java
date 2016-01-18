@@ -60,7 +60,7 @@ public class DomainParserTest {
         assertThat(domain.getAlias2(), is("NameAlias2"));
 		assertThat(domain.getDataType(), is("VARCHAR"));
         assertThat(domain.getLengthAndPrecision(), is("30"));// CELL_TYPE_STRING
-        assertThat(domain.getNotNull(), is("N"));
+        assertThat(domain.getNotNull(), is(false));
         assertThat(domain.getParentDomain(), is("NamesParent"));
 		assertThat(domain.getDefinition(), is("name def"));
 		
@@ -71,7 +71,7 @@ public class DomainParserTest {
         assertThat(domain.getAlias2(), is("AddressAlias2"));
 		assertThat(domain.getDataType(), is("VARCHAR"));
         assertThat(domain.getLengthAndPrecision(), is("200"));// CELL_TYPE_STRING
-        assertThat(domain.getNotNull(), is("N"));
+        assertThat(domain.getNotNull(), is(false));
         assertThat(domain.getParentDomain(), is("AddressesParent"));
 		assertThat(domain.getDefinition(), is("address def"));
 
@@ -82,7 +82,7 @@ public class DomainParserTest {
         assertThat(domain.getAlias2(), is("AgeAlias2"));
 		assertThat(domain.getDataType(), is("INT"));
         assertThat(domain.getLengthAndPrecision(), is("10"));// CELL_TYPE_NUMERIC
-        assertThat(domain.getNotNull(), is("N"));
+        assertThat(domain.getNotNull(), is(false));
         assertThat(domain.getParentDomain(), is("AgesParent"));
 		assertThat(domain.getDefinition(), is("age def"));
 
@@ -93,7 +93,7 @@ public class DomainParserTest {
         assertThat(domain.getAlias2(), is("BirthdayAlias2"));
 		assertThat(domain.getDataType(), is("DATE"));
         assertThat(domain.getLengthAndPrecision(), is("20"));// CELL_TYPE_NUMERIC
-        assertThat(domain.getNotNull(), is("N"));
+        assertThat(domain.getNotNull(), is(false));
         assertThat(domain.getParentDomain(), is("BirthdaysParent"));
 		assertThat(domain.getDefinition(), is("birthday def"));
 

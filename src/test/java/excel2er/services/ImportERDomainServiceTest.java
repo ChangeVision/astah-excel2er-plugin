@@ -262,7 +262,7 @@ public class ImportERDomainServiceTest {
         IERDomain actual = sut.createAstahModel(configuration,domain);
 
         assertThat(actual.getLogicalName(), is("Domein0"));
-        assertThat(actual.isNotNull(), is(true));
+        assertThat(actual.isNotNull(), is(false));
 
         domain = new Domain();
         domain.setLogicalName("Domein1");
@@ -809,7 +809,29 @@ public class ImportERDomainServiceTest {
 
         Domain domain = new Domain();
 
+        domain.setNotNull("Y");
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(true));
+
         domain.setNotNull("N");
+        try {
+            TransactionManager.beginTransaction();
+            sut.setNotNull(emptyDomain, domain);
+            TransactionManager.endTransaction();
+        } catch (Exception e) {
+            TransactionManager.abortTransaction();
+            throw e;
+        }
+        assertThat(emptyDomain.isNotNull(), is(false));
+
+        domain.setNotNull("1");
         try {
             TransactionManager.beginTransaction();
             sut.setNotNull(emptyDomain, domain);

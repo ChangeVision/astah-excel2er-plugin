@@ -138,7 +138,7 @@ public class AcceptanceDomainImportTest {
 		assertThat(domain.getDatatypeName(),is("VARCHAR"));
         assertThat(domain.getLengthPrecision(), is("200"));
 		assertThat(domain.getDefinition(),is(""));
-        assertThat(domain.isNotNull(), is(true));
+        assertThat(domain.isNotNull(), is(false));
 	}
 	
 	/**
@@ -178,7 +178,7 @@ public class AcceptanceDomainImportTest {
 		assertThat(domain.getDatatypeName(),is("VARCHAR"));
         assertThat(domain.getLengthPrecision(), is("200"));
 		assertThat(domain.getDefinition(),is("address def"));
-        assertThat(domain.isNotNull(), is(true));
+        assertThat(domain.isNotNull(), is(false));
 	}
 	
 	@Test

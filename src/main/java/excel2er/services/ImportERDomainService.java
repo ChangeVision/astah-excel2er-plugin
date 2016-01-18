@@ -504,12 +504,11 @@ public class ImportERDomainService {
         if (!isNeedChangeNotNull(domainModel, domain)) {
             return;
         }
-        domainModel.setNotNull(StringUtils.isNotEmpty(domain.getNotNull()));
+        domainModel.setNotNull(domain.getNotNull());
     }
 
     private boolean isNeedChangeNotNull(IERDomain domainModel, Domain domain) {
-        boolean isNotNull = StringUtils.isNotEmpty(domain.getNotNull());
-        return isNeedChangeValue(domainModel.isNotNull(), isNotNull);
+        return isNeedChangeValue(domainModel.isNotNull(), domain.getNotNull());
     }
 
     void setLengthPrecision(IERDomain domainModel, Domain domain) throws InvalidEditingException {

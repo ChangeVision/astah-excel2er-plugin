@@ -5,7 +5,7 @@
 		<bundle.symbolicName>com.change_vision.astah.excel2er</bundle.symbolicName>
 		<bundle.namespace>excel2er</bundle.namespace>
 		<plugin.install>true</plugin.install>
-		<astah.version>6.8</astah.version>
+		<astah.version>7.0</astah.version>
 		<astah.edition>pro</astah.edition>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>

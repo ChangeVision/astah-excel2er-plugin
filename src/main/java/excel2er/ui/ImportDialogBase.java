@@ -116,7 +116,7 @@ public abstract class ImportDialogBase extends JDialog{
 
 		String detailMessage = result.getMessage();
 		if (StringUtils.isNotEmpty(detailMessage)) {
-			JTextArea detailTextArea = new JTextArea(detailMessage, 5, 10);
+            JTextArea detailTextArea = new JTextArea(detailMessage, 25, 60);
 			detailTextArea.setName(DETAIL_TEXT);
 			detailTextArea.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 			detailTextArea.setAlignmentX(Component.CENTER_ALIGNMENT);

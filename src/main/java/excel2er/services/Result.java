@@ -1,12 +1,12 @@
 package excel2er.services;
 
 public class Result {
-	private int createdEntitiesCount = 0;
+    private int importedElementsCount = 0;
 	private StringBuilder sb = new StringBuilder();
 	private boolean errorOccured = false;
 	
-	public void inclementEntitesCount(){
-		createdEntitiesCount++;
+    public void inclementImportedElementsCount() {
+        importedElementsCount++;
 	}
 	
 	public void appendMessage(String message){
@@ -17,8 +17,8 @@ public class Result {
 		return sb.toString();
 	}
 	
-	public int getCreatedEntitiesCount(){
-		return createdEntitiesCount;
+    public int getImportedElementsCount() {
+        return importedElementsCount;
 	}
 	
 	public void setErrorOccured(boolean value){

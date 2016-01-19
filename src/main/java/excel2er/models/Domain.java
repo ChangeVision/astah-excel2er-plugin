@@ -72,8 +72,14 @@ public class Domain {
         this.lengthAndPrecision = lengthAndPrecision;
     }
 
-    public String getNotNull() {
-        return notNull;
+    public boolean getNotNull() {
+        if ("Y".equals(notNull)) {
+            return true;
+        }
+        if ("N".equals(notNull)) {
+            return false;
+        }
+        return StringUtils.isNotEmpty(notNull);
     }
 
     public void setNotNull(String notNull) {

@@ -174,9 +174,21 @@ public class ImportERDomainService {
 	private void setAdditionalProperty(Domain domain, IERDomain domainModel)
 			throws InvalidEditingException {
 
-		if (StringUtils.isNotEmpty(domain.getDefinition()))
-			domainModel.setDefinition(domain.getDefinition());
+        if (StringUtils.isNotEmpty(domain.getAlias1())) {
+            domainModel.setAlias1(domain.getAlias1());
+        }
+        if (StringUtils.isNotEmpty(domain.getAlias2())) {
+            domainModel.setAlias2(domain.getAlias2());
+        }
+        if (StringUtils.isNotEmpty(domain.getLengthAndPrecision())) {
+            domainModel.setLengthPrecision(domain.getLengthAndPrecision());
+        }
 
+        domainModel.setNotNull(StringUtils.isNotEmpty(domain.getNotNull()));
+
+        if (StringUtils.isNotEmpty(domain.getDefinition())) {
+			domainModel.setDefinition(domain.getDefinition());
+        }
 	}
 
 

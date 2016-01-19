@@ -8,7 +8,11 @@ public class Domain {
 
 	private String logicalName;
 	private String physicalName;
+    private String alias1;
+    private String alias2;
 	private String dataType;
+    private String lengthAndPrecision;
+    private String notNull;
     private String parentDomain;
 	private String definition;
 
@@ -36,6 +40,22 @@ public class Domain {
 		this.physicalName = physicalName;
 	}
 
+    public String getAlias1() {
+        return alias1;
+    }
+
+    public void setAlias1(String alias1) {
+        this.alias1 = alias1;
+    }
+
+    public String getAlias2() {
+        return alias2;
+    }
+
+    public void setAlias2(String alias2) {
+        this.alias2 = alias2;
+    }
+
 	public String getDataType() {
 		return dataType;
 	}
@@ -43,6 +63,22 @@ public class Domain {
 	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
+
+    public String getLengthAndPrecision() {
+        return lengthAndPrecision;
+    }
+
+    public void setLengthAndPrecision(String lengthAndPrecision) {
+        this.lengthAndPrecision = lengthAndPrecision;
+    }
+
+    public String getNotNull() {
+        return notNull;
+    }
+
+    public void setNotNull(String notNull) {
+        this.notNull = notNull;
+    }
 
     public String getParentDomain() {
         return parentDomain;

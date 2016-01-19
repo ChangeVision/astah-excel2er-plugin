@@ -34,7 +34,11 @@ public class DomainParser {
 			domain.setLogicalName(logicalName);
 			domain.setPhysicalName(physicalName);
 
+            parseAlias1(configuration, sheet, startRow, domain);
+            parseAlias2(configuration, sheet, startRow, domain);
 			parseDataType(configuration, sheet, startRow, domain);
+            parseLengthAndPrecision(configuration, sheet, startRow, domain);
+            parseNotNull(configuration, sheet, startRow, domain);
             parseParentDomain(configuration, sheet, startRow, domain);
 			parseDefinition(configuration, sheet, startRow, domain);
 			
@@ -72,5 +76,43 @@ public class DomainParser {
 		}
 	}
 
+    private void parseAlias1(DomainConfiguration configuration, Sheet sheet, int startRow,
+            Domain domain) {
+        String value = ParserUtils.getCellValue(sheet, startRow, configuration.getAlias1Col());
+        if (StringUtils.isNotEmpty(value)) {
+            domain.setAlias1(value);
+        }
+    }
 
+    private void parseAlias2(DomainConfiguration configuration, Sheet sheet, int startRow,
+            Domain domain) {
+        String value = ParserUtils.getCellValue(sheet, startRow, configuration.getAlias2Col());
+        if (StringUtils.isNotEmpty(value)) {
+            domain.setAlias2(value);
+        }
+    }
+
+    private void parseLengthAndPrecision(DomainConfiguration configuration, Sheet sheet,
+            int startRow, Domain domain) {
+        String value = ParserUtils.getCellValue(sheet, startRow,
+                configuration.getLengthAndPrecisionCol());
+        if (StringUtils.isEmpty(value)) {
+            return;
+        }
+        final String decimal_point_and_zero = ".0";
+        if (value.endsWith(decimal_point_and_zero)) {
+            value = value.substring(0, value.length() - decimal_point_and_zero.length());
+        }
+        if (StringUtils.isNotEmpty(value)) {
+            domain.setLengthAndPrecision(value);
+        }
+    }
+
+    private void parseNotNull(DomainConfiguration configuration, Sheet sheet, int startRow,
+            Domain domain) {
+        String value = ParserUtils.getCellValue(sheet, startRow, configuration.getNotNullCol());
+        if (StringUtils.isNotEmpty(value)) {
+            domain.setNotNull(value);
+        }
+    }
 }

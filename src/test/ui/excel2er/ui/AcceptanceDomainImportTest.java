@@ -136,9 +136,9 @@ public class AcceptanceDomainImportTest {
 		assertThat(domain.getLogicalName(),is("Address"));
 		assertThat(domain.getPhysicalName(),is(""));
 		assertThat(domain.getDatatypeName(),is("VARCHAR"));
-		assertThat(domain.getLengthPrecision(),is("10"));
+        assertThat(domain.getLengthPrecision(), is("200"));
 		assertThat(domain.getDefinition(),is(""));
-		assertThat(domain.isNotNull(),is(false));
+        assertThat(domain.isNotNull(), is(true));
 	}
 	
 	/**
@@ -176,9 +176,9 @@ public class AcceptanceDomainImportTest {
 		assertThat(domain.getLogicalName(),is("Address"));
 		assertThat(domain.getPhysicalName(),is("ADDRESS"));
 		assertThat(domain.getDatatypeName(),is("VARCHAR"));
-		assertThat(domain.getLengthPrecision(),is("10"));
+        assertThat(domain.getLengthPrecision(), is("200"));
 		assertThat(domain.getDefinition(),is("address def"));
-		assertThat(domain.isNotNull(),is(false));
+        assertThat(domain.isNotNull(), is(true));
 	}
 	
 	@Test

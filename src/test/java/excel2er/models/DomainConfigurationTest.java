@@ -113,6 +113,21 @@ public class DomainConfigurationTest {
 		assertNotErrorExist(conf);
 	}
 
+    @Test
+    public void validate_parent_domain_col() {
+        conf.setParentDomainCol("1");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol("a");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol("");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol(null);
+        assertNotErrorExist(conf);
+    }
+
 	@Test
 	public void validate_datatype_col() {
 		conf.setDataTypeCol("1");

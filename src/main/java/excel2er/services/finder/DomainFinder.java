@@ -12,6 +12,7 @@ import com.change_vision.jude.api.inf.project.ModelFinder;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.models.Attribute;
+import excel2er.services.operations.ERDomainOperations;
 
 public class DomainFinder {
 
@@ -76,4 +77,22 @@ public class DomainFinder {
 		return null;
 	}
 
+    public IERDomain find(final String fullLogicalName, final String namespaceSeparator)
+            throws ClassNotFoundException, ProjectNotFoundException {
+        ProjectAccessor projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
+        INamedElement[] findElements = projectAccessor.findElements(new ModelFinder() {
+            @Override
+            public boolean isTarget(INamedElement element) {
+                if (element instanceof IERDomain) {
+                    return new ERDomainOperations().getFullLogicalName((IERDomain) element,
+                            namespaceSeparator).equals(fullLogicalName);
+                }
+                return false;
+            }
+        });
+        if (findElements.length == 0) {
+            return null;
+        }
+        return (IERDomain) findElements[0];
+    }
 }

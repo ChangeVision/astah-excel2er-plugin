@@ -1,5 +1,10 @@
 package excel2er.models;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
 public class Attribute {
 
 	private String logicalName;
@@ -10,6 +15,9 @@ public class Attribute {
 	private String length;
 	private String defaultValue;
 	private String definition;
+    private String reference;
+    private boolean foreignKey;
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("(.*)\\((.*)\\)");
 
 	public void setLogicalName(String logicalName) {
 		this.logicalName = logicalName;
@@ -74,5 +82,45 @@ public class Attribute {
 	public void setDefinition(String value) {
 		this.definition = value;
 	}
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public boolean isForeignKey() {
+        return foreignKey;
+    }
+
+    public void setForeignKey(boolean foreignKey) {
+        this.foreignKey = foreignKey;
+    }
+
+    public String getReferenceEntityName() {
+        String reference = getReference();
+        if (StringUtils.isEmpty(reference)) {
+            return null;
+        }
+        Matcher m = REFERENCE_PATTERN.matcher(reference);
+        if (!m.find()) {
+            return null;
+        }
+        return StringUtils.trim(m.group(1));
+    }
+
+    public String getReferenceAttributeName() {
+        String reference = getReference();
+        if (StringUtils.isEmpty(reference)) {
+            return null;
+        }
+        Matcher m = REFERENCE_PATTERN.matcher(reference);
+        if (!m.find()) {
+            return null;
+        }
+        return StringUtils.trim(m.group(2));
+    }
 
 }

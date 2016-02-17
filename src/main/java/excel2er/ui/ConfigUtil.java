@@ -35,6 +35,8 @@ public class ConfigUtil {
 	private static final String DOMAIN_LATEST_NOTNULL_COL = "DOMAIN_LATEST_NOTNULL_COL";
     private static final String DOMAIN_LATEST_PARENT_DOMAIN_COL = "DOMAIN_LATEST_PARENT_DOMAIN_COL";
 	private static final String DOMAIN_LATEST_DEFINITION_COL = "DOMAIN_LATEST_DEFINITION_COL";
+    private static final String DOMAIN_LATEST_REFERENCE_COL = "DOMAIN_LATEST_REFERENCE_COL";
+    private static final String DOMAIN_LATEST_FOREIGNKEY_COL = "DOMAIN_LATEST_FOREIGNKEY_COL";
 	
 	private static final String DOMAIN_LATEST_LOADED_FILE = "DOMAIN_LATEST_LOADED_FILE";
 	
@@ -317,4 +319,21 @@ public class ConfigUtil {
 		store();
 	}
 
+    public static String getEntityReferenceCol() {
+        return config.getProperty(DOMAIN_LATEST_REFERENCE_COL);
+    }
+
+    public static void saveEntityReferenceCol(String referenceCol) {
+        config.put(DOMAIN_LATEST_REFERENCE_COL, referenceCol);
+        store();
+    }
+
+    public static String getEntityForeignKeyCol() {
+        return config.getProperty(DOMAIN_LATEST_FOREIGNKEY_COL);
+    }
+
+    public static void saveEntityForeignKeyCol(String foreignKeyCol) {
+        config.put(DOMAIN_LATEST_FOREIGNKEY_COL, foreignKeyCol);
+        store();
+    }
 }

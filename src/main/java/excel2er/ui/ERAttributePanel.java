@@ -28,6 +28,8 @@ public class ERAttributePanel extends JPanel {
 	private ItemCol dataTypeCol;
 	private ItemCol lengthCol;
 	private ItemCol definitionCol;
+    private ItemCol referenceCol;
+    private ItemCol foreignKeyCol;
 
 	public ERAttributePanel() {
 		setName(NAME);
@@ -125,18 +127,26 @@ public class ERAttributePanel extends JPanel {
 		add(new JLabel(Messages.getMessage(ItemCol.PRIMARYKEY)), gbc);
 		add(primaryKeyCol = new ItemCol(ItemCol.PRIMARYKEY), gbc);
 		gbc.gridy = 9;
+        add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.FOREIGNKEY)), gbc);
+        add(foreignKeyCol = new ItemCol(ItemCol.FOREIGNKEY), gbc);
+        gbc.gridy = 10;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.NOTNULL)), gbc);
 		add(notNullCol = new ItemCol(ItemCol.NOTNULL), gbc);
-		gbc.gridy = 10;
+        gbc.gridy = 11;
+        add(new Empty(), gbc);
+        add(new JLabel(Messages.getMessage(ItemCol.REFERENCE)), gbc);
+        add(referenceCol = new ItemCol(ItemCol.REFERENCE), gbc);
+        gbc.gridy = 12;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFAULT_VALUE)), gbc);
 		add(defaultValueCol = new ItemCol(ItemCol.DEFAULT_VALUE), gbc);
-		gbc.gridy = 11;
+        gbc.gridy = 13;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.LENGTH)), gbc);
 		add(lengthCol = new ItemCol(ItemCol.LENGTH), gbc);
-		gbc.gridy = 12;
+        gbc.gridy = 14;
 		add(new Empty(), gbc);
 		add(new JLabel(Messages.getMessage(ItemCol.DEFINITION)), gbc);
 		add(definitionCol = new ItemCol(ItemCol.DEFINITION), gbc);
@@ -164,6 +174,8 @@ public class ERAttributePanel extends JPanel {
 		static final String DATATYPE = "item_datatype";
 		static final String LENGTH = "item_length";
 		static final String DEFINITION = "item_definition";
+        static final String FOREIGNKEY = "item_foreignkey";
+        static final String REFERENCE = "item_reference";
 
 		public ItemCol(String key) {
 			setName(key);
@@ -206,5 +218,13 @@ public class ERAttributePanel extends JPanel {
 	public String getDefinitionCol() {
 		return definitionCol.getText();
 	}
+
+    public String getReferenceCol() {
+        return referenceCol.getText();
+    }
+
+    public String getForeignKeyCol() {
+        return foreignKeyCol.getText();
+    }
 
 }

@@ -147,6 +147,8 @@ public class ImportEREntityDialog extends ImportDialogBase {
 		configuration.setDataTypeCol(attributePanel.getDataTypeCol());
 		configuration.setLengthCol(attributePanel.getLengthCol());
 		configuration.setDefinitionCol(attributePanel.getDefinitionCol());
+        configuration.setForeignKeyCol(attributePanel.getForeignKeyCol());
+        configuration.setReferenceCol(attributePanel.getReferenceCol());
 
 		return configuration;
 	}

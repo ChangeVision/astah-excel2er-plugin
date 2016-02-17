@@ -25,6 +25,8 @@ public class Configuration extends ConfigurationBase{
 	private String lengthCol;
 	private String definitionCol;
 	private String startRow;
+    private String referenceCol;
+    private String foreignKeyCol;
 
 	public boolean isUseSheetName() {
 		return useSheetName;
@@ -149,6 +151,22 @@ public class Configuration extends ConfigurationBase{
 	public String getStartRow() {
 		return startRow;
 	}
+
+    public void setReferenceCol(String referenceCol) {
+        this.referenceCol = referenceCol;
+    }
+
+    public String getReferenceCol() {
+        return referenceCol;
+    }
+
+    public void setForeignKeyCol(String foreignKeyCol) {
+        this.foreignKeyCol = foreignKeyCol;
+    }
+
+    public String getForeignKeyCol() {
+        return foreignKeyCol;
+    }
 
 	/**
 	 * validate input value. this function check only row item.because reference

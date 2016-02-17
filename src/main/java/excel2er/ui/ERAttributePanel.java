@@ -55,6 +55,8 @@ public class ERAttributePanel extends JPanel {
 		lengthCol.setText(StringUtils.defaultString(ConfigUtil.getEntityLengthCol(),"U"));
 		defaultValueCol.setText(StringUtils.defaultString(ConfigUtil.getEntityDefaultValueCol(),"Y"));
 		definitionCol.setText(StringUtils.defaultString(ConfigUtil.getEntityDefinitionCol(),"AC"));
+        referenceCol.setText(StringUtils.defaultString(ConfigUtil.getEntityReferenceCol(),"AE"));
+        foreignKeyCol.setText(StringUtils.defaultString(ConfigUtil.getEntityForeignKeyCol(),"AA"));
 	}
 	
 	public void saveLatestSetting(){
@@ -67,6 +69,8 @@ public class ERAttributePanel extends JPanel {
 		ConfigUtil.saveEntityLengthCol(getLengthCol());
 		ConfigUtil.saveEntityDefaultValueCol(getDefaultValueCol());
 		ConfigUtil.saveEntityDefinitionCol(getDefinitionCol());
+        ConfigUtil.saveEntityReferenceCol(getReferenceCol());
+        ConfigUtil.saveEntityForeignKeyCol(getForeignKeyCol());
 	}
 
 	private void createContents() {

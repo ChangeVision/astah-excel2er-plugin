@@ -42,6 +42,10 @@ public class AttributeParser {
 
 			parseDefinition(configuration, sheet, startRow, attr);
 
+            parseForeignKey(configuration, sheet, startRow, attr);
+
+            parseReference(configuration, sheet, startRow, attr);
+
 			entity.addAttribute(attr);
 			startRow++;
 		}
@@ -106,4 +110,17 @@ public class AttributeParser {
 		}
 	}
 
+    private void parseReference(Configuration configuration, Sheet sheet, int startRow,
+            Attribute attr) {
+        String value = ParserUtils.getCellValue(sheet, startRow, configuration.getReferenceCol());
+        if (StringUtils.isNotEmpty(value)) {
+            attr.setReference(value);
+        }
+    }
+
+    private void parseForeignKey(Configuration configuration, Sheet sheet, int startRow,
+            Attribute attr) {
+        String value = ParserUtils.getCellValue(sheet, startRow, configuration.getForeignKeyCol());
+        attr.setForeignKey(StringUtils.isNotEmpty(value));
+    }
 }

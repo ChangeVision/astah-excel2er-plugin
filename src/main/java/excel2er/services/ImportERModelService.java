@@ -1,6 +1,9 @@
 package excel2er.services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -16,6 +19,7 @@ import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.IERModel;
+import com.change_vision.jude.api.inf.model.IERRelationship;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.Messages;
@@ -76,9 +80,197 @@ public class ImportERModelService {
 		return result;
 	}
 
-    private void mergeRelationship(ERModelEditor editor, Entity entity) {
-        // TODO Auto-generated method stub
+    private IEREntity mergeRelationship(ERModelEditor editor, Entity entity) {
+        String entityName = entity.getEntityLogicalName();
+        try {
 
+            IEREntity erEntity = erFinder.findEREntity(entityName);
+
+            for (Attribute attr : entity.getAttributes()) {
+                if (!attr.isForeignKey()) {
+                    continue;
+                }
+                String referenceEntityName = attr.getReferenceEntityName();
+                if (StringUtils.isEmpty(referenceEntityName)) {
+                    log_error(Messages.getMessage(
+                            "log.error.create_relationship.reference.parameter_error", erEntity,
+                            attr));
+                    continue;
+                }
+                if (StringUtils.equals(entityName, referenceEntityName)) {
+                    continue;
+                }
+                IEREntity parentEREntity = erFinder.findEREntity(referenceEntityName);
+                if (parentEREntity == null) {
+                    log_error(Messages.getMessage(
+                            "log.error.create_relationship.reference.parameter_error", erEntity,
+                            attr));
+                    continue;
+                }
+                try {
+                    if (attr.isPrimaryKey()) {
+                        List<IERRelationship> relationships = getIdentifyingRelationships(
+                                parentEREntity, erEntity);
+                        int needRelationshipCounts = needIdentifyingRelationshipCounts(entity,
+                                referenceEntityName);
+                        if (needRelationshipCounts <= relationships.size()) {
+                            continue;
+                        }
+                        editor.createIdentifyingRelationship(parentEREntity, erEntity,
+                                attr.getReferenceAttributeName(), null);
+                    } else {
+                        List<IERRelationship> relationships = getNonIdentifyingRelationships(
+                                parentEREntity, erEntity);
+                        int needRelationshipCounts = needNonIdentifyingRelationshipCounts(entity,
+                                referenceEntityName);
+                        if (needRelationshipCounts <= relationships.size()) {
+                            continue;
+                        }
+                        editor.createNonIdentifyingRelationship(parentEREntity, erEntity,
+                                attr.getReferenceAttributeName(), null);
+                    }
+                } catch (InvalidEditingException e) {
+                    if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
+                        log_error(Messages.getMessage(
+                                "log.error.create_relationship.parameter_error", parentEREntity,
+                                erEntity, attr.getReferenceAttributeName()), e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    if (StringUtils.equals(e.getKey(),
+                            InvalidEditingException.INVALID_ERINDEX_FOR_RELATIONSHIP_ERROR_KEY)) {
+                        log_error(
+                                Messages.getMessage(
+                                        "log.error.create_relationship.invalid_erindex_for_relationship_error",
+                                        parentEREntity, erEntity, attr.getReferenceAttributeName()),
+                                e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    if (StringUtils.equals(e.getKey(),
+                            InvalidEditingException.ILLEGALMODELTYPE_ERROR_KEY)) {
+                        log_error(Messages.getMessage(
+                                "log.error.create_relationship.illegalmodeltype_error",
+                                parentEREntity, erEntity, attr.getReferenceAttributeName()), e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    if (StringUtils.equals(e.getKey(), InvalidEditingException.NO_NAME_ERROR_KEY)) {
+                        log_error(Messages.getMessage(
+                                "log.error.create_relationship.parameter_error", parentEREntity,
+                                erEntity, attr.getReferenceAttributeName()), e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    if (StringUtils.equals(e.getKey(),
+                            InvalidEditingException.NAME_DOUBLE_ERROR_KEY)) {
+                        log_error(Messages.getMessage(
+                                "log.error.create_relationship.name_double_error", parentEREntity,
+                                erEntity, attr.getReferenceAttributeName()), e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    if (StringUtils.equals(e.getKey(), InvalidEditingException.READ_ONLY_KEY)) {
+                        log_error(Messages.getMessage("log.error.create_relationship.read_only",
+                                parentEREntity, erEntity, attr.getReferenceAttributeName()), e);
+                        aboartTransaction();
+                        throw new ApplicationException(e);
+                    }
+                    log_error(Messages.getMessage("log.error.create_relationship.error",
+                            parentEREntity, erEntity, attr.getReferenceAttributeName()), e);
+                    aboartTransaction();
+                    throw new ApplicationException(e);
+                }
+            }
+
+            return erEntity;
+        } catch (ClassNotFoundException e) {
+            log_error(Messages.getMessage("log.error.create_entity", entityName, e.getMessage()), e);
+
+            aboartTransaction();
+
+            throw new ApplicationException(e);
+        } catch (ProjectNotFoundException e) {
+            log_error(Messages.getMessage("error.project.not.found"), e);
+
+            aboartTransaction();
+            throw new ApplicationException(e);
+        }
+    }
+
+    private List<IERRelationship> getNonIdentifyingRelationships(IEREntity parentEntity,
+            IEREntity childEntity) {
+        List<IERRelationship> nonIdentifyingRelationships = new ArrayList<IERRelationship>();
+        for (IERRelationship relationship : getRelationships(parentEntity, childEntity)) {
+            if (relationship.isNonIdentifying()) {
+                nonIdentifyingRelationships.add(relationship);
+            }
+        }
+        return nonIdentifyingRelationships;
+    }
+
+    private List<IERRelationship> getIdentifyingRelationships(IEREntity parentEntity,
+            IEREntity childEntity) {
+        List<IERRelationship> identifyingRelationships = new ArrayList<IERRelationship>();
+        for (IERRelationship relationship : getRelationships(parentEntity, childEntity)) {
+            if (relationship.isIdentifying()) {
+                identifyingRelationships.add(relationship);
+            }
+        }
+        return identifyingRelationships;
+    }
+
+    private int needIdentifyingRelationshipCounts(Entity entity, String parentEntityName) {
+        return needRelationshipCounts(entity, parentEntityName, true);
+    }
+
+    private int needNonIdentifyingRelationshipCounts(Entity entity, String parentEntityName) {
+        return needRelationshipCounts(entity, parentEntityName, false);
+    }
+
+    private int needRelationshipCounts(Entity entity, String parentEntityName,
+            boolean isIdentifyingRelationship) {
+        Map<String, Integer> countMap = new HashMap<String, Integer>();
+        for (Attribute attr : entity.getAttributes()) {
+            if (!attr.isForeignKey()) {
+                continue;
+            }
+            if (isIdentifyingRelationship && !attr.isPrimaryKey()) {
+                continue;
+            }
+            if (!StringUtils.equals(attr.getReferenceEntityName(), parentEntityName)) {
+                continue;
+            }
+            int count = 1;
+            if (countMap.containsKey(attr)) {
+                count += countMap.get(attr);
+            }
+            countMap.put(attr.getReferenceAttributeName(), count);
+        }
+        if (countMap.isEmpty()) {
+            return 0;
+        }
+        String maxCountAttr = null;
+        for (String key : countMap.keySet()) {
+            if (maxCountAttr == null) {
+                maxCountAttr = key;
+                continue;
+            }
+            if (countMap.get(key) > countMap.get(maxCountAttr)) {
+                maxCountAttr = key;
+            }
+        }
+        return countMap.get(maxCountAttr);
+    }
+
+    private List<IERRelationship> getRelationships(IEREntity parentEntity, IEREntity childEntity) {
+        List<IERRelationship> relationships = new ArrayList<IERRelationship>();
+        for (IERRelationship child : parentEntity.getChildrenRelationships()) {
+            if (child.getChild().equals(childEntity)) {
+                relationships.add(child);
+            }
+        }
+        return relationships;
     }
 
     private ERModelEditor getERModelEditor(ProjectAccessor projectAccessor) {
@@ -176,6 +368,9 @@ public class ImportERModelService {
             ERModelFinder erModelFinder = new ERModelFinder();
 
             for (Attribute attr : entity.getAttributes()) {
+                if (attr.isForeignKey()) {
+                    continue;
+                }
                 IERDomain domain = domainFinder.find(attr);
                 IERAttribute attrModel = null;
                 if (domain != null) {

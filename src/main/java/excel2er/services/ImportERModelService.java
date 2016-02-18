@@ -59,14 +59,17 @@ public class ImportERModelService {
 
         ProjectAccessor projectAccessor = getProjectAccessor();
         ERModelEditor editor = getERModelEditor(projectAccessor);
+        boolean isCreateRelationship = configuration.getForeignKeyCol() != null;
 
 		for (Entity entity : entities) {
 			String entityName = entity.getEntityLogicalName();
 			try {
                 projectAccessor.getTransactionManager().beginTransaction();
                 mergeEntity(editor, entity);
-                mergeAttribute(editor, entity);
-                mergeRelationship(editor, entity);
+                mergeAttribute(editor, entity, isCreateRelationship);
+                if (isCreateRelationship) {
+                    mergeRelationship(editor, entity);
+                }
                 projectAccessor.getTransactionManager().endTransaction();
                 result.inclementImportedElementsCount();
 			} catch (ApplicationException e) {
@@ -357,7 +360,7 @@ public class ImportERModelService {
 		}
 	}
 
-    IEREntity mergeAttribute(ERModelEditor editor, Entity entity) {
+    IEREntity mergeAttribute(ERModelEditor editor, Entity entity, boolean needJudgesFK) {
         String entityName = entity.getEntityLogicalName();
         try {
 
@@ -368,7 +371,7 @@ public class ImportERModelService {
             ERModelFinder erModelFinder = new ERModelFinder();
 
             for (Attribute attr : entity.getAttributes()) {
-                if (attr.isForeignKey()) {
+                if (needJudgesFK && attr.isForeignKey()) {
                     continue;
                 }
                 IERDomain domain = domainFinder.find(attr);

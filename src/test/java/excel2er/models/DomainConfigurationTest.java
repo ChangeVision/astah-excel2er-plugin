@@ -113,6 +113,53 @@ public class DomainConfigurationTest {
 		assertNotErrorExist(conf);
 	}
 
+    @Test
+    public void validate_alias1_col() {
+        conf.setAlias1Col("1");
+        assertNotErrorExist(conf);
+
+        conf.setAlias1Col("a");
+        assertNotErrorExist(conf);
+
+        conf.setAlias1Col("");
+        assertNotErrorExist(conf);
+
+        conf.setAlias1Col(null);
+        assertNotErrorExist(conf);
+
+    }
+
+    @Test
+    public void validate_alias2_col() {
+        conf.setAlias2Col("1");
+        assertNotErrorExist(conf);
+
+        conf.setAlias2Col("a");
+        assertNotErrorExist(conf);
+
+        conf.setAlias2Col("");
+        assertNotErrorExist(conf);
+
+        conf.setAlias2Col(null);
+        assertNotErrorExist(conf);
+
+    }
+
+    @Test
+    public void validate_parent_domain_col() {
+        conf.setParentDomainCol("1");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol("a");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol("");
+        assertNotErrorExist(conf);
+
+        conf.setParentDomainCol(null);
+        assertNotErrorExist(conf);
+    }
+
 	@Test
 	public void validate_datatype_col() {
 		conf.setDataTypeCol("1");
@@ -129,6 +176,38 @@ public class DomainConfigurationTest {
 
 	}
 	
+    @Test
+    public void validate_length_and_precision_col() {
+        conf.setLengthAndPrecisionCol("1");
+        assertNotErrorExist(conf);
+
+        conf.setLengthAndPrecisionCol("a");
+        assertNotErrorExist(conf);
+
+        conf.setLengthAndPrecisionCol("");
+        assertNotErrorExist(conf);
+
+        conf.setLengthAndPrecisionCol(null);
+        assertNotErrorExist(conf);
+
+    }
+
+    @Test
+    public void validate_not_null_col() {
+        conf.setNotNullCol("1");
+        assertNotErrorExist(conf);
+
+        conf.setNotNullCol("a");
+        assertNotErrorExist(conf);
+
+        conf.setNotNullCol("");
+        assertNotErrorExist(conf);
+
+        conf.setNotNullCol(null);
+        assertNotErrorExist(conf);
+
+    }
+
 	@Test
 	public void validate_startrow() {
 		conf.setStartRow("1");

@@ -65,13 +65,48 @@ public class DomainPanelTest {
 		assertThat(target.getPhysicalCol(),is("Z"));
 	}
 	
+    @Test
+    public void should_get_alias1_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.ALIAS1).setText("W");
+
+        assertThat(target.getAlias1Col(), is("W"));
+    }
+
+    @Test
+    public void should_get_alias2_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.ALIAS2).setText("W");
+
+        assertThat(target.getAlias2Col(), is("W"));
+    }
+
 	@Test
 	public void should_get_datatype_col() throws Exception {
 		panelFixture.textBox(DomainPanel.ItemCol.DATATYPE).setText("X");
 		
 		assertThat(target.getDataTypeCol(),is("X"));
 	}
-	
+
+    @Test
+    public void should_get_length_and_precision_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.LENGTH_AND_PRECISION).setText("W");
+
+        assertThat(target.getLengthAndPrecisionCol(), is("W"));
+    }
+
+    @Test
+    public void should_get_not_null_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.NOTNULL).setText("W");
+
+        assertThat(target.getNotNullCol(), is("W"));
+    }
+
+    @Test
+    public void should_get_parent_domain_col() throws Exception {
+        panelFixture.textBox(DomainPanel.ItemCol.PARENT_DOMAIN).setText("D");
+
+        assertThat(target.getParentDomainCol(), is("D"));
+    }
+
 	@Test
 	public void should_get_definition_col() throws Exception {
 		panelFixture.textBox(DomainPanel.ItemCol.DEFINITION).setText("W");

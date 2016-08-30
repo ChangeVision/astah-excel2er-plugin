@@ -118,7 +118,12 @@ public class ImportERDomainDialog extends ImportDialogBase{
 		configuration.setLogicalCol(domainPanel.getLogicalCol());
 		configuration.setPhysicalCol(domainPanel.getPhysicalCol());
 		configuration.setStartRow(domainPanel.getStartRow());
+        configuration.setAlias1Col(domainPanel.getAlias1Col());
+        configuration.setAlias2Col(domainPanel.getAlias2Col());
 		configuration.setDataTypeCol(domainPanel.getDataTypeCol());
+        configuration.setLengthAndPrecisionCol(domainPanel.getLengthAndPrecisionCol());
+        configuration.setNotNullCol(domainPanel.getNotNullCol());
+        configuration.setParentDomainCol(domainPanel.getParentDomainCol());
 		configuration.setDefinitionCol(domainPanel.getDefinitionCol());
 
 		return configuration;

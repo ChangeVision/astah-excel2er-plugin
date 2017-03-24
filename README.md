@@ -3,11 +3,11 @@ Excel-ERModel Import Plugin
 
 Version
 ----------------
-1.0.2 (Released on 2014/10/30)
+1.1.0 (Released on 2016/9/28)
 
 Available for
 ----------------
-Astah Professional 6.8 or later
+Astah Professional 7.1 or later
 
 Description
 ----------------

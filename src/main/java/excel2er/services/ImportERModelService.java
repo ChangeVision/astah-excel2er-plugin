@@ -158,9 +158,7 @@ public class ImportERModelService {
 		} catch (InvalidEditingException e) {
 			if (StringUtils.equals(e.getKey(),
 					InvalidEditingException.PARAMETER_ERROR_KEY)) {
-				log_error(Messages.getMessage(
-						"log.error.create_entity.parameter_error", entityName));
-				log_error(e.getMessage());
+                log_error(e.getMessage());
 			} else if (StringUtils.equals(e.getKey(),
 					InvalidEditingException.NAME_DOUBLE_ERROR_KEY)) {
 				log_error(Messages.getMessage(

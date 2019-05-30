@@ -188,14 +188,7 @@ public class ImportERModelService {
 		IEREntity model = erFinder.findEREntity(entityName);
 		if (model == null) {
 			logger.info(Messages.getMessage("log.create_entity", entityName));
-            try {
-                return editor.createEREntity(erModel.getSchemata()[0], entityName,
-                        entity.getEntityPhysicalName());
-            } catch (InvalidEditingException e) {
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-                params.put("Entity LogicalName", entityName);
-                throw addParam(e, params);
-            }
+            return createEREntity(erModel, entity, entityName, editor);
 		}
 		
 		logger.info(Messages.getMessage("log.update_entity", entityName));
@@ -216,7 +209,7 @@ public class ImportERModelService {
         } catch (InvalidEditingException e) {
                 LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
                 params.put("DataType", dataType);
-                throw addParam(e, params);
+                throw recreateException(e, params);
         }
 
 	}
@@ -224,126 +217,26 @@ public class ImportERModelService {
 	private void setEditablePropertyUsingDomain(Attribute attr,
 			IERAttribute attrModel) throws InvalidEditingException {
 
-        try {
-            attrModel.setPhysicalName(attr.getPhysicalName());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Attr PhysicalName", attr.getPhysicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put("Entity",entity);
-            }
-            throw addParam(e, params);
-        }
+        setPhysicalName(attrModel, attr);
 
-        try {
-            attrModel.setPrimaryKey(attr.isPrimaryKey());
-            if(attr.isPrimaryKey()){
-                attrModel.setNotNull(true);
-            }
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put( "PrimaryKey", "" + attr.isPrimaryKey());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e,params);
-        }
+        setPrimaryKey(attrModel, attr);
 
-        try {
-            if (StringUtils.isNotEmpty(attr.getDefaultValue()))
-                attrModel.setDefaultValue(attr.getDefaultValue());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("DefaultValue", attr.getDefaultValue());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
+        setDefaultValue(attrModel, attr);
 
-        try {
-            if (StringUtils.isNotEmpty(attr.getDefinition()))
-                attrModel.setDefinition(attr.getDefinition());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Definition", attr.getDefinition());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
+        setDefinition(attrModel, attr);
 	}
 
 	private void setAdditionalProperty(Attribute attr, IERAttribute attrModel)
 			throws InvalidEditingException {
 
-        try {
-            attrModel.setPrimaryKey(attr.isPrimaryKey());
-            if (attr.isPrimaryKey()) {
-                attrModel.setNotNull(true);
-            } else {
-                attrModel.setNotNull(attr.isNotNull());
-            }
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("PrimaryKey", "" + attr.isPrimaryKey());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
+        setPrimaryKey(attrModel,attr);
 
-        try {
-            if (StringUtils.isNotEmpty(attr.getDefaultValue()))
-                attrModel.setDefaultValue(attr.getDefaultValue());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Default", attr.getDefaultValue());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
+        setDefaultValue(attrModel, attr);
+        
+        setDefinition(attrModel, attr);
+        
+        setLengthPrecision(attrModel, attr);
 
-        try {
-            if (StringUtils.isNotEmpty(attr.getDefinition()))
-                attrModel.setDefinition(attr.getDefinition());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Definition", attr.getDefinition());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
-
-        try {
-            if (StringUtils.isNotEmpty(attr.getLength()))
-                attrModel.setLengthPrecision(attr.getLength());
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Length", attr.getLength());
-            params.put("DataType", attr.getDataType());
-            params.put("Attr LogicalName", attr.getLogicalName());
-            if (attrModel.getOwner() instanceof INamedElement) {
-                String entity = ((INamedElement) attrModel.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
 	}
 
 	private IERAttribute mergeAttribute(ERModelEditor editor,
@@ -356,18 +249,7 @@ public class ImportERModelService {
 		if(attribute == null){
 			logger.info(Messages.getMessage("log.create_attribute",
 					entityModel.getName(), attr.getLogicalName()));
-            try {
-                return editor.createERAttribute(entityModel, attr.getLogicalName(),
-                        attr.getPhysicalName(), dataType);
-            } catch (InvalidEditingException e) {
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-                params.put("Attr LogicalName", attr.getLogicalName());
-                params.put("Attr PhysicalName", attr.getPhysicalName());
-                params.put("DataType", dataType.getName());
-                params.put( "Entity", entityModel.getName());
-                throw addParam(e, params);
-            }
-
+            return createERAttribute(entityModel, attr, dataType, editor);
 		}
 		
 		logger.info(Messages.getMessage("log.update_attribute",
@@ -380,26 +262,9 @@ public class ImportERModelService {
 
 	private void updateAttribute(Attribute attr, IERDatatype dataType,
 			IERAttribute attribute) throws InvalidEditingException {
-        try {
-            attribute.setPhysicalName(attr.getPhysicalName());
-        } catch (InvalidEditingException e) {
-            String entity = null;
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("Attr PhysicalName", attr.getPhysicalName());
-            if (attribute.getOwner() instanceof INamedElement) {
-                entity = ((INamedElement) attribute.getOwner()).getName();
-                params.put( "Entity", entity);
-            }
-            throw addParam(e, params);
-        }
+	    setPhysicalName(attribute, attr);
 
-        try {
-            attribute.setDatatype(dataType);
-        } catch (InvalidEditingException e) {
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("DataType", dataType.getName());
-            throw addParam(e, params);
-        }
+        setDataType(attribute, dataType);
 	}
 
 	private IERAttribute mergeAttributeUsingDomain(ERModelEditor editor,
@@ -412,17 +277,7 @@ public class ImportERModelService {
 			logger.info(Messages.getMessage("log.create_attribute_using_domain",
 					entityModel.getName(), attr.getLogicalName(), domain.getName()));
 
-            try {
-                return editor.createERAttribute(entityModel, attr.getLogicalName(),
-                        attr.getPhysicalName(), domain);
-            } catch (InvalidEditingException e) {
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-                params.put("Attr LogicalName", attr.getLogicalName());
-                params.put("Attr PhysicalName", attr.getPhysicalName());
-                params.put("Domain", domain.getName());
-                params.put( "Entity", entityModel.getName());
-                throw addParam(e, params);
-            }
+            return createERAttribuite(entityModel, attr, domain, editor);
 		}
 		
 		logger.info(Messages.getMessage("log.update_attribute_using_domain",
@@ -441,7 +296,7 @@ public class ImportERModelService {
 		}
 	}
 
-    private InvalidEditingException addParam(InvalidEditingException e,
+    private InvalidEditingException recreateException(InvalidEditingException e,
             LinkedHashMap<String, String> params) {
         List<String> keyValueList = new ArrayList<String>();
 
@@ -453,4 +308,141 @@ public class ImportERModelService {
         return new InvalidEditingException(e.getKey(), e.getMessage() + "( " + paramStr + " )");
     }
 
+    private void setDataType(IERAttribute attribute, IERDatatype dataType)
+            throws InvalidEditingException {
+        try {
+            attribute.setDatatype(dataType);
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("DataType", dataType.getName());
+            throw recreateException(e, params);
+        }
+    }
+
+    private IEREntity createEREntity(IERModel erModel, Entity entity, String entityName,
+            ERModelEditor editor) throws InvalidEditingException {
+        try {
+            return editor.createEREntity(erModel.getSchemata()[0], entityName,
+                    entity.getEntityPhysicalName());
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Entity LogicalName", entityName);
+            throw recreateException(e, params);
+        }
+    }
+
+    private IERAttribute createERAttribuite(IEREntity entityModel, Attribute attr, IERDomain domain,
+            ERModelEditor editor) throws InvalidEditingException {
+        try {
+            return editor.createERAttribute(entityModel, attr.getLogicalName(),
+                    attr.getPhysicalName(), domain);
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Attr LogicalName", attr.getLogicalName());
+            params.put("Attr PhysicalName", attr.getPhysicalName());
+            params.put("Domain", domain.getName());
+            params.put( "Entity", entityModel.getName());
+            throw recreateException(e, params);
+        }
+    }
+
+    private IERAttribute createERAttribute(IEREntity entityModel, Attribute attr,
+            IERDatatype dataType, ERModelEditor editor) throws InvalidEditingException {
+        try {
+            return editor.createERAttribute(entityModel, attr.getLogicalName(),
+                    attr.getPhysicalName(), dataType);
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Attr LogicalName", attr.getLogicalName());
+            params.put("Attr PhysicalName", attr.getPhysicalName());
+            params.put("DataType", dataType.getName());
+            params.put( "Entity", entityModel.getName());
+            throw recreateException(e, params);
+        }
+    }
+
+    public void setPhysicalName(IERAttribute attrModel, Attribute attr)
+            throws InvalidEditingException {
+        try {
+            attrModel.setPhysicalName(attr.getPhysicalName());
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Attr PhysicalName", attr.getPhysicalName());
+            if (attrModel.getOwner() instanceof INamedElement) {
+                String entity = ((INamedElement) attrModel.getOwner()).getName();
+                params.put("Entity",entity);
+            }
+            throw recreateException(e, params);
+        }
+    }
+
+    private void setPrimaryKey(IERAttribute attrModel,Attribute attr) throws InvalidEditingException {
+        try {
+            attrModel.setPrimaryKey(attr.isPrimaryKey());
+            if (attr.isPrimaryKey()) {
+                attrModel.setNotNull(true);
+            } else {
+                attrModel.setNotNull(attr.isNotNull());
+            }
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("PrimaryKey", "" + attr.isPrimaryKey());
+            params.put("Attr LogicalName", attr.getLogicalName());
+            if (attrModel.getOwner() instanceof INamedElement) {
+                String entity = ((INamedElement) attrModel.getOwner()).getName();
+                params.put( "Entity", entity);
+            }
+            throw recreateException(e, params);
+        }
+    }
+    
+    private void setDefaultValue(IERAttribute attrModel, Attribute attr) throws InvalidEditingException {
+        try {
+            if (StringUtils.isNotEmpty(attr.getDefaultValue())) {
+                attrModel.setDefaultValue(attr.getDefaultValue());
+            }
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Default", attr.getDefaultValue());
+            params.put("Attr LogicalName", attr.getLogicalName());
+            if (attrModel.getOwner() instanceof INamedElement) {
+                String entity = ((INamedElement) attrModel.getOwner()).getName();
+                params.put("Entity", entity);
+            }
+            throw recreateException(e, params);
+        }
+    }
+
+
+    private void setDefinition(IERAttribute attrModel, Attribute attr) throws InvalidEditingException {
+        try {
+            if (StringUtils.isNotEmpty(attr.getDefinition()))
+                attrModel.setDefinition(attr.getDefinition());
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Definition", attr.getDefinition());
+            params.put("Attr LogicalName", attr.getLogicalName());
+            if (attrModel.getOwner() instanceof INamedElement) {
+                String entity = ((INamedElement) attrModel.getOwner()).getName();
+                params.put( "Entity", entity);
+            }
+            throw recreateException(e, params);
+        }
+    }
+    private void setLengthPrecision(IERAttribute attrModel, Attribute attr) throws InvalidEditingException {
+        try {
+            if (StringUtils.isNotEmpty(attr.getLength()))
+                attrModel.setLengthPrecision(attr.getLength());
+        } catch (InvalidEditingException e) {
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+            params.put("Length", attr.getLength());
+            params.put("DataType", attr.getDataType());
+            params.put("Attr LogicalName", attr.getLogicalName());
+            if (attrModel.getOwner() instanceof INamedElement) {
+                String entity = ((INamedElement) attrModel.getOwner()).getName();
+                params.put( "Entity", entity);
+            }
+            throw recreateException(e, params);
+        }
+    }
 }

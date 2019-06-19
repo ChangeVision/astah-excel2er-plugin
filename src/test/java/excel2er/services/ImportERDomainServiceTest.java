@@ -578,56 +578,6 @@ public class ImportERDomainServiceTest {
     }
 
     @Test
-    public void overwriteParentDomain_addParent() throws Exception {
-        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
-
-        IERDomain emptyDomain = domainFinder.find("emptyDomain", "::");
-        assertThat(emptyDomain, is(notNullValue()));
-        IERDomain fullDomain = domainFinder.find("fullDomain", "::");
-        assertThat(fullDomain, is(notNullValue()));
-
-        Domain domain = new Domain();
-        domain.setLogicalName(emptyDomain.getLogicalName());
-        domain.setParentDomain(fullDomain.getLogicalName());
-
-        try {
-            TransactionManager.beginTransaction();
-            sut.overwriteParentDomain(emptyDomain, domain);
-            TransactionManager.endTransaction();
-        } catch (Exception e) {
-            TransactionManager.abortTransaction();
-            throw e;
-        }
-
-        assertThat((IERDomain) emptyDomain.getContainer(), is(fullDomain));
-
-    }
-
-    @Test
-    public void overwriteParentDomain_removeParent() throws Exception {
-        AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
-
-        IERDomain hasParentDomain = domainFinder.find("fullDomain::hasParentDomain", "::");
-        assertThat(hasParentDomain, is(notNullValue()));
-
-        Domain domain = new Domain();
-        domain.setLogicalName(hasParentDomain.getLogicalName());
-        domain.setParentDomain(null);
-
-        try {
-            TransactionManager.beginTransaction();
-            sut.overwriteParentDomain(hasParentDomain, domain);
-            TransactionManager.endTransaction();
-        } catch (Exception e) {
-            TransactionManager.abortTransaction();
-            throw e;
-        }
-
-        assertThat((IERDomain) hasParentDomain.getContainer(), is(nullValue()));
-
-    }
-
-    @Test
     public void setAlias1_setName() throws Exception {
         AstahModelManager.open(getWorkspaceFilePath("overwriteAstahModel.asta"));
 

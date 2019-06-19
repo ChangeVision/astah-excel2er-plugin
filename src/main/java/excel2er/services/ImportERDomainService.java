@@ -16,7 +16,6 @@ import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IERModel;
-import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.Messages;
@@ -27,7 +26,6 @@ import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
 import excel2er.services.finder.ERModelFinder;
-import excel2er.services.operations.ERDomainOperations;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -109,9 +107,6 @@ public class ImportERDomainService {
             if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
                 overwriteLengthPrecision(erDomain, domain);
             }
-            if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
-                overwriteParentDomain(erDomain, domain);
-            }
             setAdditionalProperty(configuration, erDomain, domain);
 
             TransactionManager.endTransaction();
@@ -180,57 +175,12 @@ public class ImportERDomainService {
                 return true;
             }
         }
-        if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
-            if (isNeedChangeParentDomain(erDomain, domain)) {
-                return true;
-            }
-        }
         if (StringUtils.isNotEmpty(configuration.getDefinitionCol())) {
             if (isNeedChangeDefinition(erDomain, domain)) {
                 return true;
             }
         }
         return isNeedChangeLogicalName(erDomain, domain) || isNeedChangeDatatype(erDomain, domain);
-    }
-
-    void overwriteParentDomain(IERDomain erDomain, Domain domain) throws ClassNotFoundException,
-            ProjectNotFoundException, InvalidEditingException {
-        if (!isNeedChangeParentDomain(erDomain, domain)) {
-            return;
-        }
-        String domainFullName = domain.getFullLogicalName();
-        IERDomain parentDomain = getParentERDomain(domain);
-        logger.debug(String.format("Set ParentDomain \"%s\" to %s", parentDomain.getName(),
-                domainFullName));
-        try {
-            erDomain.setParentDomain(parentDomain);
-        } catch (InvalidEditingException e) {
-            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
-                TransactionManager.abortTransaction();
-                log_error(Messages.getMessage(
-                        "log.error.overwrite_parent_domain_domain.parameter_error", domainFullName));
-                throw new ApplicationException(e);
-            }
-            throw e;
-        } catch (ApplicationException e) {
-            TransactionManager.abortTransaction();
-            throw e;
-        }
-    }
-
-    private boolean isNeedChangeParentDomain(IERDomain erDomain, Domain domain) {
-        IElement container = erDomain.getContainer();
-        if ((container == null || !(container instanceof IERDomain))
-                && StringUtils.isEmpty(domain.getParentDomain())) {
-            return false;
-        }
-        if (container != null
-                && !isNeedChangeValue(
-                        new ERDomainOperations().getFullLogicalName((IERDomain) container,
-                                domain.getNamespaceSeparator()), domain.getParentDomain())) {
-            return false;
-        }
-        return true;
     }
 
     void overwriteLengthPrecision(IERDomain domainModel, Domain domain)

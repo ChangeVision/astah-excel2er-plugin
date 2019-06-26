@@ -232,6 +232,12 @@ public class ImportERDomainService {
         }
         String domainFullName = domain.getFullLogicalName();
         IERDatatype dataType = getDataType(domain);
+        if (dataType == null) {
+            log_error(Messages.getMessage(
+                    "log.error.overwrite_datatype_domain.domain_and_parent_empty", domainFullName));
+            aboartTransaction();
+            throw new ApplicationException();
+        }
         logger.debug(String.format("Set Datatype \"%s\" to %s", dataType.getName(),
                 domainFullName));
         try {
@@ -343,6 +349,12 @@ public class ImportERDomainService {
             }
 
             logger.debug(Messages.getMessage("log.create_domain", domainFullName));
+            if (parentERDomain == null && dataType == null) {
+                log_error(Messages.getMessage("log.error.create_domain.datatype_empty",
+                        domainFullName));
+                aboartTransaction();
+                throw new ApplicationException();
+            }
             IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
                     domain.getLogicalName(), domain.getPhysicalName(), dataType);
             if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {

@@ -131,9 +131,15 @@ public class ImportERModelService {
 
 					setEditablePropertyUsingDomain(attr, attrModel);
 				} else {
-					IERDatatype dataType = dataTypeFinder.find(attr
-							.getDataType());
+                    final String dataTypeName = attr.getDataType();
+                    IERDatatype dataType = dataTypeFinder.find(dataTypeName);
 					if (dataType == null) {
+                        if (dataTypeName == null) {
+                            log_error(Messages.getMessage("log.error.create_entity.datatype_empty",
+                                    attr.getLogicalName()));
+                            aboartTransaction();
+                            throw new ApplicationException();
+                        }
 						logger.debug(Messages.getMessage("log.create.datatype",
 								attr.getDataType()));
 						dataType = createDataType(editor, erModel,

@@ -152,7 +152,6 @@ public class ImportERModelService {
 
 			}
 			projectAccessor.getTransactionManager().endTransaction();
-            result.inclementImportedElementsCount();
 			return entityModel;
 		} catch (ClassNotFoundException e) {
 			log_error(Messages.getMessage("log.error.create_entity",

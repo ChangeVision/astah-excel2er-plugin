@@ -83,7 +83,6 @@ public class ImportERModelService {
 
 	private void log_error(String message) {
 		logger.error(message);
-		log_append(message);
 		result.setErrorOccured(true);
 	}
 

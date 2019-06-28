@@ -319,7 +319,6 @@ public class ImportERDomainService {
 
 	private void log_error(String message) {
 		logger.error(message);
-		log_append(message);
 		result.setErrorOccured(true);
 	}
 	
@@ -364,7 +363,7 @@ public class ImportERDomainService {
 			
 			projectAccessor.getTransactionManager().endTransaction();
             result.inclementImportedElementsCount();
-            log_info(Messages.getMessage("log.create_domain_end", domainFullName));
+            logger.debug(Messages.getMessage("log.create_domain_end", domainFullName));
 			return domainModel;
 		} catch (ClassNotFoundException e) {
             log_error(

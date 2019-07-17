@@ -17,6 +17,7 @@ import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IEREntity;
 import com.change_vision.jude.api.inf.model.IERModel;
+import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
@@ -50,6 +51,7 @@ public class ImportERModelService {
 
 		init();
 
+        logger.info("######## Start ########");
 		ParseExcelToEntityModelService parseService = new ParseExcelToEntityModelService();
 
 		List<Entity> entities = parseService.parse(configuration);
@@ -64,6 +66,7 @@ public class ImportERModelService {
 						entityName));
 			}
 		}
+        logger.info("######## Finish ########");
 
 		return result;
 	}
@@ -80,7 +83,6 @@ public class ImportERModelService {
 
 	private void log_error(String message) {
 		logger.error(message);
-		log_append(message);
 		result.setErrorOccured(true);
 	}
 
@@ -106,6 +108,7 @@ public class ImportERModelService {
 					.findElements(IERModel.class);
 			IERModel erModel = null;
 			if (candidate == null || candidate.length == 0) {
+                logger.debug("Create ER Model");
 				erModel = editor.createERModel(projectAccessor.getProject(),
 						"ER Model");
 			} else {
@@ -127,9 +130,15 @@ public class ImportERModelService {
 
 					setEditablePropertyUsingDomain(attr, attrModel);
 				} else {
-					IERDatatype dataType = dataTypeFinder.find(attr
-							.getDataType());
+                    final String dataTypeName = attr.getDataType();
+                    IERDatatype dataType = dataTypeFinder.find(dataTypeName);
 					if (dataType == null) {
+                        if (dataTypeName == null) {
+                            log_error(Messages.getMessage("log.error.create_entity.datatype_empty",
+                                    attr.getLogicalName()));
+                            aboartTransaction();
+                            throw new ApplicationException();
+                        }
 						logger.debug(Messages.getMessage("log.create.datatype",
 								attr.getDataType()));
 						dataType = createDataType(editor, erModel,
@@ -143,7 +152,6 @@ public class ImportERModelService {
 
 			}
 			projectAccessor.getTransactionManager().endTransaction();
-            result.inclementImportedElementsCount();
 			return entityModel;
 		} catch (ClassNotFoundException e) {
 			log_error(Messages.getMessage("log.error.create_entity",
@@ -210,38 +218,77 @@ public class ImportERModelService {
 	private void setEditablePropertyUsingDomain(Attribute attr,
 			IERAttribute attrModel) throws InvalidEditingException {
 
+        String entityName = getEntityName(attrModel);
+        String attrName = attrModel.getName();
+        logger.debug(String.format("Set PhysicalName \"%s\" to %s::%s}", attr.getPhysicalName(),
+                entityName, attrName));
 		attrModel.setPhysicalName(attr.getPhysicalName());
-		
+
+        logger.debug(String.format("Set PrimaryKey \"%s\" to %s::%s", attr.isPrimaryKey(),
+                entityName, attrName));
 		attrModel.setPrimaryKey(attr.isPrimaryKey());
 		if(attr.isPrimaryKey()){
+            logger.debug(String.format("Set NotNull \"%b\" to %s::%s", true, entityName, attrName));
 			attrModel.setNotNull(true);
 		}
 
-		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
+        if (StringUtils.isNotEmpty(attr.getDefaultValue())) {
+            logger.debug(String.format("Set DefaultValue \"%s\" to %s::%s", attr.getDefaultValue(),
+                    entityName, attrName));
 			attrModel.setDefaultValue(attr.getDefaultValue());
+        }
 
-		if (StringUtils.isNotEmpty(attr.getDefinition()))
+        if (StringUtils.isNotEmpty(attr.getDefinition())) {
+            logger.debug(String.format("Set Definition \"%s\" to %s::%s", attr.getDefinition(),
+                    entityName, attrName));
 			attrModel.setDefinition(attr.getDefinition());
+        }
 	}
 
 	private void setAdditionalProperty(Attribute attr, IERAttribute attrModel)
 			throws InvalidEditingException {
 
+        String entityName = getEntityName(attrModel);
+        String attrName = attrModel.getName();
+        logger.debug(String.format("Set PrimaryKey \"%s\" to %s::%s", attr.isPrimaryKey(),
+                entityName, attrName));
 		attrModel.setPrimaryKey(attr.isPrimaryKey());
+
+        boolean notNull;
 		if(attr.isPrimaryKey()){
-			attrModel.setNotNull(true);
+            notNull = true;
 		}else{
-			attrModel.setNotNull(attr.isNotNull());
+            notNull = attr.isNotNull();
 		}
+        logger.debug(String.format("Set NotNull \"%b\" to %s::%s", notNull, entityName, attrName));
+        attrModel.setNotNull(notNull);
 
-		if (StringUtils.isNotEmpty(attr.getDefaultValue()))
+        if (StringUtils.isNotEmpty(attr.getDefaultValue())) {
+            logger.debug(String.format("Set DefaultValue \"%s\" to %s::%s", attr.getDefaultValue(),
+                    entityName, attrName));
 			attrModel.setDefaultValue(attr.getDefaultValue());
+        }
 
-		if (StringUtils.isNotEmpty(attr.getDefinition()))
+        if (StringUtils.isNotEmpty(attr.getDefinition())) {
+            logger.debug(String.format("Set Definition \"%s\" to %s::%s", attr.getDefinition(),
+                    entityName, attrName));
 			attrModel.setDefinition(attr.getDefinition());
+        }
 
-		if (StringUtils.isNotEmpty(attr.getLength()))
-			attrModel.setLengthPrecision(attr.getLength());
+        if (StringUtils.isNotEmpty(attr.getLength())) {
+            logger.debug(String.format("Set LengthPrecision \"%s\" to %s::%s", attr.getLength(),
+                    entityName, attrName));
+            try {
+                attrModel.setLengthPrecision(attr.getLength());
+            } catch (InvalidEditingException e) {
+                IERDatatype dataType = attrModel.getDatatype();
+                logger.debug(
+                        String.format("%s is Invalid LengthPrecision. %s has constraint is %s, %s.",
+                                attr.getLength(), dataType, dataType.getLengthConstraint(),
+                                dataType.getPrecisionConstraint()));
+                throw e;
+            }
+        }
 	}
 
 	private IERAttribute mergeAttribute(ERModelEditor editor,
@@ -269,7 +316,13 @@ public class ImportERModelService {
 
 	private void updateAttribute(Attribute attr, IERDatatype dataType,
 			IERAttribute attribute) throws InvalidEditingException {
+        String entityName = getEntityName(attribute);
+        String attrName = attribute.getName();
+        logger.debug(String.format("Set PhysicalName \"%s\" to %s::%s", attr.getPhysicalName(),
+                entityName, attrName));
 		attribute.setPhysicalName(attr.getPhysicalName());
+        logger.debug(
+                String.format("Set DataType \"%s\" to %s::%s", dataType, entityName, attrName));
 		attribute.setDatatype(dataType);
 	}
 
@@ -302,4 +355,12 @@ public class ImportERModelService {
 			//
 		}
 	}
+
+    private String getEntityName(IERAttribute attrModel) {
+        IElement owner = attrModel.getOwner();
+        if (owner instanceof IEREntity) {
+            return ((IEREntity) owner).getName();
+        }
+        return "";
+    }
 }

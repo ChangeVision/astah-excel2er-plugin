@@ -16,7 +16,6 @@ import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IERDatatype;
 import com.change_vision.jude.api.inf.model.IERDomain;
 import com.change_vision.jude.api.inf.model.IERModel;
-import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 
 import excel2er.Messages;
@@ -27,7 +26,6 @@ import excel2er.models.operation.DomainOperations;
 import excel2er.services.finder.DataTypeFinder;
 import excel2er.services.finder.DomainFinder;
 import excel2er.services.finder.ERModelFinder;
-import excel2er.services.operations.ERDomainOperations;
 
 public class ImportERDomainService {
 	private static final Logger logger = LoggerFactory
@@ -46,6 +44,7 @@ public class ImportERDomainService {
 	public Result importERDomain(DomainConfiguration configuration) {
 		
 		init();
+        logger.info("######## Start ########");
 		
 		ParseExcelToDomainModelService parseService = new ParseExcelToDomainModelService();
 
@@ -79,6 +78,7 @@ public class ImportERDomainService {
 			}
 		}
 		
+        logger.info("######## Finish ########");
 		return result;
 	}
 
@@ -96,7 +96,7 @@ public class ImportERDomainService {
                 return erDomain;
             }
 
-            logger.info(Messages.getMessage("log.overwrite_domain", domainFullName));
+            logger.debug(Messages.getMessage("log.overwrite_domain", domainFullName));
             TransactionManager.beginTransaction();
 
             overwriteLogicalName(erDomain, domain);
@@ -107,13 +107,9 @@ public class ImportERDomainService {
             if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
                 overwriteLengthPrecision(erDomain, domain);
             }
-            if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
-                overwriteParentDomain(erDomain, domain);
-            }
             setAdditionalProperty(configuration, erDomain, domain);
 
             TransactionManager.endTransaction();
-            result.inclementImportedElementsCount();
             log_info(Messages.getMessage("log.overwrite_domain_end", domainFullName));
 
             return erDomain;
@@ -178,11 +174,6 @@ public class ImportERDomainService {
                 return true;
             }
         }
-        if (StringUtils.isNotEmpty(configuration.getParentDomainCol())) {
-            if (isNeedChangeParentDomain(erDomain, domain)) {
-                return true;
-            }
-        }
         if (StringUtils.isNotEmpty(configuration.getDefinitionCol())) {
             if (isNeedChangeDefinition(erDomain, domain)) {
                 return true;
@@ -191,58 +182,39 @@ public class ImportERDomainService {
         return isNeedChangeLogicalName(erDomain, domain) || isNeedChangeDatatype(erDomain, domain);
     }
 
-    void overwriteParentDomain(IERDomain erDomain, Domain domain) throws ClassNotFoundException,
-            ProjectNotFoundException, InvalidEditingException {
-        if (!isNeedChangeParentDomain(erDomain, domain)) {
-            return;
-        }
-        String domainFullName = domain.getFullLogicalName();
-        try {
-            erDomain.setParentDomain(getParentERDomain(domain));
-        } catch (InvalidEditingException e) {
-            if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
-                TransactionManager.abortTransaction();
-                log_error(Messages.getMessage(
-                        "log.error.overwrite_parent_domain_domain.parameter_error", domainFullName));
-                throw new ApplicationException(e);
-            }
-            throw e;
-        } catch (ApplicationException e) {
-            TransactionManager.abortTransaction();
-            throw e;
-        }
-    }
-
-    private boolean isNeedChangeParentDomain(IERDomain erDomain, Domain domain) {
-        IElement container = erDomain.getContainer();
-        if ((container == null || !(container instanceof IERDomain))
-                && StringUtils.isEmpty(domain.getParentDomain())) {
-            return false;
-        }
-        if (container != null
-                && !isNeedChangeValue(
-                        new ERDomainOperations().getFullLogicalName((IERDomain) container,
-                                domain.getNamespaceSeparator()), domain.getParentDomain())) {
-            return false;
-        }
-        return true;
-    }
-
     void overwriteLengthPrecision(IERDomain domainModel, Domain domain)
             throws InvalidEditingException {
         if (!isNeedChangeLengthPrecision(domainModel, domain)) {
             return;
         }
         String lengthPrecision = StringUtils.defaultString(domain.getLengthAndPrecision());
+        String fullLogicalName = domain.getFullLogicalName();
+        logger.debug(String.format("Set LengthPrecision \"%s\" to %s", lengthPrecision,
+                fullLogicalName));
         try {
             domainModel.setLengthPrecision(lengthPrecision);
         } catch (InvalidEditingException e) {
         if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
-                TransactionManager.abortTransaction();
-                log_error(Messages.getMessage(
-                        "log.error.set_length_and_precision_domain.parameter_error",
-                        domain.getFullLogicalName()));
-                throw new ApplicationException(e);
+                try {
+                    log_error(Messages.getMessage(
+                            "log.error.set_length_and_precision_domain.parameter_error",
+                            fullLogicalName));
+                    IERDatatype dataType = getDataTypeForLog(domainModel);
+                    if (dataType != null) {
+                        logger.debug(String.format(
+                                "%s is Invalid LengthPrecision. %s has constraint is %s, %s.",
+                                lengthPrecision, dataType.getName(), dataType.getLengthConstraint(),
+                                dataType.getPrecisionConstraint()));
+                    } else {
+                        logger.debug(String.format(
+                                "%s is Invalid LengthPrecision.",
+                                lengthPrecision));
+                    }
+                    
+                    throw new ApplicationException(e);
+                } finally {
+                    TransactionManager.abortTransaction();
+                }
             }
             throw e;
         }
@@ -258,8 +230,17 @@ public class ImportERDomainService {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
+        IERDatatype dataType = getDataType(domain);
+        if (dataType == null) {
+            log_error(Messages.getMessage(
+                    "log.error.overwrite_datatype_domain.domain_and_parent_empty", domainFullName));
+            aboartTransaction();
+            throw new ApplicationException();
+        }
+        logger.debug(String.format("Set Datatype \"%s\" to %s", dataType.getName(),
+                domainFullName));
         try {
-            erDomain.setDatatype(getDataType(domain));
+            erDomain.setDatatype(dataType);
         } catch (InvalidEditingException e) {
             if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
                 TransactionManager.abortTransaction();
@@ -280,8 +261,11 @@ public class ImportERDomainService {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
+        String physicalName = domain.getPhysicalName();
+        logger.debug(String.format("Set PhysicalName \"%b\" to %s", physicalName,
+                domainFullName));
         try {
-            erDomain.setPhysicalName(domain.getPhysicalName());
+            erDomain.setPhysicalName(physicalName);
         } catch (InvalidEditingException e) {
             if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
                 TransactionManager.abortTransaction();
@@ -302,8 +286,11 @@ public class ImportERDomainService {
             return;
         }
         String domainFullName = domain.getFullLogicalName();
+        String logicalName = domain.getLogicalName();
+        logger.debug(String.format("Set LogicalName \"%s\" to %s", logicalName,
+                domainFullName));
         try {
-            erDomain.setLogicalName(domain.getLogicalName());
+            erDomain.setLogicalName(logicalName);
         } catch (InvalidEditingException e) {
             if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
                 TransactionManager.abortTransaction();
@@ -331,7 +318,6 @@ public class ImportERDomainService {
 
 	private void log_error(String message) {
 		logger.error(message);
-		log_append(message);
 		result.setErrorOccured(true);
 	}
 	
@@ -360,6 +346,13 @@ public class ImportERDomainService {
                 parentERDomain = getParentERDomain(domain);
             }
 
+            logger.debug(Messages.getMessage("log.create_domain", domainFullName));
+            if (parentERDomain == null && dataType == null) {
+                log_error(Messages.getMessage("log.error.create_domain.datatype_empty",
+                        domainFullName));
+                aboartTransaction();
+                throw new ApplicationException();
+            }
             IERDomain domainModel = editor.createERDomain(erModel, parentERDomain,
                     domain.getLogicalName(), domain.getPhysicalName(), dataType);
             if (StringUtils.isNotEmpty(configuration.getLengthAndPrecisionCol())) {
@@ -367,11 +360,8 @@ public class ImportERDomainService {
             }
             setAdditionalProperty(configuration, domainModel, domain);
 			
-            logger.info(Messages.getMessage("log.create_domain", domainFullName));
-			
 			projectAccessor.getTransactionManager().endTransaction();
-            result.inclementImportedElementsCount();
-            log_info(Messages.getMessage("log.create_domain_end", domainFullName));
+            logger.debug(Messages.getMessage("log.create_domain_end", domainFullName));
 			return domainModel;
 		} catch (ClassNotFoundException e) {
             log_error(
@@ -441,24 +431,39 @@ public class ImportERDomainService {
         }
         ProjectAccessor projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
         ERModelEditor editor = projectAccessor.getModelEditorFactory().getERModelEditor();
+        logger.debug("Create ER Model");
         return editor.createERModel(projectAccessor.getProject(), "ER Model");
     }
 
     private IERDatatype getDataType(Domain domain) throws ProjectNotFoundException,
             ClassNotFoundException, InvalidEditingException {
-        if (StringUtils.isEmpty(domain.getDataType())) {
+        String dataTypeName = domain.getDataType();
+        if (StringUtils.isEmpty(dataTypeName)) {
             return null;
         }
-        IERDatatype dataType = new DataTypeFinder().find(domain.getDataType());
+        IERDatatype dataType = new DataTypeFinder().find(dataTypeName);
         if (dataType != null) {
             return dataType;
         }
-        logger.debug(Messages.getMessage("log.create.datatype", domain.getDataType()));
+        logger.debug(Messages.getMessage("log.create.datatype", dataTypeName));
         ProjectAccessor projectAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
         ERModelEditor editor = projectAccessor.getModelEditorFactory().getERModelEditor();
-        return createDataType(editor, getERModel(), domain.getDataType());
+        return createDataType(editor, getERModel(), dataTypeName);
     }
-	
+
+    private IERDatatype getDataTypeForLog(IERDomain domainModel) {
+        IERDatatype dataType = null;
+        String dataTypeName = domainModel.getDatatypeName();
+        try {
+             dataType = new DataTypeFinder().find(dataTypeName);
+        } catch (ProjectNotFoundException e) {
+            //
+        } catch (ClassNotFoundException e) {
+            //
+        }
+        return dataType;
+    }
+
 	private IERDatatype createDataType(ERModelEditor editor,IERModel erModel, String dataType) throws InvalidEditingException {
 		return editor.createERDatatype(erModel, dataType);
 	}
@@ -483,13 +488,17 @@ public class ImportERDomainService {
         if (!isNeedChangeDefinition(domainModel, domain)) {
             return;
         }
+        String definition = StringUtils.defaultString(domain.getDefinition());
+        String fullLogicalName = domain.getFullLogicalName();
+        logger.debug(String.format("Set Definition \"%s\" to %s", definition,
+               fullLogicalName));
         try {
-            domainModel.setDefinition(StringUtils.defaultString(domain.getDefinition()));
+            domainModel.setDefinition(definition);
         } catch (InvalidEditingException e) {
             if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
                 TransactionManager.abortTransaction();
                 log_error(Messages.getMessage("log.error.set_definition_domain.parameter_error",
-                        domain.getFullLogicalName()));
+                        fullLogicalName));
                 throw new ApplicationException(e);
             }
             throw e;
@@ -504,7 +513,10 @@ public class ImportERDomainService {
         if (!isNeedChangeNotNull(domainModel, domain)) {
             return;
         }
-        domainModel.setNotNull(domain.getNotNull());
+        boolean notNull = domain.getNotNull();
+        logger.debug(String.format("Set NotNull \"%s\" to %s", notNull,
+                domain.getFullLogicalName()));
+        domainModel.setNotNull(notNull);
     }
 
     private boolean isNeedChangeNotNull(IERDomain domainModel, Domain domain) {
@@ -512,15 +524,34 @@ public class ImportERDomainService {
     }
 
     void setLengthPrecision(IERDomain domainModel, Domain domain) throws InvalidEditingException {
-        if (StringUtils.isNotEmpty(domain.getLengthAndPrecision())) {
+        String lengthAndPrecision = domain.getLengthAndPrecision();
+        if (StringUtils.isNotEmpty(lengthAndPrecision)) {
+            String fullLogicalName = domain.getFullLogicalName();
+            logger.debug(String.format("Set LengthPrecision \"%s\" to %s",
+                    lengthAndPrecision, fullLogicalName));
             try {
-                domainModel.setLengthPrecision(domain.getLengthAndPrecision());
+                domainModel.setLengthPrecision(lengthAndPrecision);
             } catch (InvalidEditingException e) {
                 if (StringUtils.equals(e.getKey(), InvalidEditingException.PARAMETER_ERROR_KEY)) {
-                    TransactionManager.abortTransaction();
-                    log_error(Messages.getMessage("log.error.set_length_and_precision_domain.parameter_error",
-                            domain.getFullLogicalName()));
-                    throw new ApplicationException(e);
+                    try {
+                        log_error(Messages.getMessage(
+                                "log.error.set_length_and_precision_domain.parameter_error",
+                                fullLogicalName));
+                        IERDatatype dataType = getDataTypeForLog(domainModel);
+                        if (dataType != null) {
+                            logger.debug(String.format(
+                                    "%s is Invalid LengthPrecision. %s has constraint is %s, %s.",
+                                    lengthAndPrecision, dataType.getName(),
+                                    dataType.getLengthConstraint(),
+                                    dataType.getPrecisionConstraint()));
+                        } else {
+                            logger.debug(String.format("%s is Invalid LengthPrecision.",
+                                    lengthAndPrecision));
+                        }
+                        throw new ApplicationException(e);
+                    } finally {
+                        aboartTransaction();
+                    }
                 }
                 throw e;
             }
@@ -531,7 +562,10 @@ public class ImportERDomainService {
         if (!isNeedChangeAlias2(domainModel, domain)) {
             return;
         }
-        domainModel.setAlias2(domain.getAlias2());
+        String alias2 = domain.getAlias2();
+        logger.debug(String.format("Set Alias2 \"%s\" to %s", alias2,
+                domain.getFullLogicalName()));
+        domainModel.setAlias2(alias2);
     }
 
     private boolean isNeedChangeAlias2(IERDomain domainModel, Domain domain) {
@@ -542,7 +576,10 @@ public class ImportERDomainService {
         if (!isNeedChangeAlias1(domainModel, domain)) {
             return;
         }
-        domainModel.setAlias1(domain.getAlias1());
+        String alias1 = domain.getAlias1();
+        logger.debug(String.format("Set Alias1 \"%s\" to %s", alias1,
+                domain.getFullLogicalName()));
+        domainModel.setAlias1(alias1);
     }
 
     private boolean isNeedChangeAlias1(IERDomain domainModel, Domain domain) {

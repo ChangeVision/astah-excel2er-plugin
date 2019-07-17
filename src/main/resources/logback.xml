@@ -22,7 +22,7 @@
         </triggeringPolicy>
         <encoder>
             <charset>UTF-8</charset>
-            <Pattern>%d [%t] %C &lt;%level&gt; - %m%n</Pattern>
+            <Pattern>%d %-8(&lt;%level&gt;) %msg \(%c{0}.%M\(\):%L\) %n</Pattern>
         </encoder>
     </appender>
 

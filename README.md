@@ -3,7 +3,7 @@ Excel-ERModel Import Plugin
 
 Version
 ----------------
-1.1.0 (Released on 2016/9/28)
+1.2.0 (Released on 2019/7/22)
 
 Available for
 ----------------
@@ -43,7 +43,7 @@ In case there is already an existing ER Domain Model that matches with the infor
 
 How to install
 ----------------
-0. [Download the .jar file.](http://astah.change-vision.com/plugins/excel2er/1.0.2.html)
+0. [Download the .jar file.](http://astah.change-vision.com/plugins/excel2er/1.2.0.html)
 1. Start Astah Professional
 2. Install the plug-in at the Plugin List Dialog ([help]-[Plugin List] menu)
 3. You find that the [Import ER models from Excel] has been added under the [Tool] - [ER Diagram] menu
@@ -58,7 +58,7 @@ How to build
 
 License
 ---------------
-Copyright 2014 Change Vision, Inc.
+Copyright 2014-2019 Change Vision, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.

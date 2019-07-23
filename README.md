@@ -3,7 +3,7 @@ Excel-ERModel Import Plugin
 
 Version
 ----------------
-1.1.0 (Released on 2016/9/28)
+1.2.0 (Released on 2019/7/22)
 
 Available for
 ----------------
@@ -15,35 +15,32 @@ This Plugin enables you to import items on Excel into Astah as ER models.
 
 Features
 --------------------
-* Import ER Entity Models via Excel file
-   Following items on Excel file can be imported as ER Entity models into Astah Professional (http://astah.net/editions/professional).
-   
- * Entity
-  * Logical Name
-  * Physical Name
- * Attribute
-  * Logical Name
-  * Physical Name
-  * Primary Key (When any value exists in the cell specified as Primary Key)
-  * NOT NULL (When any value exists in the cell specified as Not NULL) 
-  * Default Value
-  * Data Type (If there are any Data Types in excel that are unknown to Astah, it will be added to Astah automatically. To see added Data Types,  go to [Tool] - [ER Diagram] - [Set ER Data Type].)
-  * Length/Precision
-  * Definition
+
+* Import ER Entity Models via Excel file<br>Following items on Excel file can be imported as ER Entity models into Astah Professional (http://astah.net/editions/professional).
+   * Entity
+      * Logical Name
+      * Physical Name
+   * Attribute
+      * Logical Name
+      * Physical Name
+      * Primary Key (When any value exists in the cell specified as Primary Key)
+      * NOT NULL (When any value exists in the cell specified as Not NULL) 
+      * Default Value
+      * Data Type (If there are any Data Types in excel that are unknown to Astah, it will be added to Astah automatically. To see added Data Types,  go to [Tool] - [ER Diagram] - [Set ER Data Type].)
+      * Length/Precision
+      * Definition
 
 In case there is already an existing ER Domain Model that matches with the information of specified Attribute in Excel "Logical Name, Physical Name, Data Type, Length/Precision and NOT NULL", its existing ER Domain will be used as the Attribute's Domain.
 
-* Import ER Domain models via Excel file
- Following items on Excel file can be imported as ER Domain models into Astah Professional (http://astah.net/editions/professional)
-
- * Logical Name
- * Physical Name
- * Data Type
- * Definition
+* Import ER Domain models via Excel file<br>Following items on Excel file can be imported as ER Domain models into Astah Professional (http://astah.net/editions/professional)
+   * Logical Name
+   * Physical Name
+   * Data Type
+   * Definition
 
 How to install
 ----------------
-0. [Download the .jar file.](http://astah.change-vision.com/plugins/excel2er/1.0.2.html)
+0. [Download the .jar file.](http://astah.change-vision.com/plugins/excel2er/1.2.0.html)
 1. Start Astah Professional
 2. Install the plug-in at the Plugin List Dialog ([help]-[Plugin List] menu)
 3. You find that the [Import ER models from Excel] has been added under the [Tool] - [ER Diagram] menu
@@ -58,7 +55,7 @@ How to build
 
 License
 ---------------
-Copyright 2014 Change Vision, Inc.
+Copyright 2014-2019 Change Vision, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.

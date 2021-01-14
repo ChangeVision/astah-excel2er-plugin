@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -69,7 +70,7 @@ public class ParserUtils {
 					ExceptionUtils.getRootCauseMessage(e)), e);
 		} catch (InvalidFormatException e) {
 			throw new ApplicationException(e);
-		} catch (IOException e) {
+        } catch (IOException|EmptyFileException e) {
 			throw new ApplicationException(
 					Messages.getMessage("error.file_notfound"));
 		} finally {

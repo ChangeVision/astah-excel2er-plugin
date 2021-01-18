@@ -47,14 +47,14 @@ public class InputFilePanelTest {
 			throws Exception {
 		panelFixture.button(InputFilePanel.ReferenceButton.NAME).click();
 
-		String expectedFilePath = this.getClass()
-				.getResource("entityListModel.xls").getFile();
+        File expectedFilePath = new File(
+                this.getClass().getResource("entityListModel.xls").getFile());
 
 		panelFixture.fileChooser().requireEnabled();
-		panelFixture.fileChooser().selectFile(new File(expectedFilePath));
+        panelFixture.fileChooser().selectFile(expectedFilePath);
 		panelFixture.fileChooser().approve();
 
-		assertThat(panelFixture.textBox().text(), is(expectedFilePath));
+        assertThat(new File(panelFixture.textBox().text()), is(expectedFilePath));
 	}
 
 	@Test

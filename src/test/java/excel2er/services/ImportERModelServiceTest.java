@@ -351,7 +351,7 @@ public class ImportERModelServiceTest {
 		assertThat(actualAttr.getLengthPrecision(),is("20"));
 		assertThat(actualAttr.getDefaultValue(),is("100"));
 		assertThat(actualAttr.isNotNull(),is(true));
-		assertThat(actualAttr.getDefinition(),is(""));
+        assertThat(actualAttr.getDefinition(), is("1111"));
 		assertThat(actualAttr.isPrimaryKey(),is(false));
 	}
 	

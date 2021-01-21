@@ -483,7 +483,7 @@ public class AcceptanceEREntityImportTest {
 		assertThat(entity.getPrimaryKeys()[1].isNotNull(), is(true));
 		assertThat(entity.getPrimaryKeys()[1].getDatatype().getName(),
 				is("INT"));
-		assertThat(entity.getPrimaryKeys()[1].getLengthPrecision(), is("30"));
+		assertThat(entity.getPrimaryKeys()[1].getLengthPrecision(), is(""));
 
 		assertThat(entity.getNonPrimaryKeys().length, is(4));
 

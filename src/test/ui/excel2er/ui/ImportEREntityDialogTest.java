@@ -185,7 +185,6 @@ public class ImportEREntityDialogTest {
 	@Test
 	public void show_normal_result() throws Exception {
 		Result result = new Result();
-        result.inclementImportedElementsCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(false);
 		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);
@@ -195,7 +194,6 @@ public class ImportEREntityDialogTest {
 	@Test
 	public void show_normal_result_with_error() throws Exception {
 		Result result = new Result();
-        result.inclementImportedElementsCount();
 		result.appendMessage("aaaa\nbbbbb\nccccc");
 		result.setErrorOccured(true);
 		target.showResultDialog(ImportDialogBase.Status.NORMAL, result);

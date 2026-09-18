@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.poi.POIXMLException;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;

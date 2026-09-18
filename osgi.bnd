@@ -2,4 +2,12 @@
 # Use this file to add customized Bnd instructions for the bundle
 #-----------------------------------------------------------------
 
-Import-Package: *;resolution:=optional
+# log4j-api (POI 5) uses OsgiServiceLocator → BundleRevision when running inside Felix.
+# Keep these mandatory so they wire to the framework; everything else stays optional.
+Import-Package: \
+ org.osgi.framework,\
+ org.osgi.framework.wiring,\
+ *;resolution:=optional
+# Keep "." for plugin classes; append log4j (excluded from bnd analyzer via excludeDependencies).
+# Embed-Dependency will further append poi and other jars.
+Bundle-ClassPath: .,log4j-api-2.24.3.jar

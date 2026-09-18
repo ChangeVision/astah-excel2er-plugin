@@ -7,11 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.EmptyFileException;
-import org.apache.poi.POIXMLException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -48,45 +44,20 @@ public class ParserUtils {
 	}
 
 	public static Workbook getWorkbook(ConfigurationBase configuration) {
-		NPOIFSFileSystem npoifs = null;
-		OPCPackage pkg = null;
-
 		File inputFile = new File(configuration.getInputFilePath());
-		Workbook workbook = null;
 		try {
-			try {
-				npoifs = new NPOIFSFileSystem(inputFile);
-				workbook = WorkbookFactory.create(npoifs);
-			} catch (OfficeXmlFileException ofe) {
-				pkg = OPCPackage.open(inputFile);
-				workbook = WorkbookFactory.create(pkg);
-			}
+            Workbook workbook = WorkbookFactory.create(inputFile);
 			formulaEvaluator = workbook.getCreationHelper()
 					.createFormulaEvaluator();
-
+            return workbook;
 		} catch (POIXMLException e) {
 			throw new ApplicationException(Messages.getMessage(
 					"error.poi.exception",
 					ExceptionUtils.getRootCauseMessage(e)), e);
-		} catch (InvalidFormatException e) {
-			throw new ApplicationException(e);
-        } catch (IOException|EmptyFileException e) {
+		} catch (IOException|EmptyFileException e) {
 			throw new ApplicationException(
 					Messages.getMessage("error.file_notfound"));
-		} finally {
-			try {
-				if (npoifs != null) {
-					npoifs.close();
-				}
-				if (pkg != null) {
-					pkg.close();
-				}
-			} catch (IOException e) {
-				logger.error("error occur when close resource", e);
-			}
 		}
-
-		return workbook;
 	}
 
 	public static String getCellValue(Sheet sheet, int refRow, String refCol) {
@@ -136,20 +107,20 @@ public class ParserUtils {
 		Object value = null;
 		CellValue cellValue = formulaEvaluator.evaluate(cell);
 		switch (cellValue.getCellType()) {
-		case Cell.CELL_TYPE_BLANK:
-		case Cell.CELL_TYPE_ERROR:
+        case BLANK:
+        case ERROR:
 			break;
-		case Cell.CELL_TYPE_BOOLEAN:
+        case BOOLEAN:
 			value = cell.getBooleanCellValue();
 			break;
-		case Cell.CELL_TYPE_NUMERIC:
+        case NUMERIC:
 			value = cell.getNumericCellValue();
 			break;
-		case Cell.CELL_TYPE_STRING:
+        case STRING:
 			value = cell.getStringCellValue();
 			break;
-		case Cell.CELL_TYPE_FORMULA:
-			// CELL_TYPE_FORMULA will never happen
+        case FORMULA:
+            // FORMULA will never happen after evaluate
 			break;
 		default:
 			break;
